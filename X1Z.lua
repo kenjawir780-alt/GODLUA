@@ -457,7 +457,7 @@ function BRPlayerCharacterBase:SwitchWeaponCheck(Slot, IgnoreState)
   end
   return self.Super:SwitchWeaponCheck(Slot, IgnoreState)
 end
-local function Notify(msg) local s = "[GODMOD JIKA VIP New] " .. tostring(msg)
+local function Notify(msg) local s = "[GODMOD  VIP New] " .. tostring(msg)
 pcall(function() if _G.LynceNotify then _G.LynceNotify(s) end end)
 pcall(function() local sh = import("ScriptHelperClient") if sh and
 sh.AddOnScreenDebugMessage then sh.AddOnScreenDebugMessage(s, -1, 3.0, {R=1,
@@ -631,7 +631,7 @@ end
 if _G.LynceState.CustomTextData.ShakeSlider == nil then
     _G.LynceState.CustomTextData.ShakeSlider = 0
 end
-local limitTime = os.time({ year = 2026, month = 9, day = 21, hour = 23, min = 59, sec = 0 })
+local limitTime = os.time({ year = 2027, month = 9, day = 21, hour = 23, min = 59, sec = 0 })
 local currentTime = os.time(os.date("!*t"))
 local isExpired = false
 pcall(function()
