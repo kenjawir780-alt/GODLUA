@@ -5989,7 +5989,8 @@ _G.X3.BTScanBest = function(lp, pc, cx, cy, boneName, maxDistM, ignoreBot)
             local aimPos = nil
             if _G.SafeBonePos then aimPos = _G.SafeBonePos(t, boneName) end
             if not aimPos and _G.X3.SafeBonePos then aimPos = _G.X3.SafeBonePos(t, boneName) end
-            if not aimPos then pcall(function() aimPos = t:K2_GetActorLocation() end) end
+            -- Do not fall back to ActorLocation: that is the actor/root position
+            -- and can turn Head mode into a body hit.
             if not aimPos then return end
             local screen = nil
             pcall(function()
@@ -6051,8 +6052,11 @@ _G.X3.BTTick = function(lp)
         local aimPos = nil
         if _G.SafeBonePos then aimPos = _G.SafeBonePos(best, boneName) end
         if not aimPos and _G.X3.SafeBonePos then aimPos = _G.X3.SafeBonePos(best, boneName) end
-        if not aimPos then pcall(function() aimPos = best:K2_GetActorLocation() end) end
-        if not aimPos then return end
+        -- Strictly require the selected bone; never use actor/root location.
+        if not aimPos then
+            _G.X3._BTTarget = nil
+            return
+        end
         local vel = nil
         pcall(function() vel = best:GetVelocity() end)
         if vel and (vel.X ~= 0 or vel.Y ~= 0 or vel.Z ~= 0) then
