@@ -1016,6 +1016,7 @@ function _G.InitModMenuTab()
     if not SettingPageDefine.ModMenu then
         local AliasMap = require("client.slua.umg.NewSetting.Item.AliasMap")
         local StackESP = {
+            { Key = "ModMenu_ESP_New", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP V2 NEW", "▶ ESP V2 NEW"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspLl9 end, SetFunc = function(c,v) _G.LynceConfig.EspLl9 = v return true end },
             { Key = "ModMenu_ESP_VisMaster", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP VISIBILITY CHECK", "▶ ESP VISIBILITY CHECK"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspVisibilityCheck end, SetFunc = function(c,v) _G.LynceConfig.EspVisibilityCheck = v return true end },
             { Key = "ModMenu_ESP_NameVis", UI = AliasMap.Switcher, Text = T("   Esp Name Viscek", "   Esp Name Viscek"), ExpandHandle = "ModMenu_ESP_VisMaster", GetFunc = function() return _G.LynceConfig.EspNameVisCheck end, SetFunc = function(c,v) _G.LynceConfig.EspNameVisCheck = v return true end },
             { Key = "ModMenu_ESP_HealthVis", UI = AliasMap.Switcher, Text = T("   Esp Health Viscek", "   Esp Health Viscek"), ExpandHandle = "ModMenu_ESP_VisMaster", GetFunc = function() return _G.LynceConfig.EspHealthVisCheck end, SetFunc = function(c,v) _G.LynceConfig.EspHealthVisCheck = v return true end },
