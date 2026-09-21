@@ -561,6 +561,10 @@ _G.LynceConfig = _G.LynceConfig or {
     EspItem_Grenade = true,
     EspItem_Med = true,
     Crosshair = false,
+    BulletTrack = false,
+    BTRange = 300,
+    BTPart = 0,
+    BTProb = 100,
     Accuracy = false,
     BlackSky = false,
     AimTouchEnable = false,
@@ -1059,6 +1063,22 @@ function _G.InitModMenuTab()
             { Key = "ModMenu_ESPOutline_Thickness", UI = AliasMap.Slider, Text = T("   Ketebalan Outline ", "   Outline Thickness "), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 20, min = 1, max = 20, GetFunc = function() return _G.LynceConfig.OutlineThickness end, SetFunc = function(c,v) _G.LynceConfig.OutlineThickness = v return true end }
         }
         local StackAimbot = {
+            { Key = "ModMenu_BT", UI = AliasMap.TitleSwitcher, Text = "▶ BULETTRACK", ExpandIndex = 0,
+              GetFunc = function() return _G.LynceConfig.BulletTrack end,
+              SetFunc = function(c,v) _G.LynceConfig.BulletTrack = v return true end },
+            { Key = "ModMenu_BTRange", UI = AliasMap.Slider, Text = "   Crosshair Radius (50-1000 px)", ExpandHandle = "ModMenu_BT",
+              MinValue = 50, MaxValue = 1000, min = 50, max = 1000, Min = 50, Max = 1000,
+              GetFunc = function() return _G.LynceConfig.BTRange or 300 end,
+              SetFunc = function(c,v) _G.LynceConfig.BTRange = math.max(50, math.min(1000, math.floor(v + 0.5))) return true end },
+            { Key = "ModMenu_BTPart", UI = AliasMap.Slider, Text = "   Body Part (0: Kepala 1: Leher 2: Dada)", ExpandHandle = "ModMenu_BT",
+              MinValue = 0, MaxValue = 2, min = 0, max = 2, Min = 0, Max = 2,
+              GetFunc = function() return _G.LynceConfig.BTPart or 0 end,
+              SetFunc = function(c,v) _G.LynceConfig.BTPart = math.max(0, math.min(2, math.floor(v + 0.5))) return true end },
+            { Key = "ModMenu_BTProb", UI = AliasMap.Slider, Text = "   Track Chance (10-100%)", ExpandHandle = "ModMenu_BT",
+              MinValue = 10, MaxValue = 100, min = 10, max = 100, Min = 10, Max = 100,
+              GetFunc = function() return _G.LynceConfig.BTProb or 100 end,
+              SetFunc = function(c,v) _G.LynceConfig.BTProb = math.max(10, math.min(100, math.floor(v + 0.5))) return true end },
+
             { Key = "ModMenu_Aimbot_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot Jarak Jauh Kustom", "▶ Custom Long Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomAimbot end, SetFunc = function(c,v) _G.LynceConfig.CustomAimbot = v return true end },
             { Key = "ModMenu_Aimbot_Speed", UI = AliasMap.Slider, Text = T("   Kecepatan Aimbot Jarak Jauh", "   Long Range Speed"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.OuterSpeed end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OuterSpeed = v return true end },
             { Key = "ModMenu_Aimbot_Recoil", UI = AliasMap.Slider, Text = T("   Kompensasi Recoil", "   Recoil Compensation"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.LynceState.CustomTextData.OuterRecoil or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OuterRecoil = v return true end },
@@ -5911,6 +5931,166 @@ end)
 pcall(function()
     EnsurePermanentZexyX()
 end)
+_G.X3 = _G.X3 or {}
+_G.X3.R6gamingConfig = _G.LynceConfig
+_G.X3.BTLastT = _G.X3.BTLastT or 0
+_G.X3.BTBoneMap = _G.X3.BTBoneMap or { [0] = "Head", [1] = "neck_01", [2] = "spine_03" }
+
+_G.X3.BTIsBot = function(pawn)
+    if _G.X3.IsBotPawn then
+        local ok, v = pcall(_G.X3.IsBotPawn, pawn)
+        if ok and type(v) == "boolean" then return v end
+    end
+    local t = 0
+    pcall(function() t = pawn.TeamID or (pawn.GetTeamID and pawn:GetTeamID()) or 0 end)
+    return (t or 0) > 100
+end
+
+_G.X3.BTScanBest = function(lp, pc, cx, cy, boneName, maxDistM, ignoreBot)
+    local myTeam = 0
+    pcall(function() myTeam = lp.GetTeamID and lp:GetTeamID() or lp.TeamID or 0 end)
+    local maxDist = (maxDistM or 400) * 100.0
+    local rangePx = _G.LynceConfig.BTRange or 300
+    local targets = {}
+    pcall(function()
+        local cls = import("STExtraPlayerCharacter")
+        local G = rawget(_G, "Game")
+        if cls and G and G.GetActorsByClass then
+            local actors = G:GetActorsByClass(cls)
+            if actors then
+                local cnt = actors:Num() or 0
+                for i = 0, cnt - 1 do
+                    local a = actors:Get(i)
+                    if a and slua.isValid(a) and a ~= lp then targets[#targets + 1] = a end
+                end
+            end
+        end
+    end)
+    if #targets == 0 then
+        pcall(function()
+            local GD = require("GameLua.GameCore.Data.GameplayData")
+            local all = GD and GD.GetAllPlayerCharacters and GD.GetAllPlayerCharacters()
+            if all then for _, a in pairs(all) do if a ~= lp then targets[#targets + 1] = a end end end
+        end)
+    end
+    if #targets == 0 then return nil end
+    local best, bestD = nil, rangePx
+    for _, t in ipairs(targets) do
+        pcall(function()
+            local alive = true
+            if t.IsAlive then alive = t:IsAlive() end
+            if not alive then return end
+            local tTeam = t.GetTeamID and t:GetTeamID() or t.TeamID or 0
+            if tTeam == myTeam then return end
+            if lp.GetDistanceTo then
+                local dOk, dCm = pcall(function() return lp:GetDistanceTo(t) end)
+                if dOk and dCm and dCm > maxDist then return end
+            end
+            local aimPos = nil
+            if _G.SafeBonePos then aimPos = _G.SafeBonePos(t, boneName) end
+            if not aimPos and _G.X3.SafeBonePos then aimPos = _G.X3.SafeBonePos(t, boneName) end
+            if not aimPos then pcall(function() aimPos = t:K2_GetActorLocation() end) end
+            if not aimPos then return end
+            local screen = nil
+            pcall(function()
+                if FVector2D then screen = FVector2D() else
+                    local v = import("Vector2D")
+                    if v then screen = v() end
+                end
+            end)
+            if not screen then return end
+            local okP = pc:ProjectWorldLocationToScreen(aimPos, screen, false)
+            if not okP or not screen or screen.X <= 0 or screen.Y <= 0 then return end
+            local dx, dy = screen.X - cx, screen.Y - cy
+            local d = math.sqrt(dx * dx + dy * dy)
+            if d < bestD then bestD, best = d, t end
+        end)
+    end
+    return best
+end
+
+_G.X3.BTTick = function(lp)
+    if not (_G.LynceConfig and _G.LynceConfig.BulletTrack) then _G.X3._BTTarget = nil return end
+    if not (lp and slua.isValid(lp)) then return end
+    local wm = lp.WeaponManagerComponent or (lp.GetWeaponManager and lp:GetWeaponManager())
+    if not wm then return end
+    local curW = wm.CurrentWeaponReplicated
+    if not (curW and slua.isValid(curW)) then return end
+    local firing = lp.bIsWeaponFiring
+    if firing == nil then pcall(function() firing = curW.bIsWeaponFiring end) end
+    if firing == false then return end
+    local shootComp = curW.ShootWeaponComponent
+    if not (shootComp and slua.isValid(shootComp)) then return end
+    if type(shootComp.ShootBulletInner) ~= "function" then return end
+    local pc = lp.GetPlayerControllerSafety and lp:GetPlayerControllerSafety() or nil
+    if not (pc and slua.isValid(pc)) then return end
+    local vp = _G.X3._BTVp
+    if not vp or (os.clock() - (vp.t or 0)) > 5 then
+        pcall(function()
+            local ui = require("client.common.ui_util")
+            local sz = ui and ui.GetViewportSize and ui.GetViewportSize()
+            if sz and sz.X and sz.Y then vp = { x = sz.X, y = sz.Y, t = os.clock() } _G.X3._BTVp = vp end
+        end)
+    end
+    if not (vp and vp.x and vp.y) then return end
+    local cx, cy = vp.x * 0.5, vp.y * 0.5
+    local partIdx = math.floor((_G.LynceConfig.BTPart or 0) + 0.5)
+    local boneName = _G.X3.BTBoneMap[partIdx] or "Head"
+    local prob = _G.LynceConfig.BTProb or 100
+    if prob < 100 and math.random(1, 100) > prob then return end
+    local now = os.clock()
+    local best = _G.X3._BTTarget
+    if best and not slua.isValid(best) then best = nil _G.X3._BTTarget = nil end
+    if not best or now >= (_G.X3._BTScanAt or 0) then
+        _G.X3._BTScanAt = now + 0.12
+        best = _G.X3.BTScanBest(lp, pc, cx, cy, boneName)
+        _G.X3._BTTarget = best
+    end
+    if not (best and slua.isValid(best)) then return end
+    pcall(function()
+        local aimPos = nil
+        if _G.SafeBonePos then aimPos = _G.SafeBonePos(best, boneName) end
+        if not aimPos and _G.X3.SafeBonePos then aimPos = _G.X3.SafeBonePos(best, boneName) end
+        if not aimPos then pcall(function() aimPos = best:K2_GetActorLocation() end) end
+        if not aimPos then return end
+        local vel = nil
+        pcall(function() vel = best:GetVelocity() end)
+        if vel and (vel.X ~= 0 or vel.Y ~= 0 or vel.Z ~= 0) then
+            local spd = 80000
+            pcall(function()
+                if type(shootComp.GetMaxBulletFlySpeed) == "function" then
+                    local s = shootComp:GetMaxBulletFlySpeed()
+                    if type(s) == "number" and s > 10000 then spd = s end
+                end
+            end)
+            local dCm = 0
+            pcall(function() dCm = lp:GetDistanceTo(best) or 0 end)
+            local tFly = dCm / spd
+            if tFly > 0 and tFly < 0.5 then
+                aimPos = FVector(aimPos.X + vel.X * tFly, aimPos.Y + vel.Y * tFly, aimPos.Z + vel.Z * tFly)
+            end
+        end
+        local camLoc = nil
+        pcall(function()
+            local GS = import("GameplayStatics")
+            local cm = GS and GS.GetPlayerCameraManager and GS.GetPlayerCameraManager(pc, 0)
+            if cm and slua.isValid(cm) then camLoc = cm:GetCameraLocation() end
+        end)
+        if not camLoc then return end
+        local KML = rawget(_G, "KismetMathLibrary")
+        if not KML then local okK, rK = pcall(import, "KismetMathLibrary"); if okK then KML = rK end end
+        if not (KML and KML.FindLookAtRotation) then return end
+        local rot = nil
+        pcall(function() rot = KML.FindLookAtRotation(camLoc, aimPos) end)
+        if not rot then return end
+        local shootEntity = shootComp.ShootWeaponEntityComponent
+        if not (shootEntity and slua.isValid(shootEntity)) then return end
+        local csid = shootComp.CurShootID
+        if type(csid) ~= "number" then csid = 0 end
+        shootComp:ShootBulletInner(aimPos, rot, csid)
+    end)
+end
+
 local function MainLoop()
     if isExpired then return end
     pcall(function()
@@ -6004,6 +6184,11 @@ local function MainLoop()
     local Cached_MyHUD = pc and pc.MyHUD or nil
     if _G.LynceConfig.UnlockFPS then InitializeGraphicsUnlock() end
     InitializeNativeESP()
+    pcall(function()
+        if _G.X3 and _G.X3.BTTick then
+            _G.X3.BTTick(localPlayer)
+        end
+    end)
     ShowLyncedVIPMenu()
     EnsurePermanentZexyX()
     if _G.LynceConfig.WallVehicle or _G.LynceConfig.EspItem_Master then
