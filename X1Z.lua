@@ -3846,7 +3846,26 @@ _G.X3.BTTick = function(lp)
         if not (shootEntity and slua.isValid(shootEntity)) then return end
         local csid = shootComp.CurShootID
         if type(csid) ~= "number" then csid = 0 end
-        shootComp:ShootBulletInner(aimPos, rot, csid)
+        -- Keep BulletTrack isolated from AimTouch camera/control rotation.
+        -- BulletTrack supplies its own projectile rotation, then restores the
+        -- player's current view rotation so it cannot push AimTouch vertically.
+        local savedControlRotation = nil
+        pcall(function()
+            if pc and type(pc.GetControlRotation) == "function" then
+                savedControlRotation = pc:GetControlRotation()
+            end
+        end)
+        local shotOK = pcall(function()
+            shootComp:ShootBulletInner(aimPos, rot, csid)
+        end)
+        if savedControlRotation and pc and type(pc.SetControlRotation) == "function" then
+            pcall(function()
+                pc:SetControlRotation(savedControlRotation, "BulletTrackRestore")
+            end)
+        end
+        if not shotOK then
+            _G.X3._BTTarget = nil
+        end
     end)
 end
 
