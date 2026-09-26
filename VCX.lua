@@ -8537,11 +8537,18 @@ local function FastTick()
     end
 
     if myToken ~= _G.LynceState.LoopToken then return end
-    pcall(MainLoop) 
-    local okTicker, ticker = pcall(require, "common.time_ticker") 
-    if okTicker and ticker and ticker.AddTimerOnce then 
-        ticker.AddTimerOnce(0.01, FastTick) 
-    end 
+
+    -- [STABILITY] Tránh MainLoop chạy chồng khi một frame trước còn xử lý.
+    if not _G.LynceState.MainLoopBusy then
+        _G.LynceState.MainLoopBusy = true
+        pcall(MainLoop)
+        _G.LynceState.MainLoopBusy = false
+    end
+
+    local okTicker, ticker = pcall(require, "common.time_ticker")
+    if okTicker and ticker and ticker.AddTimerOnce then
+        ticker.AddTimerOnce(0.03, FastTick)
+    end
 end
 
 if not isExpired then
@@ -18840,7 +18847,7 @@ local function Tick(dt)
 end
 
 if TXtime_ticker then
-    _G.GODMOD_TimerIndex = TXtime_ticker.AddTimerLoop(0, Tick, -1, 0)
+    _G.GODMOD_TimerIndex = TXtime_ticker.AddTimerLoop(0, Tick, -1, 0.03)
     PLog('[GODMOD] Fast Movement loaded')
 else
     PLog('[GODMOD] ERROR: time_ticker Not Found')
