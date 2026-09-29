@@ -1788,12 +1788,9 @@ local function ShowLyncedVIPMenu()
                     end
                 end)
 
-                -- Register the Settings page immediately while the Skin flag
-                -- is already enabled, so the SKIN category is included.
-                pcall(function()
-                    _G.InitModMenuTab()
-                end)
-
+                -- Do NOT register the Settings page here.
+                -- Step_Welcome() registers it once when the user presses
+                -- ACTIVATE CHEAT, with Skin already enabled.
                 if skinLoadOK then
                     if _G.LynceLang == "EN" then
                         Notify("SKIN SYSTEM LOADED!\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
