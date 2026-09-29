@@ -1718,14 +1718,9 @@ local StackCombat = {
     end
 end
 
-local function ShowLyncedVIPMenu()
+local function ShowLyncedVIPMenu() 
     if _G.LynceMenuAlreadyShown then return end
     if _G.LynceState.MenuStep ~= 0 then return end
-
-    -- Lock the onboarding immediately. This prevents OK/Cancel callbacks
-    -- or another hook from opening the first dialog a second time.
-    _G.LynceMenuAlreadyShown = true
-    _G.LynceState.MenuStep = 1
 
     pcall(function()
         local Msg = require("client.slua.logic.common.logic_common_msg_box")
@@ -1744,6 +1739,7 @@ local function ShowLyncedVIPMenu()
                 if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end
             end, function() end, btn1, btn2)
             _G.LynceState.MenuStep = 99
+            _G.LynceMenuAlreadyShown = true
         end
 
         local function Step_Welcome()
@@ -1778,32 +1774,39 @@ local function ShowLyncedVIPMenu()
             Msg.Show(2, title, content,
             function()
                 _G.EnableLogicModSkin = true
+                if _G.LoadModSkinSystem then _G.LoadModSkinSystem() end
 
-                -- Load Skin first, but do not let a Skin loader exception
-                -- prevent the Settings menu from being registered.
-                local skinLoadOK = false
-                pcall(function()
-                    if _G.LoadModSkinSystem then
-                        skinLoadOK = (_G.LoadModSkinSystem() == true)
-                    end
-                end)
-
-                -- Do NOT register the Settings page here.
-                -- Step_Welcome() registers it once when the user presses
-                -- ACTIVATE CHEAT, with Skin already enabled.
-                if skinLoadOK then
-                    if _G.LynceLang == "EN" then
-                        Notify("SKIN SYSTEM LOADED!\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
-                    else
-                        Notify("SISTEM SKIN BERHASIL DIMUAT!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU -> SKIN.")
-                    end
+                -- Wait until the Skin popup has fully closed before opening
+                -- the next popup. Calling Msg.Show from inside the current
+                -- popup callback can otherwise be ignored by the UI layer.
+                local function OpenWelcome()
+                    Step_Welcome()
                 end
 
-                Step_Welcome()
+                local okTicker, ticker = pcall(require, "common.time_ticker")
+                if okTicker and ticker and ticker.AddTimerOnce then
+                    ticker.AddTimerOnce(0.15, OpenWelcome)
+                elseif _G.SetTimer then
+                    pcall(_G.SetTimer, 0.15, OpenWelcome)
+                else
+                    OpenWelcome()
+                end
             end,
             function()
                 _G.EnableLogicModSkin = false
-                Step_Welcome()
+
+                local function OpenWelcome()
+                    Step_Welcome()
+                end
+
+                local okTicker, ticker = pcall(require, "common.time_ticker")
+                if okTicker and ticker and ticker.AddTimerOnce then
+                    ticker.AddTimerOnce(0.15, OpenWelcome)
+                elseif _G.SetTimer then
+                    pcall(_G.SetTimer, 0.15, OpenWelcome)
+                else
+                    OpenWelcome()
+                end
             end, btn1, btn2)
         end
 
@@ -1897,6 +1900,7 @@ local function ShowLyncedVIPMenu()
             })
         end
 
+        _G.LynceState.MenuStep = 1
         Step_LegalNotice() 
     end)
 end
@@ -9200,7 +9204,8 @@ if not isExpired then
 end
 
 _G.LoadModSkinSystem = function()
-if _G.IsModSkinLoaded then return true end
+if _G.IsModSkinLoaded then return end
+_G.IsModSkinLoaded = true
 -- Bảng map ID phụ kiện gốc ra index array
 _G.BaseAttachToIndex = {
     [201010]=1, [201005]=1, [201004]=1, [201009]=2, [201003]=2, [201002]=2, 
@@ -18875,8 +18880,6 @@ pcall(function()
     end
 end)
 
-_G.IsModSkinLoaded = true
-return true
 end -- KẾT THÚC HÀM LoadModSkinSystem
 -- ==============================================================================
 
