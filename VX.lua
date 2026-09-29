@@ -1781,11 +1781,10 @@ local function ShowLyncedVIPMenu()
 
                 -- Load Skin first, but do not let a Skin loader exception
                 -- prevent the Settings menu from being registered.
-                local skinLoadCalled = false
+                local skinLoadOK = false
                 pcall(function()
                     if _G.LoadModSkinSystem then
-                        _G.LoadModSkinSystem()
-                        skinLoadCalled = true
+                        skinLoadOK = (_G.LoadModSkinSystem() == true)
                     end
                 end)
 
@@ -1795,7 +1794,7 @@ local function ShowLyncedVIPMenu()
                     _G.InitModMenuTab()
                 end)
 
-                if skinLoadCalled then
+                if skinLoadOK then
                     if _G.LynceLang == "EN" then
                         Notify("SKIN SYSTEM LOADED!\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
                     else
@@ -9204,8 +9203,7 @@ if not isExpired then
 end
 
 _G.LoadModSkinSystem = function()
-if _G.IsModSkinLoaded then return end
-_G.IsModSkinLoaded = true
+if _G.IsModSkinLoaded then return true end
 -- Bảng map ID phụ kiện gốc ra index array
 _G.BaseAttachToIndex = {
     [201010]=1, [201005]=1, [201004]=1, [201009]=2, [201003]=2, [201002]=2, 
@@ -18880,6 +18878,8 @@ pcall(function()
     end
 end)
 
+_G.IsModSkinLoaded = true
+return true
 end -- KẾT THÚC HÀM LoadModSkinSystem
 -- ==============================================================================
 
