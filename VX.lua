@@ -1758,6 +1758,17 @@ local function ShowLyncedVIPMenu()
                 else
                     Notify("MENU VIP MOD SUDAH DITAMBAHKAN!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU untuk mengaktifkan/menonaktifkan fitur.")
                 end
+
+                if _G.EnableLogicModSkin == true then
+                    pcall(function()
+                        if _G.LynceLang == "EN" then
+                            Notify("SKIN SYSTEM LOADED!\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
+                        else
+                            Notify("SISTEM SKIN BERHASIL DIMUAT!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU -> SKIN.")
+                        end
+                    end)
+                end
+
                 Step_ScamAlert()
             end, 
             function() end, btn1, btn2)
@@ -1775,15 +1786,6 @@ local function ShowLyncedVIPMenu()
             function()
                 _G.EnableLogicModSkin = true
                 if _G.LoadModSkinSystem then _G.LoadModSkinSystem() end
-
-                -- Show the Settings notification immediately after Skin is loaded.
-                pcall(function()
-                    if _G.LynceLang == "EN" then
-                        Notify("SKIN SYSTEM LOADED!\\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
-                    else
-                        Notify("SISTEM SKIN BERHASIL DIMUAT!\\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU -> SKIN.")
-                    end
-                end)
 
                 Step_Welcome()
             end,
