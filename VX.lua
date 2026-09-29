@@ -1774,38 +1774,12 @@ local function ShowLyncedVIPMenu()
             Msg.Show(2, title, content,
             function()
                 _G.EnableLogicModSkin = true
-                if _G.LoadModSkinSystem then
-                    _G.LoadModSkinSystem()
-                end
-
-                -- Msg.Show callbacks cannot reliably open another Msg.Show
-                -- while the current dialog is still being dismissed.
-                -- This source already uses common.time_ticker, so schedule
-                -- the next popup on the next UI tick instead.
-                pcall(function()
-                    local ticker = require("common.time_ticker")
-                    if ticker and ticker.AddTimerOnce then
-                        ticker.AddTimerOnce(0.4, function()
-                            Step_Welcome()
-                        end)
-                    else
-                        Step_Welcome()
-                    end
-                end)
+                if _G.LoadModSkinSystem then _G.LoadModSkinSystem() end
+                Step_Welcome()
             end,
             function()
                 _G.EnableLogicModSkin = false
-
-                pcall(function()
-                    local ticker = require("common.time_ticker")
-                    if ticker and ticker.AddTimerOnce then
-                        ticker.AddTimerOnce(0.4, function()
-                            Step_Welcome()
-                        end)
-                    else
-                        Step_Welcome()
-                    end
-                end)
+                Step_Welcome()
             end, btn1, btn2)
         end
 
