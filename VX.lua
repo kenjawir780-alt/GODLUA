@@ -1774,59 +1774,38 @@ local function ShowLyncedVIPMenu()
             Msg.Show(2, title, content,
             function()
                 _G.EnableLogicModSkin = true
-                if _G.LoadModSkinSystem then _G.LoadModSkinSystem() end
-
-                -- Wait until the Skin popup has fully closed before opening
-                -- the next popup. Calling Msg.Show from inside the current
-                -- popup callback can otherwise be ignored by the UI layer.
-                local function OpenWelcome()
-                    pcall(Step_Welcome)
+                if _G.LoadModSkinSystem then
+                    _G.LoadModSkinSystem()
                 end
 
-                -- The current Msg.Show must finish closing before another
-                -- Msg.Show is opened. A short delay prevents the second
-                -- popup from being swallowed by the active Skin dialog.
-                local delay = 0.8
-                local scheduled = false
-
-                local okTicker, ticker = pcall(require, "common.time_ticker")
-                if okTicker and ticker and ticker.AddTimerOnce then
-                    scheduled = pcall(ticker.AddTimerOnce, delay, OpenWelcome)
-                end
-
-                if not scheduled and _G.SetTimer then
-                    scheduled = pcall(_G.SetTimer, delay, OpenWelcome)
-                end
-
-                if not scheduled then
-                    OpenWelcome()
-                end
+                -- Msg.Show callbacks cannot reliably open another Msg.Show
+                -- while the current dialog is still being dismissed.
+                -- This source already uses common.time_ticker, so schedule
+                -- the next popup on the next UI tick instead.
+                pcall(function()
+                    local ticker = require("common.time_ticker")
+                    if ticker and ticker.AddTimerOnce then
+                        ticker.AddTimerOnce(0.4, function()
+                            Step_Welcome()
+                        end)
+                    else
+                        Step_Welcome()
+                    end
+                end)
             end,
             function()
                 _G.EnableLogicModSkin = false
 
-                local function OpenWelcome()
-                    pcall(Step_Welcome)
-                end
-
-                -- The current Msg.Show must finish closing before another
-                -- Msg.Show is opened. A short delay prevents the second
-                -- popup from being swallowed by the active Skin dialog.
-                local delay = 0.8
-                local scheduled = false
-
-                local okTicker, ticker = pcall(require, "common.time_ticker")
-                if okTicker and ticker and ticker.AddTimerOnce then
-                    scheduled = pcall(ticker.AddTimerOnce, delay, OpenWelcome)
-                end
-
-                if not scheduled and _G.SetTimer then
-                    scheduled = pcall(_G.SetTimer, delay, OpenWelcome)
-                end
-
-                if not scheduled then
-                    OpenWelcome()
-                end
+                pcall(function()
+                    local ticker = require("common.time_ticker")
+                    if ticker and ticker.AddTimerOnce then
+                        ticker.AddTimerOnce(0.4, function()
+                            Step_Welcome()
+                        end)
+                    else
+                        Step_Welcome()
+                    end
+                end)
             end, btn1, btn2)
         end
 
