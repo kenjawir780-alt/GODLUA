@@ -1107,7 +1107,8 @@ end
 -- ========================================== 
 
 function _G.InitModMenuTab()
-    if _G.ModMenuInitialized and _G.ModMenuRegistered then return true end
+    if _G.ModMenuInitialized then return end
+    _G.ModMenuInitialized = true
 
     -- Fungsi bantuan terjemahan bahasa (Otomatis memilih EN atau VN)
     local function T(vnText, enText)
@@ -1682,22 +1683,8 @@ local StackCombat = {
             Category = menuCategories
         }
         
-        -- Remove any stale copy before registering the current menu.
-        for i = #SettingCatalog, 1, -1 do
-            local page = SettingCatalog[i]
-            if type(page) == "table" and page.Key == "ModMenu" then
-                table.remove(SettingCatalog, i)
-            end
-        end
         table.insert(SettingCatalog, 1, SettingPageDefine.ModMenu)
-        _G.ModMenuRegistered = true
     end
-
-    if not _G.ModMenuRegistered then
-        return false
-    end
-    _G.ModMenuInitialized = true
-    return true
 
     local UIManager = _G.UIManager
     if UIManager and not UIManager._IsModMenuHooked then
@@ -1765,17 +1752,11 @@ local function ShowLyncedVIPMenu()
 
             Msg.Show(1, title, content, 
             function() 
-                local menuOK = false
-                pcall(function()
-                    menuOK = (_G.InitModMenuTab() == true)
-                end)
+                _G.InitModMenuTab()
                 if _G.LynceLang == "EN" then
                     Notify("VIP MOD MENU ADDED!\nOpen Settings (Gear icon) -> VIP MOD MENU to toggle features.")
                 else
                     Notify("MENU VIP MOD SUDAH DITAMBAHKAN!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU untuk mengaktifkan/menonaktifkan fitur.")
-                end
-                if menuOK and _G.EnableLogicModSkin == true then
-                    Notify("SISTEM SKIN BERHASIL DIMUAT!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU -> SKIN.")
                 end
                 Step_ScamAlert()
             end, 
