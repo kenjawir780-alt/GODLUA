@@ -1722,9 +1722,10 @@ local function ShowLyncedVIPMenu()
     if _G.LynceMenuAlreadyShown then return end
     if _G.LynceState.MenuStep ~= 0 then return end
 
-    -- Mark the onboarding as shown before opening the first dialog.
-    -- This prevents callbacks/initialization from reopening the sequence.
+    -- Lock the onboarding immediately. This prevents OK/Cancel callbacks
+    -- or another hook from opening the first dialog a second time.
     _G.LynceMenuAlreadyShown = true
+    _G.LynceState.MenuStep = 1
 
     pcall(function()
         local Msg = require("client.slua.logic.common.logic_common_msg_box")
@@ -1900,7 +1901,6 @@ local function ShowLyncedVIPMenu()
             })
         end
 
-        _G.LynceState.MenuStep = 1
         Step_LegalNotice() 
     end)
 end
@@ -7361,13 +7361,6 @@ local function MainLoop()
 
     if _G.LynceConfig.UnlockFPS then InitializeGraphicsUnlock() end
     InitializeNativeESP()
-    -- Reset only the one-session onboarding state. Saved feature settings
-    -- remain untouched, but the Skin/ESP selection and Settings notification
-    -- can be shown again on a fresh script load.
-    _G.LynceMenuAlreadyShown = nil
-    if _G.LynceState then
-        _G.LynceState.MenuStep = 0
-    end
     ShowLyncedVIPMenu()
 
     -- [GỌI LOGIC DUNGCU] Luôn chạy độc lập không cần công tắc
