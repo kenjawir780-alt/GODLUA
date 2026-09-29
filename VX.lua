@@ -1780,15 +1780,25 @@ local function ShowLyncedVIPMenu()
                 -- the next popup. Calling Msg.Show from inside the current
                 -- popup callback can otherwise be ignored by the UI layer.
                 local function OpenWelcome()
-                    Step_Welcome()
+                    pcall(Step_Welcome)
                 end
+
+                -- The current Msg.Show must finish closing before another
+                -- Msg.Show is opened. A short delay prevents the second
+                -- popup from being swallowed by the active Skin dialog.
+                local delay = 0.8
+                local scheduled = false
 
                 local okTicker, ticker = pcall(require, "common.time_ticker")
                 if okTicker and ticker and ticker.AddTimerOnce then
-                    ticker.AddTimerOnce(0.15, OpenWelcome)
-                elseif _G.SetTimer then
-                    pcall(_G.SetTimer, 0.15, OpenWelcome)
-                else
+                    scheduled = pcall(ticker.AddTimerOnce, delay, OpenWelcome)
+                end
+
+                if not scheduled and _G.SetTimer then
+                    scheduled = pcall(_G.SetTimer, delay, OpenWelcome)
+                end
+
+                if not scheduled then
                     OpenWelcome()
                 end
             end,
@@ -1796,15 +1806,25 @@ local function ShowLyncedVIPMenu()
                 _G.EnableLogicModSkin = false
 
                 local function OpenWelcome()
-                    Step_Welcome()
+                    pcall(Step_Welcome)
                 end
+
+                -- The current Msg.Show must finish closing before another
+                -- Msg.Show is opened. A short delay prevents the second
+                -- popup from being swallowed by the active Skin dialog.
+                local delay = 0.8
+                local scheduled = false
 
                 local okTicker, ticker = pcall(require, "common.time_ticker")
                 if okTicker and ticker and ticker.AddTimerOnce then
-                    ticker.AddTimerOnce(0.15, OpenWelcome)
-                elseif _G.SetTimer then
-                    pcall(_G.SetTimer, 0.15, OpenWelcome)
-                else
+                    scheduled = pcall(ticker.AddTimerOnce, delay, OpenWelcome)
+                end
+
+                if not scheduled and _G.SetTimer then
+                    scheduled = pcall(_G.SetTimer, delay, OpenWelcome)
+                end
+
+                if not scheduled then
                     OpenWelcome()
                 end
             end, btn1, btn2)
