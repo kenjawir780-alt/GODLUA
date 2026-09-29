@@ -1777,9 +1777,11 @@ local function ShowLyncedVIPMenu()
 
                 -- Load Skin first, but do not let a Skin loader exception
                 -- prevent the Settings menu from being registered.
+                local skinLoadCalled = false
                 pcall(function()
                     if _G.LoadModSkinSystem then
                         _G.LoadModSkinSystem()
+                        skinLoadCalled = true
                     end
                 end)
 
@@ -1789,10 +1791,12 @@ local function ShowLyncedVIPMenu()
                     _G.InitModMenuTab()
                 end)
 
-                if _G.LynceLang == "EN" then
-                    Notify("SKIN SYSTEM LOADED!\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
-                else
-                    Notify("SISTEM SKIN BERHASIL DIMUAT!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU -> SKIN.")
+                if skinLoadCalled then
+                    if _G.LynceLang == "EN" then
+                        Notify("SKIN SYSTEM LOADED!\nOpen Settings (Gear icon) -> VIP MOD MENU -> SKIN.")
+                    else
+                        Notify("SISTEM SKIN BERHASIL DIMUAT!\nBuka Pengaturan (ikon roda gigi) -> VIP MOD MENU -> SKIN.")
+                    end
                 end
 
                 Step_Welcome()
@@ -7354,6 +7358,13 @@ local function MainLoop()
 
     if _G.LynceConfig.UnlockFPS then InitializeGraphicsUnlock() end
     InitializeNativeESP()
+    -- Reset only the one-session onboarding state. Saved feature settings
+    -- remain untouched, but the Skin/ESP selection and Settings notification
+    -- can be shown again on a fresh script load.
+    _G.LynceMenuAlreadyShown = nil
+    if _G.LynceState then
+        _G.LynceState.MenuStep = 0
+    end
     ShowLyncedVIPMenu()
 
     -- [GỌI LOGIC DUNGCU] Luôn chạy độc lập không cần công tắc
