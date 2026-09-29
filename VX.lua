@@ -1718,9 +1718,13 @@ local StackCombat = {
     end
 end
 
-local function ShowLyncedVIPMenu() 
+local function ShowLyncedVIPMenu()
     if _G.LynceMenuAlreadyShown then return end
     if _G.LynceState.MenuStep ~= 0 then return end
+
+    -- Mark the onboarding as shown before opening the first dialog.
+    -- This prevents callbacks/initialization from reopening the sequence.
+    _G.LynceMenuAlreadyShown = true
 
     pcall(function()
         local Msg = require("client.slua.logic.common.logic_common_msg_box")
@@ -1739,7 +1743,6 @@ local function ShowLyncedVIPMenu()
                 if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end
             end, function() end, btn1, btn2)
             _G.LynceState.MenuStep = 99
-            _G.LynceMenuAlreadyShown = true
         end
 
         local function Step_Welcome()
