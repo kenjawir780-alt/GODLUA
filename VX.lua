@@ -9441,7 +9441,7 @@ local ITEMS = {
     1101001103, -- Hóa Thạch - AKM (Cấp 7)
     1101001116, -- Bí Ngô Kinh Dị - AKM (Cấp 7)
     1101001128, -- Long Vương - AKM (Cấp 7)
-    1101001143, -- Hải Tặc Kuning - AKM (Cấp 7)
+    1101001143, -- Hải Tặc Vàng - AKM (Cấp 7)
     1101001154, -- Người Giải Mã - AKM (Cấp 7)
     1101001231, -- Thỏ Tinh Nghịch - AKM (Cấp 7)
     1101001249, -- Thánh Quang (Trăng Thần) - AKM (Cấp 7)
@@ -9453,7 +9453,7 @@ local ITEMS = {
     1101003146, -- Gai Tà Ác - SCAR-L (Cấp 8)
     1101003167, -- Ma Vương Huyết Hồn - SCAR-L (Cấp 8)
     1101003227, -- Thiên Điểu - SCAR-L (Cấp 8)
-    1101003057, -- Senjata nước - SCAR-L (Cấp 7)
+    1101003057, -- Súng nước - SCAR-L (Cấp 7)
     1101003070, -- Bí Ngô Ma Quái - SCAR-L (Cấp 7)
     1101003080, -- Chiến Dịch Vì Ngày Mai - SCAR-L (Cấp 7)
     1101003099, -- Drop Da Bass - SCAR-L (Cấp 7)
@@ -9469,7 +9469,7 @@ local ITEMS = {
     1101008081, -- Vị Khách Nổi Loạn - M762 (Cấp 8)
     1101008104, -- Lõi Sao Huyền Ảo - M762 (Cấp 8)
     1101008146, -- Bạch Cốt U Minh - M762 (Cấp 8)
-    1101008154, -- Panel Xương - M762 (Cấp 8)
+    1101008154, -- Khung Xương - M762 (Cấp 8)
     1101008051, -- Bản Nhạc Tình Yêu - M762 (Cấp 7)
     1101008061, -- Phát Bắn Chí Mạng - M762 (Cấp 7)
     1101008070, -- GACKT MOONSAGA - M762 (Cấp 7)
@@ -9494,7 +9494,7 @@ local ITEMS = {
     1101005098, -- Godzilla Bốc Lửa - Groza (Cấp 7)
     1101005019, -- Kỵ Binh Rừng Sâu - GROZA (Cấp 5)
     1101005025, -- Đêm Huyền Ảo - GROZA (Cấp 5)
-    1101005043, -- Trận Chiến Sắc Warna - Groza (Cấp 5)
+    1101005043, -- Trận Chiến Sắc Màu - Groza (Cấp 5)
     1101005082, -- Lồng Đèn Bí Ngô - Groza (Cấp 5)
     1101005090, -- Di Tích Thượng Cổ - Groza (Cấp 5)
     1101005105, -- Singam Roar - Groza (Cấp 5)
@@ -9509,7 +9509,7 @@ local ITEMS = {
     1101009019, -- Thỏ Tinh Quái - Mk47 (Cấp 3)
     1101010029, -- Xung Nhịp Sân Cỏ - G36C (Cấp 5)
     1101012033, -- Cổ Mộc Chiến Khí - Honey Badger (Cấp 7)
-    1101012009, -- Sắc Warna Huyền Ảo - Honey Badger (Cấp 5)
+    1101012009, -- Sắc Màu Huyền Ảo - Honey Badger (Cấp 5)
     1101012018, -- Thanh Âm Du Dương - Honey Badger (Cấp 5)
     1101012024, -- Honey Badger Mikey (Cấp 5)
     1101100012, -- Đế Vương Thần Vực - FAMAS (Cấp 8)
@@ -9533,7 +9533,7 @@ local ITEMS = {
     1102001103, -- Cam Tươi Mát - UZI (Cấp 5)
     1102001102, -- Máy Ép Trái Cây - UZI (Cấp 5)
     1102002438, -- Song Tử Chiến - UMP45 (Cấp 8)
-    1102002446, -- Song Tử Merah Thẫm - UMP45 (Cấp 8)
+    1102002446, -- Song Tử Đỏ Thẫm - UMP45 (Cấp 8)
     1102002043, -- Hỏa long - UMP45 (Cấp 7)
     1102002061, -- Ảo Mộng Chết Chóc - UMP45 (Cấp 7)
     1102002136, -- Băng Giá - UMP45 (Cấp 7)
@@ -9550,8 +9550,8 @@ local ITEMS = {
     1102003020, -- Nanh Dơi Huyết Tộc - Vector (Cấp 5)
     1102003031, -- Hoa Hồng Đêm - Vector (Cấp 5)
     1102003039, -- Gấu Tinh Nghịch - Vector (Cấp 5)
-    1102003052, -- Bá Tước Kuning - Vector (Cấp 5)
-    1102003065, -- Lưỡi Liềm Kuning - Vector (Cấp 5)
+    1102003052, -- Bá Tước Vàng - Vector (Cấp 5)
+    1102003065, -- Lưỡi Liềm Vàng - Vector (Cấp 5)
     1102003072, -- Sát Thủ Tối Thượng - Vector (Cấp 5)
     1102003090, -- KMF Lancelot - Vector (Cấp 5)
     1102004018, -- Kẹo ngọt - Thompson (Cấp 5)
@@ -9601,13 +9601,13 @@ local ITEMS = {
     1103003087, -- Thanh Hoa Xà - AWM (Cấp 7)
     1103003099, -- Hắc Khí - AWM (Cấp 7)
     1103003092, -- Hồng Hoang - AWM (Cấp 5)
-    1103004037, -- Quý Bà Merah - SKS (Cấp 7)
+    1103004037, -- Quý Bà Đỏ - SKS (Cấp 7)
     1103004046, -- Rừng Thép - SKS (Cấp 5)
     1103004058, -- Năng Lượng Băng Tuyết - SKS (Cấp 5)
     1103004080, -- Khiết Hoa Nở Rộ - SKS (Cấp 5)
     1103004087, -- Giai Điệu Tử Thần - SKS (Cấp 5)
     1103005024, -- Quạ Đen - VSS (Cấp 5)
-    1103005048, -- Trinh Sát Tuyết Putih - VSS (Cấp 3)
+    1103005048, -- Trinh Sát Tuyết Trắng - VSS (Cấp 3)
     1103009022, -- Mùa Hoa Đào - SLR (Cấp 5)
     1103009037, -- Ngọn Lửa Ma Thuật - SLR (Cấp 5)
     1103009051, -- Ma Mộng - SLR (Cấp 5)
@@ -9633,14 +9633,14 @@ local ITEMS = {
     -- [ SHOTGUN & MACHINE GUN (S12K, DBS, M249, DP-28, MG3...) ]
     1104001035, -- Độc Hồn - S686 (Cấp 5)
     1104002022, -- Chạng Vạng - S1897 (Cấp 5)
-    1104002049, -- Xung Kích Sắc Warna - S1897 (Cấp 3)
+    1104002049, -- Xung Kích Sắc Màu - S1897 (Cấp 3)
     1104003026, -- S12K GACKT (Cấp 7)
     1104003037, -- Kích Hoạt Nguyên Tử - S12K (Cấp 5)
     1104003046, -- Trái Tim Cyber - S12K (Cấp 5)
     1104004035, -- Chiến Giáp Quái Thú - DBS (Cấp 5)
     1104004041, -- Sandsinger - DBS (Cấp 5)
     1104004051, -- Okarun - DBS (Cấp 5)
-    1104004024, -- Báo Sắc Warna - DBS (Cấp 3)
+    1104004024, -- Báo Sắc Màu - DBS (Cấp 3)
     1104102004, -- Tàn Tích Hoàng Kim - NS2000 (Cấp 3)
     1105001034, -- Pháo Giáng Sinh - M249 (Cấp 7)
     1105001048, -- Nữ Đế Ánh Sáng - M249 (Cấp 7)
@@ -9650,7 +9650,7 @@ local ITEMS = {
     1105001062, -- Graffiti Đường Phố - M249 (Cấp 5)
     1105001075, -- Cá Mập Thép - M249 (Cấp 4)
     1105002091, -- Huyết Họa - DP28 (Cấp 8)
-    1105002018, -- Sát Thủ Bí Sembunyikan - DP-28 (Cấp 5)
+    1105002018, -- Sát Thủ Bí Ẩn - DP-28 (Cấp 5)
     1105002035, -- Ngọc Long - DP-28 (Cấp 5)
     1105002058, -- Chiến Binh Hàng Hải - DP28 (Cấp 5)
     1105002063, -- Rồng Thần Shenron - DP-28 (Cấp 5)
@@ -9659,12 +9659,12 @@ local ITEMS = {
     1105002083, -- DP-28 Frieren's Staff (Cấp 5)
     1105002096, -- Hồ Tộc - DP-28 (Cấp 3)
     1105010019, -- Chiến Thần Bầu Trời - MG3 (Cấp 7)
-    1105010008, -- Thiên Panel - MG3 (Cấp 5)
+    1105010008, -- Thiên Khung - MG3 (Cấp 5)
     1105010026, -- Mina Ashiro - MG3 (Cấp 5)
 
     -- [ CẬN CHIẾN & VŨ KHÍ KHÁC (Skorpion, Nỏ, Chảo, Dao...) ]
-    1106008013, -- Mật Mã Kuning - Skorpion (Cấp 5)
-    1106008022, -- Bí Sembunyikan Tinh Tú - Skorpion (Cấp 3)
+    1106008013, -- Mật Mã Vàng - Skorpion (Cấp 5)
+    1106008022, -- Bí Ẩn Tinh Tú - Skorpion (Cấp 3)
     1106011008, -- Rồng Rắn Lên Mây - MP7 Kép (Cấp 5)
     1106011003, -- Thợ Săn Kẹo - MP7 (Cấp 3)
     1107001018, -- Chúa Hề Thịnh Nộ - Nỏ (Cấp 3)
@@ -9693,14 +9693,14 @@ local ITEMS = {
     -- ==============================================================================
     -- [ McLaren ]
     1961007, -- McLaren 570S (Đen)
-    1961010, -- McLaren 570S (Putih)
+    1961010, -- McLaren 570S (Trắng)
     1961012, -- McLaren 570S (Hồng)
-    1961013, -- McLaren 570S (Kuning Putih)
-    1961014, -- McLaren 570S (Kuning Đen)
+    1961013, -- McLaren 570S (Vàng Trắng)
+    1961014, -- McLaren 570S (Vàng Đen)
     1961015, -- McLaren 570S (Ánh Kim)
     1961147, -- McLaren P1 (Trời Sao)
     1961148, -- McLaren P1 (Hồng Rực Rỡ)
-    1961149, -- McLaren P1 (Kuning Núi Lửa)
+    1961149, -- McLaren P1 (Vàng Núi Lửa)
     1907054, -- Xe Đua Đội McLaren F1 (Điện Tử)
     1907058, -- Xe Đua Đội McLaren F1
     1907059, -- Xe Đua Đội McLaren F1 (Chiến Thắng)
@@ -9730,8 +9730,8 @@ local ITEMS = {
     1908067, -- Lamborghini Urus Giallo Inti
 
     -- [ Bugatti ]
-    1961041, -- Bugatti Veyron 16.4 (Sắc Warna)
-    1961042, -- Bugatti Veyron 16.4 (Kuning)
+    1961041, -- Bugatti Veyron 16.4 (Sắc Màu)
+    1961042, -- Bugatti Veyron 16.4 (Vàng)
     1961043, -- Bugatti Veyron 16.4
     1961044, -- Bugatti La Voiture Noire
     1961045, -- Bugatti La Voiture Noire (Hợp Kim)
@@ -9763,7 +9763,7 @@ local ITEMS = {
     1961137, -- Bentley Batur (Kim Cương Lấp Lánh)
     1961138, -- Bentley Batur (Tận Cùng Thời Gian)
     1961139, -- Bentley Betayga Azure (Vương Quốc Huyền Ảo)
-    1903200, -- Bentley Flying Spur Mulliner (Tinh Vân Hijau)
+    1903200, -- Bentley Flying Spur Mulliner (Tinh Vân Xanh)
     1903201, -- Bentley Flying Spur Mulliner (Dòng Chảy Vịnh Hẹp)
     1908094, -- Bentley Betayga Azure (Mưa Hoa)
     1908095, -- Bentley Betayga Azure (Đêm Yên Tĩnh)
@@ -9801,26 +9801,26 @@ local ITEMS = {
     1961063, -- Porsche 918 Spyder (964 Bạc Ánh Kim)
     1961064, -- Porsche 918 Spyder (Hồng)
     1903218, -- Porsche Panamera Turbo S (Lam Ngọc)
-    1903219, -- Porsche Panamera Turbo S (Hijau Viper)
+    1903219, -- Porsche Panamera Turbo S (Xanh Viper)
     1908108, -- Porsche Cayenne Turbo GT (Đường Đua Rực Lửa)
     1908109, -- Porsche Cayenne Turbo GT (Cam Dung Nham)
     1915021, -- Porsche 911 Carrera 4 GTS Cabriolet (Ngàn Sao)
-    1915022, -- Porsche 911 Carrera 4 GTS Cabriolet (Merah Ruby)
+    1915022, -- Porsche 911 Carrera 4 GTS Cabriolet (Đỏ Ruby)
 
     -- [ Shelby / Ford ]
-    1961058, -- Shelby 427 Cobra (Hijau & Putih)
+    1961058, -- Shelby 427 Cobra (Xanh & Trắng)
     1961059, -- Shelby 427 Cobra (Graffiti Phục Cổ)
-    1903210, -- Shelby GT500 (Đen & Merah)
+    1903210, -- Shelby GT500 (Đen & Đỏ)
     1903211, -- Shelby GT500 (Người Ngoài Hành Tinh Cyber)
-    1961068, -- Ford Mustang GTD (Huyền Thoại Hijau Tươi)
+    1961068, -- Ford Mustang GTD (Huyền Thoại Xanh Tươi)
     1961069, -- Ford Mustang GTD (Tinh Thần Nước Mỹ)
 
     -- [ Lotus ]
     1961060, -- Lotus Emira (Rừng Sâu Thẫm)
-    1961061, -- Lotus Emira (Lướt Sắc Hijau)
+    1961061, -- Lotus Emira (Lướt Sắc Xanh)
 
     -- [ Apollo ]
-    1961065, -- Apollo EVO (Kuning Rực Rỡ)
+    1961065, -- Apollo EVO (Vàng Rực Rỡ)
     1961066, -- Apollo EVO (Hoàng Hôn)
     1961067, -- Apollo EVO (Băng Giá)
     1903220, -- Apollo Intensa Emozione (Hỏa Ngục Nóng Chảy)
@@ -9832,12 +9832,12 @@ local ITEMS = {
     1961140, -- Ảo Ảnh Hoa Hồng SSC Tuatara
     1961141, -- Hạc Trời SSC Tuatara
     1961142, -- Đao Bình Minh SSC Tuatara Striker
-    1961143, -- Layar Đêm Hijau SSC Tuatara Striker
+    1961143, -- Màn Đêm Xanh SSC Tuatara Striker
 
     -- [ Tesla ]
     1903071, -- Tesla Roadster (Kim Cương)
     1903072, -- Tesla Roadster (Pha Lê Tím)
-    1903073, -- Tesla Roadster (Hijau Biển Cả)
+    1903073, -- Tesla Roadster (Xanh Biển Cả)
 
     -- [ Ducati / Motor VIP ]
     1901073, -- DUCATI Panigale V4S
@@ -9851,13 +9851,13 @@ local ITEMS = {
     -- [ DÙ (Parachutes) ]
     1401000, -- New Years Blessing Parachute
     1401001, -- Happy New Year Parachute
-    1401002, -- Dù Xương Merah
+    1401002, -- Dù Xương Đỏ
     1401003, -- Dù tiểu quỷ tinh nghịch
     1401005, -- Dù nhện biến hình
     1401006, -- Dù Mùa 5
     1401007, -- Dù sinh nhật
-    1401008, -- Dù Sếu Kuning
-    1401009, -- Dù Quỷ Merah
+    1401008, -- Dù Sếu Vàng
+    1401009, -- Dù Quỷ Đỏ
     1401010, -- Dù hoa bách thảo
     1401011, -- Dù anh đào
     1401012, -- Dù Campus Tournament
@@ -9865,7 +9865,7 @@ local ITEMS = {
     1401014, -- Dù chú hề
     1401015, -- Carabao Parachute
     1401016, -- Orange Life Parachute
-    1401017, -- Dù ưng danng
+    1401017, -- Dù ưng vàng
     1401018, -- Dù Quán quân Mùa 8
     1401019, -- Dù Đội trưởng Ryan
     1401020, -- Dù kẻ lang thang
@@ -9879,14 +9879,14 @@ local ITEMS = {
     1401028, -- Dù Quán quân Mùa 7
     1401029, -- Dù sinh nhật rực rỡ
     1401031, -- Dù Quán quân Mùa 6
-    1401032, -- Dù Dao Găm Merah
+    1401032, -- Dù Dao Găm Đỏ
     1401033, -- Dù WALKER
     1401034, -- Dù Phù Thủy Băng Giá
-    1401035, -- Dù pemain thách đấu
+    1401035, -- Dù người thách đấu
     1401036, -- Dù BAPE X PUBGM CAMO
-    1401037, -- Dù Godzilla (Putih)
-    1401038, -- Dù Godzilla (Kuning)
-    1401039, -- Dù Godzilla (Hijau)
+    1401037, -- Dù Godzilla (Trắng)
+    1401038, -- Dù Godzilla (Vàng)
+    1401039, -- Dù Godzilla (Xanh)
     1401040, -- Dù Monarch
     1401041, -- Dù Cà Ri
     1401043, -- Dù Người Gác Đêm
@@ -9918,7 +9918,7 @@ local ITEMS = {
     1401074, -- Dù Bí Ngô Kinh Dị
     1401085, -- Dù Gà Thơm Ngon
     1401086, -- Dù Quán quân Mùa 11
-    1401087, -- Dù Hoa Sen Darah
+    1401087, -- Dù Hoa Sen Máu
     1401088, -- Dù Hành Tinh Trôi Dạt
     1401089, -- Dù Quán Quân Mùa 12
     1401090, -- Dù Ninja Sát Thủ
@@ -9929,7 +9929,7 @@ local ITEMS = {
     1401096, -- Dù Người Phán Quyết
     1401097, -- Dù Africa Pride
     1401098, -- Dù Africa Unite
-    1401100, -- Dù Cậu Kuning
+    1401100, -- Dù Cậu Vàng
     1401102, -- Dù đặc vụ PMSC World Cup
     1401103, -- Dù Quân Đoàn Thất Lạc
     1401104, -- Dù Giải Đấu PMCO
@@ -9955,7 +9955,7 @@ local ITEMS = {
     1401134, -- Dù Tulip
     1401135, -- Dù Ác Ma Cuồng Nộ
     1401137, -- Dù Mùa 14
-    1401138, -- Dù Pro League (Kuning)
+    1401138, -- Dù Pro League (Vàng)
     1401139, -- Dù Pro League (Bạc)
     1401140, -- Dù Lạc Đà Bảnh Bao
     1401141, -- Dù Gà Rán
@@ -9989,17 +9989,17 @@ local ITEMS = {
     1401178, -- Dù Băng Cát Sét
     1401179, -- Dù El Diablo
     1401181, -- Chúa Tể Băng Giá - Dù
-    1401182, -- Dù Kẻ Săn Mồi Biển Hijau
+    1401182, -- Dù Kẻ Săn Mồi Biển Xanh
     1401183, -- Dù Mộng Điệp
     1401184, -- Dù Bọ Cánh Cứng
-    1401186, -- Dù Rùa dan Thỏ
+    1401186, -- Dù Rùa và Thỏ
     1401187, -- Dù Nhịp Bước Mạnh Mẽ
     1401188, -- Dù PMPL Mùa Xuân 2021
     1401189, -- Dù GodzillaVsKong
     1401190, -- Dù Hành Trình Kỳ Diệu
     1401191, -- Dù Dấu Ấn Vũ Trụ
     1401192, -- Dù Đầu Bếp Gà
-    1401193, -- Dù Nghệ Thuật Sắc Warna
+    1401193, -- Dù Nghệ Thuật Sắc Màu
     1401194, -- Dù Aerial Punk Rich Brian
     1401195, -- Dù OPPO
     1401196, -- Dù BUG
@@ -10012,15 +10012,15 @@ local ITEMS = {
     1401208, -- Dù Thành Phố Trên Không
     1401209, -- Dù Bóng Ma Tương Lai
     1401210, -- Dù Mật Thám Cơ Khí
-    1401212, -- Dù Thành Phố Sắc Warna
-    1401213, -- Dù Senjata Hoa Hồng
+    1401212, -- Dù Thành Phố Sắc Màu
+    1401213, -- Dù Súng Hoa Hồng
     1401215, -- Dù Băng Giá
     1401216, -- Dù Bản Đồ Kho Báu
     1401217, -- Dù Cơn Sốt Giáng Sinh
-    1401218, -- Dù Họa Tiết Kuning
-    1401219, -- Dù Vương Quốc Kuning
+    1401218, -- Dù Họa Tiết Vàng
+    1401219, -- Dù Vương Quốc Vàng
     1401220, -- Dù Hoàng Hôn Rực Rỡ
-    1401221, -- Dù Bồ Câu Putih
+    1401221, -- Dù Bồ Câu Trắng
     1401222, -- Dù Vòng Xoay Thời Gian
     1401223, -- Dù Zong
     1401224, -- Dù Quán Quân C1S2
@@ -10030,7 +10030,7 @@ local ITEMS = {
     1401231, -- Dù PMGC 2021
     1401232, -- Dù Liverpool FC
     1401233, -- Dù Đột Phá
-    1401234, -- Dù Voi Sắc Warna
+    1401234, -- Dù Voi Sắc Màu
     1401235, -- Dù Hợp Tác Egor Kreed
     1401236, -- Gackt Moon Parachute
     1401237, -- Dù Dune
@@ -10055,16 +10055,16 @@ local ITEMS = {
     1401258, -- Dù Người Nhện: Không Còn Nhà
     1401259, -- Dù Sát Thủ Thời Không
     1401260, -- Dù Vùng Đất Hoang
-    1401261, -- Dù Sắc Warna
-    1401262, -- Dù Lễ Hội Sắc Warna
+    1401261, -- Dù Sắc Màu
+    1401262, -- Dù Lễ Hội Sắc Màu
     1401263, -- Dù Rạp Xiếc Thần Kỳ
-    1401264, -- Dù Thiếu Nữ Tóc Merah
+    1401264, -- Dù Thiếu Nữ Tóc Đỏ
     1401265, -- Dù Bộ Đôi Hoàn Hảo
     1401266, -- Dù Thiếu Nữ Song Sinh
     1401267, -- Dù Cánh Cổng Kỳ Dị
     1401268, -- Dù Thiếu Nữ Anime
     1401269, -- Dù Gà Chiến Đấu
-    1401270, -- Dù Nến Hijau
+    1401270, -- Dù Nến Xanh
     1401271, -- Dù Hồn Ma Nghịch Ngợm
     1401272, -- Dù Thiếu Nữ Cầu Nguyện
     1401273, -- Dù Ma Nữ Đáng Yêu
@@ -10087,7 +10087,7 @@ local ITEMS = {
     1401292, -- Dù Lil Burger
     1401294, -- Dù Dòng Sông Mộng Mơ
     1401295, -- Dù C3S8
-    1401296, -- Dù Đêm Của Phép Warna
+    1401296, -- Dù Đêm Của Phép Màu
     1401298, -- Dù Vinh Quang
     1401299, -- Dù Bản Đồ Sao
     1401300, -- Dù Chúa Tể Gai Độc
@@ -10108,9 +10108,9 @@ local ITEMS = {
     1401319, -- Dù C3S9
     1401320, -- Dù BoBoiBoy
     1401323, -- Dù Đường Đua Hoang Dã
-    1401324, -- Dù Tuần Lộc Putih
+    1401324, -- Dù Tuần Lộc Trắng
     1401325, -- Dù Rìu Hoàng Kim
-    1401326, -- Dù Kuning Huyền Bí
+    1401326, -- Dù Vàng Huyền Bí
     1401330, -- Dù Du Hành Tinh Vân
     1401332, -- Dù Mèo Tuyết
     1401334, -- Dù KFC
@@ -10131,7 +10131,7 @@ local ITEMS = {
     1401356, -- Dù Cặp Đôi Diễn Võ
     1401357, -- Dù Donkey King
     1401360, -- Dù Pro League
-    1401361, -- Dù Kế Hoạch Merah Thẫm
+    1401361, -- Dù Kế Hoạch Đỏ Thẫm
     1401362, -- Dù C4S11
     1401363, -- Dù Bản Đồ Vũ Trụ
     1401364, -- Dù BE@RBRICK
@@ -10156,7 +10156,7 @@ local ITEMS = {
     1401383, -- Dù KFC
     1401385, -- Dù Yeti Khổng Lồ
     1401386, -- Dù Pagani
-    1401387, -- Dù Báo Sắc Warna
+    1401387, -- Dù Báo Sắc Màu
     1401388, -- Dù Bé Sóc Đáng Yêu
     1401389, -- Dù Kỳ Giông Hồng
     1401390, -- RS Swagster Parachute
@@ -10184,14 +10184,14 @@ local ITEMS = {
     1401412, -- Dù Nữ Đế Hắc Ám
     1401413, -- Dù Hợp Tác Lamborghini
     1401416, -- Dù Tượng Đá Cổ Xưa
-    1401417, -- Dù Đại Dương Hijau
+    1401417, -- Dù Đại Dương Xanh
     1401418, -- KAKAO FRIENDS Parachute
     1401419, -- Dù Infinix GT
     1401420, -- Dù Esports World Cup 2024
     1401421, -- Dù C7S19
     1401422, -- Dù Thỏ Tinh Quái
     1401423, -- Dù Hợp Tác VW
-    1401424, -- Dù Miêu Linh Sắc Warna
+    1401424, -- Dù Miêu Linh Sắc Màu
     1401425, -- Dù Hắc Long Ma Nhãn
     1401426, -- Dù Âm Dương
     1401427, -- NieR:Automata Parachute
@@ -10218,7 +10218,7 @@ local ITEMS = {
     1401448, -- Parachute(Frieren&Fern)
     1401449, -- Dù C8S23
     1401450, -- Dù Lượn Mã Số Hóa 
-    1401451, -- Dù Lượn Khuếch Đại Sắc Warna
+    1401451, -- Dù Lượn Khuếch Đại Sắc Màu
     1401452, -- Dù Hợp Tác Shelby
     1401453, -- Dù Ráng Chiều Rực Cháy
     1401454, -- Dù Attack on Titan
@@ -10283,10 +10283,10 @@ local ITEMS = {
     1401530, -- Dù Giáp Gai
     1401531, -- Dù Vùng Nguy Hiểm
     1401532, -- Dù Ốc Biển
-    1401534, -- Dù Vịt Kuning B.Duck
+    1401534, -- Dù Vịt Vàng B.Duck
     1401538, -- Dù Thỏ Dịu Dàng
     1401540, -- Dù Yeti
-    1401541, -- Dù Pixel Sắc Warna
+    1401541, -- Dù Pixel Sắc Màu
     1401542, -- Dù Mỹ Vị
     1401543, -- Dù I Love Tao Kae Noi
     1401544, -- Dù Vẹt Baby
@@ -10307,7 +10307,7 @@ local ITEMS = {
     1401617, -- Dù Sư Tử Hống
     1401618, -- Dù Facebook
     1401619, -- Dù Bùa Hộ Mệnh Pharaoh
-    1401620, -- Dù Pharaoh (Hijau)
+    1401620, -- Dù Pharaoh (Xanh)
     1401621, -- Dù Huyết Nha
     1401622, -- Dù LINE FRIENDS
     1401623, -- Dù PMNC 2021
@@ -10345,8 +10345,8 @@ local ITEMS = {
     1401846, -- Dù Sự Kiện Trial of Fire
 
     -- [ TÀU LƯỢN / VÁN TRƯỢT / THIẾT BỊ BAY (Gliders/Hoverboards) ]
-    4151001, -- Dù (Hijau)
-    4151002, -- Hiệu ứng nhảy dù (Kuning)
+    4151001, -- Dù (Xanh)
+    4151002, -- Hiệu ứng nhảy dù (Vàng)
     4151003, -- Khói Lượn Dù (Hồng)
     4151004, -- Khói lượn xanh
     4151006, -- Khói lượn cầu vồng
@@ -10355,14 +10355,14 @@ local ITEMS = {
     4151013, -- Ván Trượt Tuyết
     4151014, -- Ván trượt CHU KỲ 2
     4151015, -- Khói Lượn Dù Chúc Mừng (3 màu)
-    4151017, -- Ván trượt Trái Tim Rừng Hijau
+    4151017, -- Ván trượt Trái Tim Rừng Xanh
     4151018, -- Ván trượt Sinh Nhật
     4151019, -- Tàu Lượn Chiến Thần Tình Yêu
     4151020, -- Ván Trượt Cảnh Vệ C3
     4151021, -- Tàu Lượn Sứ Giả Của Thần
-    4151022, -- Tàu Lượn Cánh Kuning
+    4151022, -- Tàu Lượn Cánh Vàng
     4151023, -- Ván Trượt Hợp Tác Messi
-    4151024, -- Tàu Lượn Giáo Sĩ Merah Thẫm
+    4151024, -- Tàu Lượn Giáo Sĩ Đỏ Thẫm
     4151025, -- Tàu Lượn Diều Giấy
     4151026, -- Ván Trượt Đại Sư Võ Hồn
     4151027, -- Ván Trượt Cycle 4
@@ -10370,19 +10370,19 @@ local ITEMS = {
     4151029, -- Tàu Lượn Nữ Đế Ánh Sáng
     4151030, -- Tàu Lượn Ma Vương Huyết Hồn
     4151031, -- Tàu Lượn Khủng Long Túi Tiền
-    4151032, -- Tàu Lượn Cánh Rồng Merah Thẫm
+    4151032, -- Tàu Lượn Cánh Rồng Đỏ Thẫm
     4151034, -- Cân Đẩu Vân
     4151035, -- Tàu Lượn Giao Hưởng Gió
     4151036, -- Ván Trượt Máy Dập Sóng
     4151037, -- Ván Trượt CYCLE 5
     4151038, -- Dù Lượn Ngọc Trai Tuyệt Hảo
     4151040, -- Ván trượt Thợ Săn Điện Quang
-    4151041, -- Dù Lượn Xương Hijau
+    4151041, -- Dù Lượn Xương Xanh
     4151042, -- Tàu Lượn Công Chúa Công Nghệ
     4151043, -- Tàu Lượn Công Chúa Công Nghệ
     4151044, -- Ván Trượt Cá Mập
     4151045, -- Dù Lượn Mùa Đông Hoàng Gia
-    4151046, -- Ván Trượt Lưỡi Dao Trời Hijau
+    4151046, -- Ván Trượt Lưỡi Dao Trời Xanh
     4151056, -- Dù Lượn Mùa Đông Hoàng Gia
     4151057, -- Ván Trượt Hỏa Hồ Ly
     4151058, -- Dù Lượn LINE FRIENDS
@@ -10456,7 +10456,7 @@ local ITEMS = {
     4151133, -- Tàu Lượn Dịch Chuyển Không Gian
     4151134, -- Dù Lượn Đa Vũ Trụ
     4151135, -- SAKAMOTO TARO Glider
-    4151138, -- Tàu Lượn Sấm Sét Merah
+    4151138, -- Tàu Lượn Sấm Sét Đỏ
     4151139, -- Tàu Lượn Hư Không
     4151140, -- Tàu Lượn Song Tử
     4151141, -- Tàu Lượn Cerberus
@@ -10505,18 +10505,25 @@ local ITEMS = {
     -- ==============================================================================
     -- 3. TRANG PHỤC (OUTFITS), X-SUIT & PHỤ KIỆN
     -- ==============================================================================
+        -- 3. TRANG PHỤC (OUTFITS), X-SUIT & PHỤ KIỆN
+    -- ==============================================================================
+    1405132,
+    1407381,
+    1405130,
+    1405143,
+    1407382,
     -- [ X-SUIT ]
     1407895, -- X-Suit Quạ Huyết (7 Sao)
     1407856, -- X-Suit Phượng Hoàng (7 Sao)
-    1405628, -- X-Suit Pharaoh Kuning (6 Sao)
-    1406469, -- X-Suit Pharaoh Kuning (7 Sao)
+    1405628, -- X-Suit Pharaoh Vàng (6 Sao)
+    1406469, -- X-Suit Pharaoh Vàng (7 Sao)
     1405870, -- X-Suit Quạ Huyết (6 Sao)
     1407140, -- X-Suit Poseidon (7 Sao)
     1407142, -- X-Suit Silvanus (7 Sao)
     1407141, -- X-Suit Bão Tuyết (7 Sao)
     1407550, -- X-Suit Ánh Sáng Cầu Vồng (7 Sao)
-    1406638, -- X-Suit Hề Bí Sembunyikan (6 Sao) [Đen]
-    1406641, -- X-Suit Hề Bí Sembunyikan (6 Sao) [Putih]
+    1406638, -- X-Suit Hề Bí Ẩn (6 Sao) [Đen]
+    1406641, -- X-Suit Hề Bí Ẩn (6 Sao) [Trắng]
     1406872, -- X-Suit Chúa Tể Âm Ty (7 Sao)
     1406971, -- X-Suit Marmoris (7 Sao)
     1407103, -- X-Suit Fiore (7 Sao)
@@ -10525,32 +10532,121 @@ local ITEMS = {
     1407512, -- X-Suit Anukhra (7 Sao)
     1407625, -- X-Suit Dravion (7 Sao) [Nam]
     1407667, -- X-Suit Dravion (7 Sao) [Nữ]
+    40605012,
+    1404133,  -- Dark Gold Top 
+    1404134,  -- Dark Gold Bottom 
+    1404135,  -- Dark Gold Boots
+    
 
-    1404133  -- Dark Gold Top 
-    1404134  -- Dark Gold Bottom 
-    1404135  -- Dark Gold Boots
 
     -- [ OUTFITS ]
+    1400773,
+    1407961,
+    1407962,
+    1407963,
+    1407964,
+    1407965,
+    1407966,
+    1407967,
+    1407968,
+    1407969,
+    1407970,
+    1407971,
+    403003,
+    1407916,
+    1407391,
+    1407330,
+    1407329,
+    1407286,
+    1407285,
+    1407277,
+    1407276,
+    1407275,
+    1407225,
+    1407224,
+    1407259,
+    1407161,
+    1407160,
+    1407107,
+    1407106,
+    1407079,
+    1407048,
+    1406977,
+    1406976,
+    1406898,
+    1400569,
+    1404000,
+    1404049,
+    1400119,
+    1400117,
+    1406060,
+    1406891,
+    1400687,
+    1405160,
+    1405145,
+    1405436,
+    1405435,
+    1405434,
+    1405064,
+    1405207,
+    1406895,
+    1400333,
+    1400377,
+    1405092,
+    1405121,
+    1406889,
+    1407278,
+    1407279,
+    1407380,
+    1407385,
+    1406389,
+    1406388,
+    1406387,
+    1406386,
+    1406385,
+    1406140,
+    1400782,
+    1407392,
+    1407318,
+    1407317,
+    1407404,
+    1407402,
+    1407401,
+    1407387,
+    1404434,
+    1404437,
+    1404440,
+    1404448,
+    1400324,
+    1400708,
+    1404043,
+    1404048,
+    1405953,
+    1400101,
+    1404153,
+    1407440,
+    1407441,
+    
     1407870, -- Bộ Nữ Thần Không Gian
     1407871, -- Bộ Thám Tử Đa Vũ Trụ
     1407812, -- Bộ Vệ Binh Hoang Dã
     1407758, -- Bộ Tiên Nữ Mùa Đông
-    1407286, -- Bộ Mèo Cyber Tinh Nghịch
-    1407329, -- Bộ Ánh Sáng Tĩnh Lặng
-    1407391, -- Bộ Nữ Bá Tước Ma Cà Rồng
-    1407392, -- Bộ Kẻ Phá Hoại Man Rợ
-    1407387, -- Bộ Tử Thần Tận Thế
-    1407440, -- Bộ Kẻ Chinh Phục Bắc Cực
+    -- Bộ Mèo Cyber Tinh Nghịch
+    -- Bộ Ánh Sáng Tĩnh Lặng
+    -- Bộ Nữ Bá Tước Ma Cà Rồng
+    -- Bộ Kẻ Phá Hoại Man Rợ
+    -- Bộ Tử Thần Tận Thế
+    -- Bộ Kẻ Chinh Phục Bắc Cực
     1406985, -- Bộ Người Tình Bãi Biển
     1407470, -- Bộ Thiên Thần Nổi Loạn
     1407471, -- Bộ Cực Quang Nanh Ngọc
     1407522, -- Bộ Hậu Duệ Tiên Cát
-    1407330, -- Bộ Đô Đốc Bóng Ma
+    -- Bộ Đô Đốc Bóng Ma
     1407523, -- Bộ Uy Quyền Tà Ác
     1407558, -- Bộ Thái Dương Thăng Hoa
     1407559, -- Bộ Ánh Sáng Nguyệt Cung
     1407572, -- Bộ Huyết Dạ Hoàng Hôn
-    1407682, -- Bộ Kén Sembunyikan Sĩ
+    1407682, -- Bộ Kén Ẩn Sĩ
     1407695, -- Bộ Lễ Tình Nhân Rùng Rợn
     1407696, -- Bộ Lăng Kính Thăng Hoa
     1407632, -- Bộ Hắc Dạ Tà Ác
@@ -10562,18 +10658,18 @@ local ITEMS = {
     1406555, -- Bộ Khuôn Mặt Địa Ngục
     1406573, -- Bộ Thiên Nga Bóng Ma
     1406574, -- Bộ Quan Tòa Vũ Trụ
-    1406656, -- Bộ Trưa Đẫm Darah
+    1406656, -- Bộ Trưa Đẫm Máu
     1406657, -- Bộ Đô Đốc Biển Sao
     1406742, -- Bộ Đạo Sư Bạc
     1406744, -- Bộ Hiệp Sĩ Thái Dương
     1406789, -- Bộ Bóng Ma Địa Ngục
     1406823, -- Bộ Giọt Nguyệt Bất Diệt
-    1406824, -- Bộ Kẻ Thù Nhuốm Darah
-    1406897, -- Bộ Ác Mộng Merah Thẫm
-    1407277, -- Trang Phục Hỏa Thần Cổ Ngữ
-    1406891, -- Trang Phục Linh Hồn Xác Ướp
-    1405623, -- Bộ Xác Ướp Kuning
-    1400687, -- Bộ Xác Ướp Putih
+    1406824, -- Bộ Kẻ Thù Nhuốm Máu
+    1406897, -- Bộ Ác Mộng Đỏ Thẫm
+    -- Trang Phục Hỏa Thần Cổ Ngữ
+    -- Trang Phục Linh Hồn Xác Ướp
+    1405623, -- Bộ Xác Ướp Vàng
+    -- Bộ Xác Ướp Trắng
     1407618, -- Bộ Thực Hồn Bắc Cực (Polar Spectrophage)
 
     -- [ Dragon Ball Super Collab ]
@@ -10589,19 +10685,19 @@ local ITEMS = {
     1406954, -- Trang Phục Nhân Vật Piccolo
     1407264, -- Trang Phục Nhân Vật Vegito
     1407265, -- Trang Phục Nhân Vật Vegito Siêu Saiyan
-    1407266, -- Trang Phục Nhân Vật Vegito Siêu Saiyan Hijau
-    1407267, -- Trang Phục Nhân Vật Son Goku Siêu Saiyan Hijau
-    1407268, -- Trang Phục Nhân Vật Son Goku Siêu Saiyan Hijau (Bị Thương)
-    1407269, -- Trang Phục Nhân Vật Vegeta Super Saiyan Hijau
-    1407270, -- Trang Phục Nhân Vật Vegeta Siêu Saiyan Hijau (Bị Thương)
+    1407266, -- Trang Phục Nhân Vật Vegito Siêu Saiyan Xanh
+    1407267, -- Trang Phục Nhân Vật Son Goku Siêu Saiyan Xanh
+    1407268, -- Trang Phục Nhân Vật Son Goku Siêu Saiyan Xanh (Bị Thương)
+    1407269, -- Trang Phục Nhân Vật Vegeta Super Saiyan Xanh
+    1407270, -- Trang Phục Nhân Vật Vegeta Siêu Saiyan Xanh (Bị Thương)
     1407271, -- Trang Phục Nhân Vật Bulma
 
     -- [ Evangelion Collab ]
-    1406385, -- Plugsuit Evangelion Shinji
-    1406386, -- Plugsuit Evangelion Rei
-    1406387, -- Plugsuit Evangelion Asuka
-    1406388, -- Plugsuit Evangelion Mari
-    1406389, -- Plugsuit Evangelion Kaworu
+    -- Plugsuit Evangelion Shinji
+    -- Plugsuit Evangelion Rei
+    -- Plugsuit Evangelion Asuka
+    -- Plugsuit Evangelion Mari
+    -- Plugsuit Evangelion Kaworu
 
     -- [ Attack on Titan Collab ]
     1407563, -- Trang Phục Nhân Vật Eren Jaeger
@@ -10628,7 +10724,7 @@ local ITEMS = {
     1406135, -- Trang phục DDU-DU DDU-DU LISA
     1406161, -- Trang phục How You Like That ROSÉ
     1406162, -- Trang phục How You Like That JENNIE
-    1406163, -- Trang phục How You Like That JISOO 
+    1406163, -- Trang phục How You Like That JISOO
     1406164, -- Trang phục How You Like That LISA
     1406178, -- Trang phục Lovesick Girls ROSÉ
     1406179, -- Trang phục Lovesick Girls JENNIE
@@ -10661,9 +10757,9 @@ local ITEMS = {
     1406730, -- Trang Phục Rồng Gầm Lý Tiểu Long
     1406731, -- Trang Phục Võ Sĩ Lý Tiểu Long
     1407206, -- SPY×FAMILY Trang Phục Hoàng Hôn
-    1407401, -- C.C. Set
-    1407402, -- Kallen Kozuki Set
-    1407404, -- Suzaku Kururugi Set
+    -- C.C. Set
+    -- Kallen Kozuki Set
+    -- Suzaku Kururugi Set
     1407405, -- ZERO Set
     1407408, -- Emperor Lelouch Set
     1407769, -- Okarun(transformed) Set
@@ -10682,40 +10778,40 @@ local ITEMS = {
     1407901, -- Trang Phục Nhân Vật Isagi Yoichi
     1407902, -- Trang Phục Nhân Vật Bachira Meguru
 
-    -- [ Set Đồ Merah Tự Nhiên & Siêu VIP của Game ]
-    1405160, -- Huyền Thoại Godzilla
+    -- [ Set Đồ Đỏ Tự Nhiên & Siêu VIP của Game ]
+    -- Huyền Thoại Godzilla
     1405161, -- Siêu Thú Ghidorah
     1405186, -- Bộ Đồ Godzilla
     1405662, -- Trang phục Giáp Samurai
     1405663, -- Trang phục Sát Thủ Bóng Đêm
     1406020, -- Trang phục Quái Thú
-    1406398, -- Trang phục Hỏa Diệm Ma Giáp
-    1406399, -- Trang phục Kỵ Binh Thần Giáp
+    -- Trang phục Hỏa Diệm Ma Giáp
+    -- Trang phục Kỵ Binh Thần Giáp
     1406456, -- Trang Phục Anh Hùng Truyền Thuyết
     1406568, -- Trang Phục Nữ Hoàng Bóng Đêm
     1406569, -- Trang Phục Minh Vương Hành Quyết
     1406732, -- Trang Phục Nữ Đế Hoàng Kim
     1406733, -- Trang Phục Hoàng Đế Hoàng Kim
-    1406764, -- Trang Phục Thiếu Nữ Merah Rực
+    1406764, -- Trang Phục Thiếu Nữ Đỏ Rực
 
     -- ==============================================================================
     -- 4. ÁO, QUẦN, GIÀY ĐẸP & TDM (PHONG CÁCH CỰC CHẤT)
     -- ==============================================================================
     -- [ BAPE & ALAN WALKER ]
-    1400569, -- BAPE MIX CAMO HOODIE
+    -- BAPE MIX CAMO HOODIE
     1400650, -- BAPE MIX CAMO SHORTS
     1400651, -- BAPE STA MID
-    1404000, -- BAPE City Camo Hoodie
+    -- BAPE City Camo Hoodie
     1404002, -- BAPE City Camo Pants
     1404003, -- BAPE Sta Mid
-    1404048, -- Áo BAPE X PUBGM CAMO
-    1404049, -- Áo Hoodie cá mập BAPE X PUBGM CAMO
+    -- Áo BAPE X PUBGM CAMO
+    -- Áo Hoodie cá mập BAPE X PUBGM CAMO
     1404050, -- Quần BAPE X PUBGM CAMO
     1404051, -- Giày BAPE X PUBGM CAMO
     1404016, -- Alan Walker T-shirt
     1404017, -- Alan Walker Hoodie
     1404042, -- Trang phục Alan Walker
-    1404043, -- Áo Alan Walker
+    -- Áo Alan Walker
     1404044, -- Quần Alan Walker
     1404045, -- Giày Alan Walker
     1404340, -- Trang phục Alan Walker 2021
@@ -10725,35 +10821,35 @@ local ITEMS = {
     -- [ Đồ TDM Phổ Biến (Khăn bịt mặt, Áo Lính, Áo Khoác Đen...) ]
     402001, -- Khăn rằn sinh tồn
     402037, -- Khăn quàng cao bồi
-    402043, -- Khăn quàng PUBG (Merah-Đen)
+    402043, -- Khăn quàng PUBG (Đỏ-Đen)
     402045, -- Khăn quàng PUBG (Chiến thuật)
     1400158, -- Mặt Nạ Hockey
     1402005, -- Mysterious Leather Mask
-    1403100, -- Mặt nạ pemain leo núi
-    403010, -- Áo Ba Lỗ Bẩn (Putih)
-    403028, -- Áo Trench coat (Warna đen)
+    1403100, -- Mặt nạ người leo núi
+    403010, -- Áo Ba Lỗ Bẩn (Trắng)
+    403028, -- Áo Trench coat (Màu đen)
     403181, -- Áo lính sa mạc
     403182, -- Áo Hoodie săn mồi (Đen)
-    403183, -- Áo Hoodie biệt kích (Putih)
+    403183, -- Áo Hoodie biệt kích (Trắng)
     403192, -- Áo khoác bomber
     404006, -- Quần Jeans (Nâu)
     404008, -- Quần lính (Ka-ki)
     404013, -- Quần lính (Rằn ri)
-    404015, -- Quần Jeans Bó (Warna Lam)
-    404026, -- Quần túi hộp (Warna be)
-    404028, -- Quần túi hộp (Warna đen)
+    404015, -- Quần Jeans Bó (Màu Lam)
+    404026, -- Quần túi hộp (Màu be)
+    404028, -- Quần túi hộp (Màu đen)
     404084, -- Quần thể thao ngắn (Đen)
-    404100, -- Quần pemain ẩn nấp (Đen)
-    405001, -- Giày đế mềm (Warna trắng)
+    404100, -- Quần người ẩn nấp (Đen)
+    405001, -- Giày đế mềm (Màu trắng)
     405002, -- Giày thể thao cổ cao
     405019, -- Giày lính chim ưng (Đen)
     405044, -- Giày đế mềm (Đen)
     1400013, -- Quần Jeans Mỹ
 
     -- [ CÁC ÁO LẺ VIP (Collab, Siêu Xe) ]
-    1404142, -- Áo thun THE WALKING DEAD (Putih)
+    1404142, -- Áo thun THE WALKING DEAD (Trắng)
     1404143, -- Áo thun THE WALKING DEAD (Đen)
-    1404218, -- Áo Hoodie COVERNAT (Putih)
+    1404218, -- Áo Hoodie COVERNAT (Trắng)
     1404219, -- Áo Hoodie COVERNAT (Đen)
     1404326, -- Áo thun Xiaomi
     1404327, -- Áo thun OnePlus
@@ -10767,7 +10863,7 @@ local ITEMS = {
     1404427, -- Quần Người Chinh Phục Pagani
     1404428, -- Giày Người Chinh Phục Pagani
     1404508, -- Áo Hoodie Mr.Beast
-    1400324, -- áo b
+    -- áo b
     1400325, -- áo a
     452001, 452002, 452003, -- Găng Tay (Gloves)
     
@@ -10777,7 +10873,7 @@ local ITEMS = {
     12212201, -- Hành động Sát thủ Cực Ám
     12219207, -- Hành động Đại tướng Thiên Ngưu
     12209001, -- Hành động Võ sĩ (Samurai)
-    12219561, -- Hành động Áo untukàng Merah thẫm
+    12219561, -- Hành động Áo choàng Đỏ thẫm
     12210001, -- Hành động Cái chạm của Tử thần
     12219022, -- Hành động Thiết vệ Gai góc
     12208801, -- Hành động Dũng sĩ Bán thần
@@ -10806,15 +10902,15 @@ local ITEMS = {
     12215529, -- Hành động Kỵ sĩ Đua xe
     12219053, -- Hành động Nữ hoàng Trân bảo
     12204601, -- Hành động Thiên hạ Bố võ
-    12215701, -- Hành động Hành tinh Vượn pemain
+    12215701, -- Hành động Hành tinh Vượn người
     12219003, -- Hành động Bóng tối Thần linh
     12219004, -- Hành động Ngân hồn Rực lửa
-    12219009, -- Hành động Mê atau Rực lửa
+    12219009, -- Hành động Mê hoặc Rực lửa
     12219216, -- Hành động Tế tư Héo úa
     
     
     -- tóc mặt tùm lum
-    1404198, 1410085, 1404366, 1403137, 1410480, 1403028, 1400158, 40605011, 1404323, 1406001, 1403002,
+    1404198, 1410085, 1404366, 1403137, 1410480, 1403028, 40605011, 1404323, 1406001, 1403002,
 
 -- ==============================================================================
     -- MŨ GIÁP VIP (CHỈ LẤY CẤP 1 - GỌN GÀNG, DỄ ẨN NẤP)
@@ -10850,13 +10946,13 @@ local ITEMS = {
     1502001133, -- Mũ Bí Ngô Kinh Dị (Cấp 1)
     1502001145, -- Mũ Chú Lính Chì (Cấp 1)
     1502001154, -- Mũ Giáp Đại Bàng Tỏa Sáng (Cấp 1)
-    1502001175, -- Mũ Vịt Kuning B.Duck (Cấp 1)
+    1502001175, -- Mũ Vịt Vàng B.Duck (Cấp 1)
     1502001230, -- Mũ Rồng Công Nghệ (Cấp 1)
     1502001248, -- Mũ Người Mở Đường (Cấp 1)
     1502001264, -- Mũ Ét Ô Ét (Cấp 1)
-    1502001276, -- Mũ Vũ Công Bí Sembunyikan (Cấp 1)
+    1502001276, -- Mũ Vũ Công Bí Ẩn (Cấp 1)
     1502001294, -- Mũ Giáp Ma Pháp Sư (Cấp 1)
-    1502001301, -- Mũ Giáp Aruntukn Lừng Lẫy (Cấp 1)
+    1502001301, -- Mũ Giáp Archon Lừng Lẫy (Cấp 1)
     1502001357, -- Mũ Giáp Son Goku (Cấp 1)
     1502001381, -- Mũ Giáp Hỏa Linh Chí Tôn (Cấp 1)
     1502001416, -- Mũ Giáp PMGC 2024 (Cấp 1)
@@ -10877,8 +10973,8 @@ local ITEMS = {
     1501001062, -- Ba Lô Siêu Thú Ghidorah (Cấp 1)
     1501001082, -- Ba lô Genbu (Cấp 1)
     1501001112, -- Ba lô Pig Ngốc Nghếch (Cấp 1)
-    1501001133, -- Ba lô Joker Khát Darah (Cấp 1)
-    1501001243, -- Ba Lô Vịt Kuning B.Duck (Cấp 1)
+    1501001133, -- Ba lô Joker Khát Máu (Cấp 1)
+    1501001243, -- Ba Lô Vịt Vàng B.Duck (Cấp 1)
     1501001273, -- Ba lô MECHAGODZILLA (Cấp 1)
     1501001304, -- Ba lô Ma Vương (Cấp 1)
     1501001331, -- Ba lô của Jinx (Cấp 1)
@@ -10902,27 +10998,33 @@ local ITEMS = {
     1501001715, -- SAKAMOTO TARO Backpack (Lv.1)
     1501001720, -- Ba Lô BLUE LOCK (Cấp 1)
     
-        -- [ BALO, MŨ & DÙ LƯỢN ]
+        -- [ BALO, MŨ & DÙ LƯỢN ] 
     1501001024, -- Balo Bá Tước
     1502001014, -- Mũ Đinh
     1502001439, -- mũ vương miện
     1502001069, -- mũ cương thi
     1502001023, -- mũ băng
+    1501000047,
+    1501001047,
+    1501002047,
+    1501003047,
     
 
     
     -- id bổ xung
-    1400092, 1400101, 1400122, --tư lệnh
+    1400092, 1400122, --tư lệnh
     1404191, -- quần bộ hành
-    1405128, 1405129, 140224445, 140224445, -- crew
-    1407961, 1407962, 1407963, 1407964, 1407965, 1407966, 1407967, 1407968, 1407969, 1407970, 1407971, 1502001508, 1502002508, 1502003508, 1411134, 1411133, 1411135, 1403771, 1403770, 1407994, 1407993, 1101006106, 1101006098, 4151145, 1903230, 1903231, 1903232, 1908117, 1908118, 1908119, 19116002, 19116003, 19116004, 1961070, 1961071, 1961072, 1961073, 1408045, 1408038, 1407990,1407922, -- Trang Phục Nữ Thần Ái Tình
+    1405128, 1405129, 140224445, -- crew
+    1502001508, 1502002508, 1502003508, 1411134, 1411133, 1411135, 1403771, 1403770, 1407994, 1407993, 1101006106, 1101006098, 4151145, 1903230, 1903231, 1903232, 1908117, 1908118, 1908119, 19116002, 19116003, 19116004, 1961070, 1961071, 1961072, 1961073, 1408045, 1408038, 1407990, 1407922, -- Trang Phục Nữ Thần Ái Tình
     1407704, -- Trang Phục Cô Dâu Tinh Quái
-    1400782, -- Trang phục băng tuyết
+    -- Trang phục băng tuyết
     1407614, -- Trang Phục Optimus Prime Transformers
-    1407276, -- Trang Phục Vệ Thần Tình Ái
+    -- Trang Phục Vệ Thần Tình Ái
     1410356, -- Mặt Nạ Ma Vương Huyết Hồn
-    40605012, -- Tóc Hai Chùm
-    401035, -- Mũ cao bồi (Putih)
+    -- Tóc Hai Chùm
+    401035, -- Mũ cao bồi (Trắng)
+    
+    1407300, 1407301, 1407302, 1407303, 1407304, 1407305, 1407306, 1407307, 1407308, 1407309, 1407310, 1407311, 1407312, 1407313, 1407314, 1407315, 1407316, 1407319, 1407320, 1407321, 1407322, 1407323, 1407324, 1407325, 1407326, 1407327, 1407328, 1407331, 1407332, 1407333, 1407334, 1407335, 1407336, 1407337, 1407338, 1407339, 1407340, 1407341, 1407342, 1407343, 1407344, 1407345, 1407351, 1407352, 1407353, 1407354, 1407355, 1407356, 1407357, 1407358, 1407359, 1407360, 1407361, 1407362, 1407363, 1407364, 1407365, 1407367, 1407368, 1407369, 1407370, 1407371, 1407372, 1407373, 1407374, 1407375, 1407376, 1407377, 1407378, 1407379, 1407383, 1407384, 1407386, 1407388, 1407389, 1407390, 1407393, 1407394, 1407395, 1407396, 1407397, 1407398, 1407399, 1407400, 1407403, 1407406, 1407407, 1407409, 1407410, 1407411, 1407412, 1407413, 1407414, 1407415, 1407416, 1407417, 1407418, 1407419, 1407420, 1407421, 1407422, 1407423, 1407424, 1407425, 1407426, 1407427, 1407428, 1407429, 1407430, 1407431, 1407432, 1407433, 1407434, 1407435, 1407436, 1407437, 1407438, 1407439, 1407442, 1407443, 1407444, 1407445, 1407446, 1407447, 1407448, 1407449, 1407450, 1407451, 1407452, 1407453, 1407454, 1407455, 1407456, 1407457, 1407458, 1407459, 1407460, 1407461, 1407462, 1407463, 1407464, 1407465, 1407466, 1407467, 1407468, 1407469, 1407472, 1407473, 1407474, 1407475, 1407476, 1407477, 1407478, 1407479, 1407480, 1407481, 1407482, 1407483, 1407484, 1407485, 1407486, 1407487, 1407488, 1407489, 1407490, 1407491, 1407492, 1407493, 1407494, 1407495, 1407496, 1407497, 1407498, 1407499, 1407500, 1407501, 1407502, 1407503, 1407504, 1407505, 1407506, 1407507, 1407508, 1407509, 1407510, 1407511, 1407513, 1407514, 1407515, 1407516, 1407517, 1407518, 1407519, 1407520, 1407521, 1407524, 1407525, 1407526, 1407527, 1407528, 1407529, 1407530, 1407531, 1407532, 1407533, 1407534, 1407535, 1407536, 1407537, 1407538, 1407539, 1407540, 1407541, 1407542, 1407543, 1407544, 1407545, 1407546, 1407547, 1407548, 1407549, 1407551, 1407552, 1407553, 1407554, 1407555, 1407556, 1407557, 1407560, 1407561, 1407562, 1407564, 1407570, 1407571, 1407574, 1407575, 1407576, 1407577, 1407578, 1407579, 1407580, 1407581, 1407582, 1407583, 1407584, 1407585, 1407586, 1407587, 1407588, 1407589, 1407590, 1407591, 1407592, 1407593, 1407594, 1407595, 1407596, 1407597, 1407598, 1407599, 1407600, 1407601, 1407602, 1407603, 1407604, 1407605, 1407606, 1407607, 1407608, 1407609, 1407610, 1407611, 1407612, 1407613, 1407615, 1407616, 1407617, 1407619, 1407620, 1407621, 1407622, 1407623, 1407624, 1407626, 1407627, 1407628, 1407629, 1407630, 1407631, 1407633, 1407634, 1407635, 1407636, 1407637, 1407638, 1407639, 1407640, 1407641, 1407642, 1407643, 1407644, 1407645, 1407646, 1407647, 1407648, 1407649, 1407650, 1407651, 1407652, 1407653, 1407654, 1407655, 1407656, 1407657, 1407658, 1407659, 1407660, 1407661, 1407662, 1407663, 1407664, 1407665, 1407666, 1407668, 1407669, 1407670, 1407671, 1407680, 1407681, 1407683, 1407684, 1407685, 1407686, 1407689, 1407690, 1407691, 1407692, 1407693, 1407694, 1407697, 1407698, 1407699, 1407700, 1407701, 1407702, 1407703, 1407705, 1407706, 1407707, 1407708, 1407709, 1407710, 1407711, 1407712, 1407713, 1407714, 1407715, 1407716, 1407717, 1407718, 1407719, 1407720, 1407721, 1407722, 1407723, 1407724, 1407725, 1407726, 1407727, 1407728, 1407729, 1407730, 1407731, 1407732, 1407733, 1407734, 1407735, 1407736, 1407737, 1407738, 1407739, 1407740, 1407741, 1407742, 1407743, 1407744, 1407752, 1407753, 1407754, 1407755, 1407756, 1407757, 1407759, 1407760, 1407761, 1407762, 1407763, 1407764, 1407765, 1407766, 1407767, 1407768, 1407774, 1407775, 1407776, 1407777, 1407778, 1407779, 1407780, 1407781, 1407782, 1407783, 1407784, 1407785, 1407786, 1407787, 1407788, 1407789, 1407790, 1407791, 1407792, 1407793, 1407797, 1407799, 1407802, 1407803, 1407804, 1407805, 1407806, 1407807, 1407808, 1407809, 1407810, 1407811, 1407813, 1407814, 1407815, 1407816, 1407817, 1407818, 1407819, 1407820, 1407821, 1407822, 1407823, 1407824, 1407825, 1407830, 1407831, 1407832, 1407833, 1407834, 1407835, 1407836, 1407837, 1407838, 1407839, 1407840, 1407841, 1407842, 1407843, 1407844, 1407845, 1407847, 1407849, 1407850, 1407851, 1407852, 1407853, 1407854, 1407855, 1407857, 1407858, 1407859, 1407860, 1407861, 1407862, 1407863, 1407864, 1407865, 1407866, 1407867, 1407868, 1407869, 1407872, 1407873, 1407874, 1407875, 1407876, 1407877, 1407878, 1407879, 1407880, 1407881, 1407882, 1407883, 1407884, 1407885, 1407886, 1407887, 1407888, 1407889, 1407890, 1407891, 1407892, 1407893, 1407894, 1407896, 1407897, 1407898, 1407899, 1407900, 1407903, 1407904, 1407905, 1407906, 1407907, 1407908, 1407909, 1407910, 1407911, 1407912, 1407913, 1407914, 1407915, 1407917, 1407918, 1407919, 1407920, 1407921, 1407923, 1407924, 1407925, 1407926, 1407927, 1407928, 1407929, 1407930, 1407931, 1407932, 1407933, 1407934, 1407935, 1407936, 1407937, 1407938, 1407939, 1407940, 1407941, 1407942, 1407943, 1407944, 1407945, 1407946, 1407947, 1407948, 1407949, 1407950, 1407951, 1407952, 1407953, 1407954, 1407955, 1407956, 1407957, 1407958, 1407959, 1407960, 1407972, 1407973, 1407974, 1407975, 1407976, 1407977, 1407978, 1407979, 1407980, 1407981, 1407982, 1407983, 1407984, 1407985, 1407986, 1407987, 1407988, 1407989, 1407991, 1407992, 1407995, 1407996, 1407997, 1407998, 1407999, 1400001, 1400002, 1400003, 1400004, 1400007, 1400008, 1400009, 1400010, 1400011, 1400012, 1400014, 1400015, 1400016, 1400017, 1400018, 1400020, 1400021, 1400022, 1400023, 1400024, 1400025, 1400026, 1400027, 1400028, 1400029, 1400030, 1400031, 1400032, 1400038, 1400039, 1400040, 1400041, 1400042, 1400043, 1400044, 1400045, 1400046, 1400047, 1400048, 1400049, 1400050, 1400051, 1400052, 1400053, 1400054, 1400055, 1400056, 1400057, 1400058, 1400059, 1400060, 1400061, 1400062, 1400063, 1400064, 1400065, 1400066, 1400067, 1400068, 1400069, 1400070, 1400072, 1400073, 1400074, 1400075, 1400076, 1400077, 1400078, 1400079, 1400080, 1400081, 1400082, 1400083, 1400084, 1400085, 1400086, 1400087, 1400088, 1400089, 1400090, 1400091, 1400093, 1400094, 1400095, 1400096, 1400097, 1400098, 1400099, 1400100, 1400103, 1400104, 1400105, 1400106, 1400107, 1400108, 1400109, 1400110, 1400111, 1400112, 1400113, 1400114, 1400115, 1400118, 1400120, 1400121, 1400123, 1400124, 1400125, 1400127, 1400128, 1400129, 1400130, 1400132, 1400133, 1400134, 1400135, 1400136, 1400137, 1400138, 1400139, 1400141, 1400142, 1400143, 1400146, 1400147, 1400148, 1400149, 1400150, 1400151, 1400152, 1400153, 1400154, 1400155, 1400156, 1400159, 1400160, 1400161, 1400162, 1400163, 1400164, 1400165, 1400166, 1400167, 1400168, 1400169, 1400170, 1400171, 1400172, 1400173, 1400174, 1400175, 1400176, 1400177, 1400179, 1400180, 1400181, 1400182, 1400213, 1400215, 1400216, 1400218, 1400219, 1400220, 1400221, 1400224, 1400225, 1400226, 1400227, 1400228, 1400229, 1400230, 1400231, 1400232, 1400233, 1400236, 1400237, 1400238, 1400239, 1400240, 1400242, 1400243, 1400244, 1400247, 1400248, 1400249, 1400251, 1400253, 1400255, 1400256, 1400257, 1400258, 1400259, 1400260, 1400261, 1400262, 1400264, 1400265, 1400266, 1400267, 1400268, 1400269, 1400270, 1400271, 1400272, 1400274, 1400275, 1400276, 1400277, 1400279, 1400280, 1400281, 1400282, 1400283, 1400284, 1400285, 1400286, 1400287, 1400288, 1400289, 1400290, 1400291, 1400292, 1400293, 1400294, 1400295, 1400296, 1400297, 1400298, 1400299, 1400301, 1400302, 1400303, 1400306, 1400307, 1400308, 1400309, 1400310, 1400311, 1400312, 1400313, 1400314, 1400315, 1400316, 1400317, 1400318, 1400319, 1400320, 1400321, 1400322, 1400323, 1400326, 1400327, 1400328, 1400329, 1400332, 1400334, 1400336, 1400337, 1400338, 1400339, 1400341, 1400342, 1400344, 1400345, 1400347, 1400348, 1400350, 1400351, 1400352, 1400353, 1400354, 1400355, 1400356, 1400357, 1400358, 1400359, 1400360, 1400361, 1400362, 1400363, 1400364, 1400365, 1400366, 1400367, 1400368, 1400369, 1400370, 1400371, 1400374, 1400375, 1400376, 1400378, 1400380, 1400381, 1400384, 1400385, 1400386, 1400387, 1400388, 1400389, 1400390, 1400391, 1400392, 1400393, 1400394, 1400395, 1400396, 1400397, 1400398, 1400399, 1400400, 1400401, 1400402, 1400403, 1400404, 1400405, 1400406, 1400407, 1400408, 1400409, 1400410, 1400411, 1400412, 1400413, 1400414, 1400415, 1400416, 1400417, 1400418, 1400419, 1400420, 1400421, 1400422, 1400423, 1400424, 1400425, 1400426, 1400427, 1400428, 1400429, 1400430, 1400431, 1400432, 1400433, 1400434, 1400435, 1400436, 1400437, 1400438, 1400439, 1400441, 1400442, 1400443, 1400444, 1400445, 1400446, 1400447, 1400448, 1400449, 1400450, 1400451, 1400452, 1400453, 1400455, 1400456, 1400457, 1400458, 1400459, 1400460, 1400461, 1400462, 1400463, 1400464, 1400465, 1400468, 1400469, 1400470, 1400472, 1400473, 1400474, 1400475, 1400476, 1400477, 1400478, 1400479, 1400480, 1400481, 1400482, 1400483, 1400484, 1400485, 1400486, 1400488, 1400489, 1400490, 1400491, 1400492, 1400493, 1400494, 1400495, 1400498, 1400499, 1400500, 1400501, 1400502, 1400503, 1400504, 1400505, 1400506, 1400508, 1400509, 1400511, 1400512, 1400513, 1400514, 1400515, 1400516, 1400517, 1400518, 1400520, 1400521, 1400522, 1400523, 1400524, 1400525, 1400526, 1400527, 1400528, 1400529, 1400530, 1400531, 1400532, 1400533, 1400534, 1400535, 1400539, 1400540, 1400541, 1400542, 1400543, 1400544, 1400545, 1400546, 1400547, 1400548, 1400549, 1400550, 1400551, 1400552, 1400553, 1400554, 1400555, 1400556, 1400559, 1400560, 1400561, 1400562, 1400563, 1400564, 1400565, 1400566, 1400567, 1400568, 1400570, 1400571, 1400572, 1400573, 1400574, 1400575, 1400576, 1400577, 1400578, 1400583, 1400584, 1400585, 1400586, 1400587, 1400588, 1400589, 1400590, 1400592, 1400594, 1400595, 1400596, 1400597, 1400598, 1400599, 1400600, 1400601, 1400603, 1400604, 1400606, 1400619, 1400620, 1400622, 1400623, 1400624, 1400625, 1400626, 1400628, 1400629, 1400631, 1400632, 1400633, 1400634, 1400635, 1400636, 1400637, 1400638, 1400639, 1400640, 1400641, 1400642, 1400643, 1400644, 1400645, 1400646, 1400647, 1400648, 1400649, 1400652, 1400653, 1400654, 1400656, 1400657, 1400658, 1400659, 1400660, 1400661, 1400664, 1400665, 1400666, 1400668, 1400669, 1400670, 1400673, 1400678, 1400679, 1400680, 1400682, 1400683, 1400688, 1400689, 1400690,
 }
 
 local INS_BASE = 2000000000
