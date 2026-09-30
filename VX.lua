@@ -667,7 +667,10 @@ _G.LynceConfig = _G.LynceConfig or {
     WeaponGlow = false,
     
     -- Konfigurasi Bug Layar
-    BugManEnable = false
+    BugManEnable = false,
+    AutoReportEnable = false,
+    AutoMassReport = false,
+    AutoKillerReport = false
 }
 
 -- MENYIMPAN STATE SISTEM ĐÃ ĐƯỢC OPTIMALKAN HÓA SEPENUHNYA RAM TRỐNG
@@ -1622,8 +1625,17 @@ local StackCombat = {
 
             { Key = "ModMenu_WeaponGlow_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Glow Outline Senjata (HDR Bercahaya)", "▶ Weapon Glow (HDR)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.WeaponGlow end, SetFunc = function(c,v) _G.LynceConfig.WeaponGlow = v return true end },
             { Key = "ModMenu_WeaponGlowColor", UI = AliasMap.Slider, Text = T("   Warna Senjata (1:Merah 2:Hijau 3:Biru 4:Kuning 5:Rainbow)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Rnb)"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 5, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowColor or 5 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowColor = v return true end },
-            { Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T("   Ketebalan Outline Senjata", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowThickness = v return true end }
-        }
+            { Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T("   Ketebalan Outline Senjata", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowThickness = v return true end },
+
+-- ============================================================
+-- AUTO REPORT SYSTEM
+-- ============================================================
+{ Key = "ModMenu_AutoReport_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ AUTO REPORT SYSTEM", "▶ AUTO REPORT SYSTEM"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AutoReportEnable end, SetFunc = function(c,v) _G.LynceConfig.AutoReportEnable = v return true end },
+
+{ Key = "ModMenu_AutoMassReport", UI = AliasMap.Switcher, Text = T("   Mass Report Otomatis", "   Auto Mass Report"), ExpandHandle = "ModMenu_AutoReport_Ex", GetFunc = function() return _G.LynceConfig.AutoMassReport end, SetFunc = function(c,v) _G.LynceConfig.AutoMassReport = v return true end },
+
+{ Key = "ModMenu_AutoKillerReport", UI = AliasMap.Switcher, Text = T("   Report Killer Otomatis", "   Auto Report Killer"), ExpandHandle = "ModMenu_AutoReport_Ex", GetFunc = function() return _G.LynceConfig.AutoKillerReport end, SetFunc = function(c,v) _G.LynceConfig.AutoKillerReport = v return true end }
+}
 
     for _, _graphicsItem in ipairs(StackGraphics) do
         table.insert(StackCombat, _graphicsItem)
@@ -18943,6 +18955,368 @@ end)
 
 end -- KẾT THÚC HÀM LoadModSkinSystem
 -- ==============================================================================
+
+-- AUTO REPORT SYSTEM - COMPLETE PACKAGE
+-- ============================================================================
+
+local AutoReport = {}
+
+local function loadModule(name)
+    return package.loaded[name] or require(name)
+end
+
+local function isEnabled(key)
+    if key == "AUTO_MASS_REPORT" then
+        return _G.LynceConfig.AutoMassReport == true and _G.LynceConfig.AutoReportEnable == true
+    elseif key == "AUTO_REPORT_KILL" then
+        return _G.LynceConfig.AutoKillerReport == true and _G.LynceConfig.AutoReportEnable == true
+    end
+    return false
+end
+
+local function notify(message)
+    if _G.GODMODNotify then
+        _G.GODMODNotify(message)
+    else
+        print("[GODMOD Report] " .. tostring(message))
+    end
+end
+
+local function submitReport(complaint, name, matchID, uid, openID, source)
+    complaint.Submit(
+        name,
+        false,
+        false,
+        {4},
+        source == "GODMOD_KillerReport" and "Auto Report Killer" or "Auto Mass Report GODMOD",
+        1,
+        {1, 3, 9},
+        {},
+        "",
+        matchID,
+        18,
+        uid,
+        openID or "",
+        "",
+        {},
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        0,
+        nil,
+        source,
+        uid,
+        false,
+        0
+    )
+end
+
+-- ============================================================
+-- MASS REPORT
+-- ============================================================
+
+local MassReport = {
+    Queue = {},
+    IsScanning = false,
+    TimerScan = nil,
+    TimerProcess = nil,
+    CurrentMatchID = nil,
+    MatchStartTime = 0,
+    ReportedUIDs = {}
+}
+
+function MassReport.ScanServer()
+    if not isEnabled("AUTO_MASS_REPORT") then
+        return
+    end
+
+    pcall(function()
+        local complaint = loadModule("client.logic.battle.logic_complaint")
+        if not complaint then
+            return
+        end
+
+        local matchID = tostring(complaint.GetBattleID() or "LOBBY")
+        if matchID == "LOBBY" or matchID == "0" then
+            return
+        end
+
+        if MassReport.CurrentMatchID ~= matchID then
+            MassReport.CurrentMatchID = matchID
+            MassReport.MatchStartTime = os.time()
+            MassReport.ReportedUIDs = {}
+            MassReport.Queue = {}
+            notify("Detect new match! Waiting for 30 seconds...")
+            return
+        end
+
+        local elapsed = os.time() - MassReport.MatchStartTime
+        if elapsed < 30 then
+            if elapsed == 10 or elapsed == 20 then
+                notify(string.format("Starting auto-report system (%d sec)", 30 - elapsed))
+            end
+            return
+        end
+
+        local gameplayData = loadModule("GameLua.GameCore.Data.GameplayData")
+        local localPlayer = gameplayData.GetPlayerCharacter and gameplayData.GetPlayerCharacter()
+        if not slua.isValid(localPlayer) then
+            return
+        end
+
+        local characters = {}
+        if gameplayData.GetAllPlayerCharacters then
+            characters = gameplayData.GetAllPlayerCharacters()
+        elseif gameplayData.GameCharacters then
+            for _, character in pairs(gameplayData.GameCharacters) do
+                table.insert(characters, character)
+            end
+        end
+
+        local added = 0
+        local skippedVIP = 0
+
+        for _, character in pairs(characters) do
+            if slua.isValid(character) and _G.IsEnemyTarget and _G.IsEnemyTarget(localPlayer, character) then
+                local name = ""
+                local uid = 0
+                local openID = ""
+
+                pcall(function()
+                    name = character.PlayerName or (type(character.GetPlayerNameSafety) == "function" and character:GetPlayerNameSafety()) or ""
+                    local playerState = character.PlayerState
+                    if not playerState and type(character.GetPlayerStateSafety) == "function" then
+                        playerState = character:GetPlayerStateSafety()
+                    end
+                    if slua.isValid(playerState) then
+                        uid = tonumber(playerState.UID) or tonumber(playerState.PlayerUID) or tonumber(character.PlayerKey) or 0
+                        openID = playerState.OpenID or ""
+                        if playerState.MLAIDisplayUID and playerState.MLAIDisplayUID > 0 then
+                            uid = tonumber(playerState.MLAIDisplayUID)
+                        end
+                    else
+                        uid = tonumber(character.PlayerKey) or 0
+                    end
+                end)
+
+                if name ~= "" and uid > 0 then
+                    local uidKey = tostring(uid)
+                    if not MassReport.ReportedUIDs[uidKey] then
+                        local isVIP = _G.GOD_MODUsersWhitelist and _G.GOD_MODUsersWhitelist[uidKey]
+                        if isVIP then
+                            skippedVIP = skippedVIP + 1
+                            MassReport.ReportedUIDs[uidKey] = true
+                        else
+                            local queued = false
+                            for _, item in ipairs(MassReport.Queue) do
+                                if item.uid == uid then
+                                    queued = true
+                                    break
+                                end
+                            end
+                            if not queued then
+                                table.insert(MassReport.Queue, {
+                                    name = name,
+                                    uid = uid,
+                                    openid = openID
+                                })
+                                added = added + 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if added > 0 then
+            local message = string.format("Added %d enemies to wait-list (Total wait: %d)", added, #MassReport.Queue)
+            if skippedVIP > 0 then
+                message = message .. string.format(" | SKIP %d VIP GODMOD", skippedVIP)
+            end
+            notify(message)
+        end
+    end)
+end
+
+function MassReport.ProcessQueue()
+    if not isEnabled("AUTO_MASS_REPORT") then
+        MassReport.Queue = {}
+        return
+    end
+    if #MassReport.Queue == 0 then
+        return
+    end
+    if os.time() - MassReport.MatchStartTime < 30 then
+        return
+    end
+
+    pcall(function()
+        local target = table.remove(MassReport.Queue, 1)
+        local complaint = loadModule("client.logic.battle.logic_complaint")
+        if not complaint then
+            return
+        end
+
+        local uidKey = tostring(target.uid)
+        if MassReport.ReportedUIDs[uidKey] or complaint.IsAlreadyReported(target.name, complaint.GetBattleID()) then
+            return
+        end
+
+        submitReport(complaint, target.name, complaint.GetBattleID(), target.uid, target.openid, "MassReportQueue")
+        MassReport.ReportedUIDs[uidKey] = true
+        notify(string.format("REPORTED HACKER: %s. REMAINING: %d TARGETS.", target.name, #MassReport.Queue))
+    end)
+end
+
+function MassReport.Start()
+    local ticker = loadModule("common.time_ticker")
+    if not ticker or not ticker.AddTimerLoop then
+        return
+    end
+
+    if MassReport.TimerScan then
+        ticker.RemoveTimer(MassReport.TimerScan)
+    end
+    if MassReport.TimerProcess then
+        ticker.RemoveTimer(MassReport.TimerProcess)
+    end
+
+    MassReport.TimerScan = ticker.AddTimerLoop(0, MassReport.ScanServer, -1, 30.0)
+    MassReport.TimerProcess = ticker.AddTimerLoop(0, MassReport.ProcessQueue, -1, 10.0)
+end
+
+-- ============================================================
+-- KILLER REPORT
+-- ============================================================
+
+local KillerReport = {
+    ReportedCache = {},
+    MatchID = "",
+    TimerHandle = nil
+}
+
+function KillerReport.CheckAndReport()
+    if not isEnabled("AUTO_REPORT_KILL") then
+        return
+    end
+
+    pcall(function()
+        local complaint = loadModule("client.logic.battle.logic_complaint")
+        if not complaint then
+            return
+        end
+
+        local matchID = tostring(complaint.GetBattleID() or "LOBBY")
+        if matchID == "LOBBY" or matchID == "0" then
+            return
+        end
+
+        if KillerReport.MatchID ~= matchID then
+            KillerReport.MatchID = matchID
+            KillerReport.ReportedCache = {}
+            notify("Match started. Auto-report system start now.")
+        end
+
+        if not _G.SubsystemMgr then
+            return
+        end
+
+        local reportSubsystem = _G.SubsystemMgr:Get("ClientReportPlayerSubsystem")
+        if not reportSubsystem then
+            return
+        end
+
+        local reportUtils = loadModule("GameLua.Mod.BaseMod.Common.Security.ReportPlayerUtils")
+        if not reportUtils then
+            return
+        end
+
+        local nameKey = reportUtils.S_NAME
+        local uidKey = reportUtils.S_UID
+        local openIDKey = reportUtils.S_OPEN_ID
+        local targets = {}
+
+        for _, data in pairs(reportSubsystem:GetFatalDamagerMap(true) or {}) do
+            table.insert(targets, data)
+        end
+        for _, data in pairs(reportSubsystem:GetFatalDamagerMap(false) or {}) do
+            table.insert(targets, data)
+        end
+
+        for _, data in pairs(targets) do
+            if data and data[nameKey] and data[uidKey] then
+                local name = data[nameKey]
+                local uid = tonumber(data[uidKey])
+                local openID = data[openIDKey] or ""
+                local cacheKey = tostring(uid)
+
+                if not KillerReport.ReportedCache[cacheKey] then
+                    KillerReport.ReportedCache[cacheKey] = true
+                    if _G.GOD_MODUsersWhitelist and _G.GOD_MODUsersWhitelist[cacheKey] then
+                        notify("VIP USER " .. name .. " KILLED YOU! SKIP HIM.")
+                    else
+                        submitReport(complaint, name, matchID, uid, openID, "GODMOD_KillerReport")
+                        notify("YOU HAVE BEEN KILLED, REPORTING TARGET: " .. name)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+function KillerReport.Start()
+    local ticker = loadModule("common.time_ticker")
+    if not ticker or not ticker.AddTimerLoop then
+        return
+    end
+
+    if KillerReport.TimerHandle then
+        ticker.RemoveTimer(KillerReport.TimerHandle)
+    end
+
+    KillerReport.TimerHandle = ticker.AddTimerLoop(0, KillerReport.CheckAndReport, -1, 1.0)
+end
+
+-- ============================================================
+-- FUNGSI UTAMA
+-- ============================================================
+
+function AutoReport.Start()
+    MassReport.Start()
+    KillerReport.Start()
+    notify("Auto Report System Started")
+end
+
+function AutoReport.Stop()
+    local ticker = loadModule("common.time_ticker")
+    if not ticker then return end
+    
+    if MassReport.TimerScan then
+        ticker.RemoveTimer(MassReport.TimerScan)
+        MassReport.TimerScan = nil
+    end
+    if MassReport.TimerProcess then
+        ticker.RemoveTimer(MassReport.TimerProcess)
+        MassReport.TimerProcess = nil
+    end
+    if KillerReport.TimerHandle then
+        ticker.RemoveTimer(KillerReport.TimerHandle)
+        KillerReport.TimerHandle = nil
+    end
+    
+    MassReport.Queue = {}
+    MassReport.ReportedUIDs = {}
+    KillerReport.ReportedCache = {}
+    notify("Auto Report System Stopped")
+end
+
+AutoReport.MassReport = MassReport
+AutoReport.KillerReport = KillerReport
+
 
 pcall(function()
     local _0xM = require(
