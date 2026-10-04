@@ -2,8 +2,8 @@
 -- MOD: POPUP MAINTENANCE + AUTO CLOSE
 -- ============================================================
 
-_G.GODMODConfig = _G.GODMODConfig or {}
-_G.GODMODConfig.MaintenancePopup = 1  -- 1 = ON, 0 = OFF
+_G.LynceConfig = _G.LynceConfig or {}
+_G.LynceConfig.MaintenancePopup = 1  -- 1 = ON, 0 = OFF
 
 local _popupShown = false
 local _lastTick = 0
@@ -21,7 +21,7 @@ local function AutoClosePopup()
         local UIManager = require("client.slua_ui_framework.manager")
         if UIManager then
             UIManager.CloseUI(UIManager.UI_Config.Common_MessageBox)
-            print("[GODMOD] Maintenance - Auto closed after 10 seconds")
+            print("[Lynce] Maintenance - Auto closed after 10 seconds")
         end
     end)
 end
@@ -31,7 +31,7 @@ end
 -- ============================================================
 local function ShowMaintenancePopup()
     if _popupShown then return end
-    if _G.GODMODConfig.MaintenancePopup ~= 1 then return end
+    if _G.LynceConfig.MaintenancePopup ~= 1 then return end
     
     pcall(function()
         local Msg = require("client.slua.logic.common.logic_common_msg_box")
@@ -51,11 +51,11 @@ PAKS SEDANG DALAM PERBAIKAN MOHON TUNGGU JUKA TIDAK SABAR BISA BELI VIP KE ADMIN
             title,
             content,
             function()                  -- Tombol OK
-                print("[GODMOD] Maintenance - OK clicked")
+                print("[Lynce] Maintenance - OK clicked")
                 _popupShown = true
             end,
             function()                  -- Tombol CLOSE
-                print("[GODMOD] Maintenance - Closed by user")
+                print("[Lynce] Maintenance - Closed by user")
                 _popupShown = true
             end,
             "OK",
@@ -80,7 +80,7 @@ local function OnTick()
     if now - _lastTick < _interval then return end
     _lastTick = now
     
-    if not _popupShown and _G.GODMODConfig.MaintenancePopup == 1 then
+    if not _popupShown and _G.LynceConfig.MaintenancePopup == 1 then
         ShowMaintenancePopup()
     end
 end
@@ -88,7 +88,7 @@ end
 -- ============================================================
 -- REGISTRASI
 -- ============================================================
-_G.GODMODRegisterMod("Maintenance Popup", "✅ Active")
-_G.GODMODAddTick(OnTick)
+_G.LynceRegisterMod("Maintenance Popup", "✅ Active")
+_G.LynceAddTick(OnTick)
 
 print("✅ POPUP MAINTENANCE - Loaded!")
