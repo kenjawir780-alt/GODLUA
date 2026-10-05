@@ -16871,7 +16871,7 @@ AutoReport.KillerReport=KillerReport
 local function __SetupAutoFeedback()
 local AutoFeedback = {
 	Config = {
-		ServerURL = "https://autofeedbackserverzex-production.up.railway.app",
+		ServerURL = "https://autofeedback-serverzex.kenjw14.workers.dev/",
 		TestMode = false
 	},
 	Hooked = false
