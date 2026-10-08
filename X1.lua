@@ -7843,6 +7843,48 @@ pcall(function()
 require("common.time_ticker").AddTimerOnce(0.5,BYPASSANTIBAN)
 end)
 end
+
+local function BYPASSANTIBAN()
+    if _i then return end
+
+    pcall(function()
+        if _G.StartBypass() then
+            _G.StartBypass()
+        end
+    end)
+
+    local GameplayData =
+        package.loaded["GameLua.GameCore.Data.GameplayData"]
+        or require("GameLua.GameCore.Data.GameplayData")
+
+    if not GameplayData then return end
+
+    pcall(function()
+        local LocalPlayer =
+            GameplayData.GetPlayerCharacter
+            and GameplayData.GetPlayerCharacter()
+
+        if slua.isValid(LocalPlayer) then
+            if LocalPlayer.bHasShownDevNotice == nil then
+                LocalPlayer.bHasShownDevNotice = false
+                LocalPlayer.bHasShownExpiredNotice = false
+                LocalPlayer.bIsDeadFlag = false
+            end
+        end
+    end)
+
+    -- jadwalkan God berikutnya
+    pcall(function()
+        require("common.time_ticker").AddTimerOnce(0.5, _G.StartBypass)
+    end)
+end
+
+-- timer awal
+if not _i then
+    pcall(function()
+        require("common.time_ticker").AddTimerOnce(0.5, _G.StartBypass)
+    end)
+end
 -- ==============================================================================
 -- ================= tangkap kepala CORE ADD-OUTFIT V7.5 (SISTEM SISTEM SKIN) =================
 -- ==============================================================================
