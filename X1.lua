@@ -2243,7 +2243,7 @@ pcall(function()
 local WeaponManager=PlayerCharacter:GetWeaponManager()
 if not slua.isValid(WeaponManager)then return end
 local isGlowEnabled=_G.LynceConfig.WeaponGlow
-local LinearColorClass=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
+local LinearColorClass=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
 local glowIntensity=80.0
 local thickness=_G.LynceState.CustomTextData.WeaponGlowThickness or 3
 local colorMode=_G.LynceState.CustomTextData.WeaponGlowColor or 5
@@ -2572,7 +2572,7 @@ end
 UIManager._IsModMenuHooked=true
 end
 end
-local function ShowGODMOD VIPMenu()
+local function ShowGODMOD_VIPMenu()
 if _G.LynceMenuAlreadyShown then return end
 if _G.LynceState.MenuStep~=0 then return end
 pcall(function()
@@ -2684,7 +2684,7 @@ local GSC_FPS=require("client.slua.umg.NewSetting.GraphicsNew.Comps.GSC_FPS")
 local GSC_FPSFT=require("client.slua.umg.NewSetting.GraphicsNew.Comps.GSC_FPSFT")
 local GraphicSettingDB=require("client.slua.umg.NewSetting.GraphicsNew.GraphicSettingDB")
 local KismetMathLibrary=import("KismetMathLibrary")or _G.KismetMathLibrary
-local FLinearColor=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
+local FLinearColor=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
 if logic_setting_graphics then
 local old_SetFPS=logic_setting_graphics.SetFPS
 function logic_setting_graphics.SetFPS(gameInstance,FPSLevel)
@@ -3167,7 +3167,7 @@ local vR,vG,vB=GetColorRGB(visChoice)
 local invisColor={R=hR,G=hG,B=hB,A=255,r=hR,g=hG,b=hB,a=255}
  -- warna border terlihat area HDR (visColor)
 local glowIntensity=80.0
-local LinearColorClass=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
+local LinearColorClass=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
 local visColor=LinearColorClass and LinearColorClass((vR/255)*glowIntensity,(vG/255)*glowIntensity,(vB/255)*glowIntensity,1.0)or{R=vR*glowIntensity,G=vG*glowIntensity,B=vB*glowIntensity,A=255}
 local scale={R=3.0,G=3.0,B=0.0,A=0.0,r=3.0,g=3.0,b=0.0,a=0.0}
 markData.MIDs_V3=markData.MIDs_V3 or{}
@@ -3329,7 +3329,7 @@ end
 markData.LastColorNewHash=stateHash
 markData.ColorNewApplied=true
  -- hanya Load bagian warna saat benar-benar perlu proses logika
-local LinearColorClass=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
+local LinearColorClass=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
 local c_vis=LinearColorClass and LinearColorClass(0,100,0,1)or{R=0,G=100,B=0,A=1}
 local c_occ=LinearColorClass and LinearColorClass(100,0,0,1)or{R=100,G=0,B=0,A=1}
 local c_bVis=LinearColorClass and LinearColorClass(49,48,0,100)or{R=49,G=48,B=0,A=100}
@@ -3537,7 +3537,7 @@ end
 local currentMaxDist=maxDistMeters*100
 local enemies=_G.GetEnemyTargetsFromActors(currentMaxDist)
 if not enemies or#enemies==0 then return end
-local FVector2D=_G.Zexy GetImport("Vector2D")
+local FVector2D=_G.Zexy_GetImport("Vector2D")
 local UGameplayStatics=import("GameplayStatics")
 local KismetMathLibrary=import("KismetMathLibrary")
 local camManager=UGameplayStatics.GetPlayerCameraManager(pc,0)
@@ -4691,7 +4691,7 @@ end
 
 function ESP.ScreenPixelToCanvasLocal(pc,screenPixelPos)
   if not screenPixelPos then
-    local V=_G.Zexy GetImport("Vector2D") or _G.FVector2D
+    local V=_G.Zexy_GetImport("Vector2D") or _G.FVector2D
     return V and V(0,0) or {X=0,Y=0}
   end
   local sx=ESP.ScaleX or 1.0
@@ -4700,7 +4700,7 @@ function ESP.ScreenPixelToCanvasLocal(pc,screenPixelPos)
   local oy=ESP.OffsetY or 0.0
   local x=(screenPixelPos.X or 0)*sx+ox
   local y=(screenPixelPos.Y or 0)*sy+oy
-  local V=_G.Zexy GetImport("Vector2D") or _G.FVector2D
+  local V=_G.Zexy_GetImport("Vector2D") or _G.FVector2D
   return V and V(x,y) or {X=x,Y=y}
 end
 
@@ -5774,7 +5774,7 @@ if not ParentCanvas or not slua.isValid(ParentCanvas)then return false end
 local Container=nil
 pcall(function()Container=CGame:NewObjectFromPath("/Script/UMG.CanvasPanel",ParentCanvas)end)
 if not Container or not slua.isValid(Container)then return false end
-local FVector2D=_G.Zexy GetImport("Vector2D")or _G.FVector2D
+local FVector2D=_G.Zexy_GetImport("Vector2D")or _G.FVector2D
 for i=1,_G.FovCircleOverlay.NumSegments do
 local border=nil
 pcall(function()border=CGame:NewObjectFromPath("/Script/UMG.Border",Container)end)
@@ -5849,7 +5849,7 @@ local vpX=_G.__AimTouch_ViewportX or 1920
 if PlayerMapMarker and PlayerMapMarker.UpdateCanvasTransform then
 pcall(function()PlayerMapMarker.UpdateCanvasTransform(pc)end)
 end
-local FVector2D=_G.Zexy GetImport("Vector2D")or _G.FVector2D
+local FVector2D=_G.Zexy_GetImport("Vector2D")or _G.FVector2D
 local screenCenter=FVector2D and FVector2D(rawCX,rawCY)or{X=rawCX,Y=rawCY}
 local canvasCenter={X=rawCX,Y=rawCY}
 pcall(function()
@@ -5885,7 +5885,7 @@ _G.FovCircleOverlay.LastRadius=targetRadius
 _G.FovCircleOverlay.LastColor=colIdx
 _G.FovCircleOverlay.LastCX=centerX
 _G.FovCircleOverlay.LastCY=centerY
-local FLinearColor=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
+local FLinearColor=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
 local r,g,b=GetFOVColor(colIdx)
 local dim=0.55
 local color=FLinearColor and FLinearColor(r*dim,g*dim,b*dim,1.0)or{R=r*dim*255,G=g*dim*255,B=b*dim*255,A=255}
@@ -5912,7 +5912,7 @@ _G.FovCircleOverlay.PrecalcMath[i]={c1=c1,s1=s1,dist_unit=dist_unit,angleDeg=ang
 end
 end
 pcall(function()
-local FVector2D=_G.Zexy GetImport("Vector2D")or _G.FVector2D
+local FVector2D=_G.Zexy_GetImport("Vector2D")or _G.FVector2D
 for i=1,numSegments do
 local mathData=_G.FovCircleOverlay.PrecalcMath[i]
  -- hanya gunakan Sihir karakter dasar versi super ringan ganti karena hitung hitung jumlah trigonometri rumit rumit
@@ -5984,7 +5984,7 @@ end
  -- paksa update update Scale layar gambar parasut ESP V2 sedang MATI
 pcall(function()_G.PlayerMapMarker.UpdateCanvasTransform(PC)end)
 local fromX,fromY=_G.PlayerMapMarker.GetSnapLineStartPos(PC)
-local FVector2D=_G.Zexy GetImport("Vector2D")or _G.FVector2D
+local FVector2D=_G.Zexy_GetImport("Vector2D")or _G.FVector2D
 pcall(function()DungCuOverlay.Slot:SetPosition(FVector2D(fromX,fromY-8))end)
 end
 return
@@ -6005,8 +6005,8 @@ pcall(function()txtTitle=CGame:NewObjectFromPath("/Script/UMG.TextBlock",ParentC
 if txtTitle and slua.isValid(txtTitle)then
 pcall(function()
 txtTitle:SetText("")
-local FLinearColor=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
-local FSlateColor=_G.Zexy GetImport("SlateColor")or import("/Script/SlateCore.SlateColor")
+local FLinearColor=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
+local FSlateColor=_G.Zexy_GetImport("SlateColor")or import("/Script/SlateCore.SlateColor")
 local redLinear=FLinearColor and FLinearColor(1.0,0.0,0.0,1.0)or{R=255,G=0,B=0,A=255}
 if FSlateColor then txtTitle:SetColorAndOpacity(FSlateColor(redLinear))else txtTitle:SetColorAndOpacity(redLinear)end
 if txtTitle.Font then
@@ -6014,7 +6014,7 @@ local font=txtTitle.Font
 font.Size=24
 txtTitle.Font=font
 end
-local FVector2D=_G.Zexy GetImport("Vector2D")or _G.FVector2D
+local FVector2D=_G.Zexy_GetImport("Vector2D")or _G.FVector2D
 txtTitle:SetRenderScale(FVector2D(1.0,1.0))
 txtTitle:SetRenderTransformPivot(FVector2D(0.5,0.5))
 txtTitle:SetWidgetVisibility(UEnums.ESlateVisibility.SelfHitTestInvisible)
@@ -6023,7 +6023,7 @@ local txtSlot=ParentCanvas:AddChildToCanvas(txtTitle)
 if txtSlot then
 pcall(function()
 txtSlot:SetAutoSize(true)
-local FVector2D=_G.Zexy GetImport("Vector2D")or _G.FVector2D
+local FVector2D=_G.Zexy_GetImport("Vector2D")or _G.FVector2D
 txtSlot:SetAlignment(FVector2D(0.5,1.0))
 txtSlot:SetZOrder(9999)
 end)
@@ -6139,7 +6139,7 @@ pcall(function()Cached_SecurityCommonUtils=require("GameLua.Mod.BaseMod.Common.S
 local Cached_MyHUD=pc and pc.MyHUD or nil
 if _G.LynceConfig.UnlockFPS then InitializeGraphicsUnlock()end
 InitializeNativeESP()
-ShowGODMOD VIPMenu()
+ShowGODMOD_VIPMenu()
  -- [panggil LOGIC DUNGCU] selalu jalan unik buat tidak perlu fungsi saklar
 EnsurePermanentDungCu()
  -- [panggil LOGIC ESP ITEM dan VEHICLE ke lingkaran ulang]
@@ -6300,7 +6300,7 @@ local centerY=viewportSize.Y*0.5
 local FOV_RADIUS=(6/100.0)*(viewportSize.X/2.0)
 local enemies=_G.GetEnemyTargetsFromActors(40000)
 if enemies and#enemies>0 then
-local FVector2D=_G.Zexy GetImport("Vector2D")
+local FVector2D=_G.Zexy_GetImport("Vector2D")
 for _,target in ipairs(enemies)do
 if slua.isValid(target)and target.HealthStatus~=1 then
 local tPos=type(target.K2_GetActorLocation)=="function"and target:K2_GetActorLocation()or nil
@@ -7356,7 +7356,7 @@ if markData.OutlineState~=outlineHash or markData.LastMeshCountOutline~=currentM
  elseif outColorChoice==5 then r,g,b=255,0,255 -- Ungu/Pink
  elseif outColorChoice==6 then r,g,b=255,255,255 end -- Putih
 local glowIntensity=80.0
-local LinearColorClass=_G.Zexy GetImport("LinearColor")or _G.FLinearColor
+local LinearColorClass=_G.Zexy_GetImport("LinearColor")or _G.FLinearColor
 local glowDynamic=LinearColorClass and LinearColorClass((r/255)*glowIntensity,(g/255)*glowIntensity,(b/255)*glowIntensity,1.0)or{R=r*glowIntensity,G=g*glowIntensity,B=b*glowIntensity,A=255}
 for _,comp in ipairs(meshes)do
 if Valid(comp)then
@@ -16820,10 +16820,10 @@ local CBRPlayerCharacterBase=class(CCharacterBase,nil,BRPlayerCharacterBase)
 -- Cache helper untuk data statis/netral.
 -- Tidak mengubah logic fitur atau loop utama.
 -- ============================================================
-_G.Zexy CommonCache=_G.Zexy CommonCache or{imports={},lastUIValues={}
+_G.Zexy_CommonCache=_G.Zexy_CommonCache or{imports={},lastUIValues={}
 }
-_G.Zexy GetImport=_G.Zexy GetImport or function(name)
-local cache=_G.Zexy CommonCache.imports
+_G.Zexy_GetImport=_G.Zexy_GetImport or function(name)
+local cache=_G.Zexy_CommonCache.imports
 if cache[name]~=nil then
 return cache[name]
 end
@@ -16834,8 +16834,8 @@ return result
 end
 return nil
 end
-_G.Zexy UIValueChanged=_G.Zexy UIValueChanged or function(key,value)
-local values=_G.Zexy CommonCache.lastUIValues
+_G.Zexy_UIValueChanged=_G.Zexy_UIValueChanged or function(key,value)
+local values=_G.Zexy_CommonCache.lastUIValues
 if values[key]==value then
 return false
 end
