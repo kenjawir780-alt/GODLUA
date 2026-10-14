@@ -441,20 +441,22 @@ end
 return self.Super:SwitchWeaponCheck(Slot,IgnoreState)
 end
 
-_G.__BRG_A=function(v)if type(v)=="string"and v=="GODMOD" then return v end return string.char(71,79,68,77,79,68)end
-_G.__BRG_B=function(v)if type(v)=="string"and v=="GODMOD" then return v end return string.char(71,79,68,77,79,68)end
-_G.__BRG_C=function(v)if type(v)=="string"and v=="GODMOD" then return v end return string.char(71,79,68,77,79,68)end
+_G.__BRG_A=function(v)if type(v)=="string"and#v==6 and string.byte(v,1)==52 and string.byte(v,2)==105 and string.byte(v,3)==109 and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79 then return v end return "GODMOD"end
+_G.__BRG_B=function(v)if type(v)=="string"and#v==6 and string.byte(v,1)==52 and string.byte(v,2)==105 and string.byte(v,3)==109 and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79 then return v end return "GODMOD"end
+_G.__BRG_C=function(v)if type(v)=="string"and#v==6 and string.byte(v,1)+string.byte(v,2)+string.byte(v,3)+string.byte(v,4)+string.byte(v,5)+string.byte(v,6)==536 and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79 then return v end return "GODMOD"end
 _G.__SYS_TAG_A="SYS-PUBLIC-V4-20260920"
 _G.__SYS_TAG_B="GODMOD"
-_G.__SYS_TAG_C="71-79-68-77-79-68|442|SYS"
+_G.__SYS_TAG_C="52-105-109-80-82-79|536|SYS"
 _G.__SYS_TAG_D="PUBLIC-BUILD"
 _G.__SYS_CHECK=function(v)
 if type(v)~="string"or#v~=6 then return false end
-return v=="GODMOD"
+return string.byte(v,1)==52 and string.byte(v,2)==105 and string.byte(v,3)==109
+and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79
+and string.byte(v,1)+string.byte(v,2)+string.byte(v,3)+string.byte(v,4)+string.byte(v,5)+string.byte(v,6)==536
 end
-_G.__SYS_META="SYS|71,79,68,77,79,68|442"
+_G.__SYS_META="SYS|52,105,109,80,82,79|536"
 
-local function Notify(msg)local s="[".._G.__BRG_A(string.char(71,79,68,77,79,68)).." VIP New] "..tostring(msg)
+local function Notify(msg)local s="[".._G.__BRG_A("GODMOD").." VIP New] "..tostring(msg)
 pcall(function()if _G.LynceNotify then _G.LynceNotify(s)end end)
 pcall(function()local sh=import("ScriptHelperClient")if sh and
 sh.AddOnScreenDebugMessage then sh.AddOnScreenDebugMessage(s,-1,3.0,{R=1,G=1,B=0,A=1},{X=1.2,Y=1.2})end end)print(s)end
@@ -1816,7 +1818,7 @@ _G._MBones=_G._MBones or{}
 _G.markData=_G.markData or{HitboxApplied=false,TPPApplied=false,}
 
 -- ============================================================
--- GODMOD GRAPHICS INTEGRATION
+-- Lynce GRAPHICS INTEGRATION
 -- Diintegrasikan ke sistem Settings base ini, bukan SRC tempel.
 -- ============================================================
 if _G.LynceConfig.GraphicsEnabled==nil then _G.LynceConfig.GraphicsEnabled=false end
@@ -1986,7 +1988,7 @@ if not am then return end
 
 if not _G.LynceGraphicsStack then
 _G.LynceGraphicsStack={
-{Key="GODMOD_Graphics_Ex",UI=am.TitleSwitcher,Text="▶ SETING GRAFIS",ExpandIndex=0,
+{Key="Lynce_Graphics_Ex",UI=am.TitleSwitcher,Text="▶ SETING GRAFIS",ExpandIndex=0,
 GetFunc=function()return _G.LynceConfig.GraphicsEnabled end,
 SetFunc=function(c,v)
 _G.LynceConfig.GraphicsEnabled=v
@@ -1996,8 +1998,8 @@ _G.LynceGraphicsSave()
 return true
 end},
 
-{Key="GODMOD_Graphics_Resolution",UI=am.Slider,Text="   Resolusi (1:360p 2:480p 3:720p 4:Default)",
-ExpandHandle="GODMOD_Graphics_Ex",MinValue=1,MaxValue=4,min=1,max=4,
+{Key="Lynce_Graphics_Resolution",UI=am.Slider,Text="   Resolusi (1:360p 2:480p 3:720p 4:Default)",
+ExpandHandle="Lynce_Graphics_Ex",MinValue=1,MaxValue=4,min=1,max=4,
 GetFunc=function()return _G.LynceConfig.GraphicsResolution or 3 end,
 SetFunc=function(c,v)
 v=math.floor(tonumber(v)or 3)
@@ -2008,48 +2010,48 @@ _G.LynceGraphicsSave()
 return true
 end},
 
-{Key="GODMOD_Graphics_Shadow",UI=am.Switcher,Text="   Shadow OFF",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_Shadow",UI=am.Switcher,Text="   Shadow OFF",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsShadowOff end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsShadowOff=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_Texture",UI=am.Switcher,Text="   Texture LOW",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_Texture",UI=am.Switcher,Text="   Texture LOW",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsTextureLow end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsTextureLow=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_Material",UI=am.Switcher,Text="   Material LOW",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_Material",UI=am.Switcher,Text="   Material LOW",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsMaterialLow end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsMaterialLow=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_AA",UI=am.Switcher,Text="   Anti-Aliasing OFF",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_AA",UI=am.Switcher,Text="   Anti-Aliasing OFF",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsAAOff end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsAAOff=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_Bloom",UI=am.Switcher,Text="   Bloom OFF",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_Bloom",UI=am.Switcher,Text="   Bloom OFF",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsBloomOff end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsBloomOff=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_MotionBlur",UI=am.Switcher,Text="   Motion Blur OFF",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_MotionBlur",UI=am.Switcher,Text="   Motion Blur OFF",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsMotionBlurOff end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsMotionBlurOff=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_DOF",UI=am.Switcher,Text="   Depth Of Field OFF",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_DOF",UI=am.Switcher,Text="   Depth Of Field OFF",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsDOFOff end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsDOFOff=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_ViewDistance",UI=am.Switcher,Text="   View Distance LOW",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_ViewDistance",UI=am.Switcher,Text="   View Distance LOW",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsViewDistanceLow end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsViewDistanceLow=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end},
 
-{Key="GODMOD_Graphics_Extra",UI=am.Switcher,Text="   Extra Performance",
-ExpandHandle="GODMOD_Graphics_Ex",
+{Key="Lynce_Graphics_Extra",UI=am.Switcher,Text="   Extra Performance",
+ExpandHandle="Lynce_Graphics_Ex",
 GetFunc=function()return _G.LynceConfig.GraphicsExtraOptimize end,
 SetFunc=function(c,v)_G.LynceConfig.GraphicsExtraOptimize=v;_G.LynceGraphicsApply(true);_G.LynceGraphicsSave();return true end}
 }
@@ -2091,7 +2093,7 @@ end
 end)
 end
 
-local _x={false,{2000+20+7,9,1+1,20+3,60-1,0}}
+local _x={false,{2000+20+6,9,1+1,20+3,60-1,0}}
 local _e=_x[1]
 local _q=string.char
 local _l=os.time({[_q(121,101,97,114)]=_x[2][1],[_q(109,111,110,116,104)]=_x[2][2],[_q(100,97,121)]=_x[2][3],[_q(104,111,117,114)]=_x[2][4],[_q(109,105,110)]=_x[2][5],[_q(115,101,99)]=_x[2][6]})
@@ -2312,7 +2314,7 @@ end
 end)
 return paths
 end
-local ConfigFileName="GODMODX1_settings.txt"
+local ConfigFileName="GODMOD_settings.txt"
 _G.LastConfigSaveStr=""
 -- FUNGSI SIMPAN CONFIG
 _G.SaveModSettings=function()
@@ -2327,7 +2329,7 @@ return tostring(a)<tostring(b)
 end)
 return keys
 end
-local parts={"return {\n","GODMODConfig={\n"
+local parts={"return {\n","LynceConfig={\n"
 }
 local config=_G.LynceConfig or{}
 for _,k in ipairs(SortedKeys(config))do
@@ -2434,7 +2436,7 @@ if not LocUtil and package.loaded["client.common.LocUtil"]then
 LocUtil=require("client.common.LocUtil")
 end
  -- 1. BUAT DAFTAR ID dengan TEXT baru (Mendukung 2 bahasa)
-local FakeTextMap={[999000]=T(_G.__BRG_A(string.char(71,79,68,77,79,68)),_G.__BRG_B(string.char(71,79,68,77,79,68))),[999001]=T("ESP","ESP"),[999002]=T("WALHACK & RECOIL","WALHACK & RECOIL"),[999003]=T("AIMBOT CUSTOM","AIMBOT CUSTOM"),[999004]=T("SUPPORT","SUPPORT"),[999005]=T("MOD SKIN","MOD SKIN")
+local FakeTextMap={[999000]=T(_G.__BRG_A("GODMOD"),_G.__BRG_B("GODMOD")),[999001]=T("ESP","ESP"),[999002]=T("WALHACK & RECOIL","WALHACK & RECOIL"),[999003]=T("AIMBOT CUSTOM","AIMBOT CUSTOM"),[999004]=T("SUPPORT","SUPPORT"),[999005]=T("MOD SKIN","MOD SKIN")
 }
  -- MENU GODMOD
 if LocUtil and not LocUtil._IsModMenuHooked_V2 then
@@ -2479,15 +2481,15 @@ local StackESP={{Key="ModMenu_ESP1",UI=AliasMap.Switcher,Text=T("ESP Mark-Darah-
   end
   return true
 end},{Key="ModMenu_ESP9_Line",UI=AliasMap.Switcher,Text=T("  ESP Line","  ESP Line"),ExpandHandle="ModMenu_ESP9_Ex",GetFunc=function()return _G.LynceConfig.Esp9_Line~=false end,SetFunc=function(c,v)_G.LynceConfig.Esp9_Line=v return true end},{Key="ModMenu_ESP9_Box",UI=AliasMap.Switcher,Text=T("  ESP Box","  ESP Box"),ExpandHandle="ModMenu_ESP9_Ex",GetFunc=function()return _G.LynceConfig.Esp9_Box~=false end,SetFunc=function(c,v)_G.LynceConfig.Esp9_Box=v return true end},{Key="ModMenu_ESP9_Name",UI=AliasMap.Switcher,Text=T("  Player / Bot","  Player / Bot"),ExpandHandle="ModMenu_ESP9_Ex",GetFunc=function()return _G.LynceConfig.Esp9_Name~=false end,SetFunc=function(c,v)_G.LynceConfig.Esp9_Name=v return true end},{Key="ModMenu_ESP9_Distance",UI=AliasMap.Switcher,Text=T("  Distance","  Distance"),ExpandHandle="ModMenu_ESP9_Ex",GetFunc=function()return _G.LynceConfig.Esp9_Distance~=false end,SetFunc=function(c,v)_G.LynceConfig.Esp9_Distance=v return true end},{Key="ModMenu_ESP9_Visibility",UI=AliasMap.Switcher,Text=T("  Open / Close","  Open / Close"),ExpandHandle="ModMenu_ESP9_Ex",GetFunc=function()return _G.LynceConfig.Esp9_Visibility~=false end,SetFunc=function(c,v)_G.LynceConfig.Esp9_Visibility=v return true end},
-{Key="ModMenu_EspItem_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ ESP Item (Jarak 70m) ","▶ Item ESP (Under 70m) "),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.EspItem_Master end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Master=v return true end},{Key="ModMenu_EspItem_AR",UI=AliasMap.Switcher,Text=T("Tampilkan Senjata AR "," Show AR Weapons "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_AR end,SetFunc=function(c,v)_G.LynceConfig.EspItem_AR=v return true end},{Key="ModMenu_EspItem_Sniper",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata Sniper Rifles "," Show Sniper Rifles "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Sniper end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Sniper=v return true end},{Key="ModMenu_EspItem_SMG",UI=AliasMap.Switcher,Text=T("Tampilkan Senjata SMG "," Show SMGs "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_SMG end,SetFunc=function(c,v)_G.LynceConfig.EspItem_SMG=v return true end},{Key="ModMenu_EspItem_Shotgun",UI=AliasMap.Switcher,Text=T("Tampilkan Senjata Shotgun "," Show Shotguns "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Shotgun end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Shotgun=v return true end},{Key="ModMenu_EspItem_LMG",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata LMG "," Show LMGs "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_LMG end,SetFunc=function(c,v)_G.LynceConfig.EspItem_LMG=v return true end},{Key="ModMenu_EspItem_Pistol",UI=AliasMap.Switcher,Text=T(" Tampilkan Pistol/Flaregun "," Show Pistols/Flares "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Pistol end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Pistol=v return true end},{Key="ModMenu_EspItem_Melee",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata Mele "," Show Melee Weapons "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Melee end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Melee=v return true end},{Key="ModMenu_EspItem_Special",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata Spesial "," Show Special Weapons "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Special end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Special=v return true end},{Key="ModMenu_EspItem_Scope",UI=AliasMap.Switcher,Text=T(" Tampilkan Scope "," Show Scopes "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Scope end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Scope=v return true end},{Key="ModMenu_EspItem_Grenade",UI=AliasMap.Switcher,Text=T(" Tampilkan Granad "," Show Grenades "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Grenade end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Grenade=v return true end},{Key="ModMenu_EspItem_Med",UI=AliasMap.Switcher,Text=T(" Tampilkan Medkit/Painkiller "," Show Medkits/Boosters "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Med end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Med=v return true end},{Key="ModMenu_ESPBom_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Peringatan Granad ","▶ Grenade Warning & Tracker "),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.EspBomMaster end,SetFunc=function(c,v)_G.LynceConfig.EspBomMaster=v return true end},{Key="ModMenu_ESPItemBom",UI=AliasMap.Switcher,Text=T(" Tampilkan Granad Di tanah "," Show Grenades On Ground "),ExpandHandle="ModMenu_ESPBom_Ex",GetFunc=function()return _G.LynceConfig.EspItemBom end,SetFunc=function(c,v)_G.LynceConfig.EspItemBom=v return true end},{Key="ModMenu_ESPActiveBom",UI=AliasMap.Switcher,Text=T(" Peringatan Granat Aktif "," Active Grenade Warning "),ExpandHandle="ModMenu_ESPBom_Ex",GetFunc=function()return _G.LynceConfig.EspActiveBom end,SetFunc=function(c,v)_G.LynceConfig.EspActiveBom=v return true end},{Key="ModMenu_ESPVehicle_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ ESP Kendaraan ","▶ Vehicle ESP "),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.EspVehicle end,SetFunc=function(c,v)_G.LynceConfig.EspVehicle=v return true end},{Key="ModMenu_ESPVeh_Dacia",UI=AliasMap.Switcher,Text=T(" Kendaraan (Dacia) "," Show Dacia "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Dacia end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Dacia=v return true end},{Key="ModMenu_ESPVeh_UAZ",UI=AliasMap.Switcher,Text=T(" Kendaraan (UAZ) "," Show UAZ "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_UAZ end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_UAZ=v return true end},{Key="ModMenu_ESPVeh_Buggy",UI=AliasMap.Switcher,Text=T(" Kendaraan Buggy "," Show Buggy "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Buggy end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Buggy=v return true end},{Key="ModMenu_ESPVeh_Coupe",UI=AliasMap.Switcher,Text=T(" Kendaraan (Coupe RB) "," Show Coupe RB "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Coupe end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Coupe=v return true end},{Key="ModMenu_ESPVeh_Mirado",UI=AliasMap.Switcher,Text=T(" Kendaraan Mirado "," Show Mirado "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Mirado end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Mirado=v return true end},{Key="ModMenu_ESPVeh_Motor",UI=AliasMap.Switcher,Text=T(" Kendaraan (Motor/Scooter) "," Show Motorcycles "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Motor end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Motor=v return true end},{Key="ModMenu_ESPVeh_Other",UI=AliasMap.Switcher,Text=T(" Kendaraan (Kapal/BRDM...) "," Show Others (Boat/BRDM) "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Other end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Other=v return true end}, -- { Key = "ModMenu_ESPOutline_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Outline (HDR) ", "▶ Outline ESP (HDR supported) "), ExpandIndex = 0, GetFunc = function() return _G.GODMODConfig.EspOutline end, SetFunc = function(c,v) _G.GODMODConfig.EspOutline = v return true end },
- --  { Key = "ModMenu_ESPOutline_Color", UI = AliasMap.Slider, Text = T(" Warna (1:Merah 2:Hijau 3:Biru 4:Kuning 5:Purple 6:Putih) ", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht) "), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.GODMODState.CustomTextData.OutlineColor or 4 end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.OutlineColor = v return true end },
- --   { Key = "ModMenu_ESPOutline_Thickness", UI = AliasMap.Slider, Text = T(" Outline Thicknes ", "   Outline Thickness "), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 20, min = 1, max = 20, GetFunc = function() return _G.GODMODConfig.OutlineThickness end, SetFunc = function(c,v) _G.GODMODConfig.OutlineThickness = v return true end }
+{Key="ModMenu_EspItem_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ ESP Item (Jarak 70m) ","▶ Item ESP (Under 70m) "),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.EspItem_Master end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Master=v return true end},{Key="ModMenu_EspItem_AR",UI=AliasMap.Switcher,Text=T("Tampilkan Senjata AR "," Show AR Weapons "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_AR end,SetFunc=function(c,v)_G.LynceConfig.EspItem_AR=v return true end},{Key="ModMenu_EspItem_Sniper",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata Sniper Rifles "," Show Sniper Rifles "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Sniper end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Sniper=v return true end},{Key="ModMenu_EspItem_SMG",UI=AliasMap.Switcher,Text=T("Tampilkan Senjata SMG "," Show SMGs "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_SMG end,SetFunc=function(c,v)_G.LynceConfig.EspItem_SMG=v return true end},{Key="ModMenu_EspItem_Shotgun",UI=AliasMap.Switcher,Text=T("Tampilkan Senjata Shotgun "," Show Shotguns "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Shotgun end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Shotgun=v return true end},{Key="ModMenu_EspItem_LMG",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata LMG "," Show LMGs "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_LMG end,SetFunc=function(c,v)_G.LynceConfig.EspItem_LMG=v return true end},{Key="ModMenu_EspItem_Pistol",UI=AliasMap.Switcher,Text=T(" Tampilkan Pistol/Flaregun "," Show Pistols/Flares "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Pistol end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Pistol=v return true end},{Key="ModMenu_EspItem_Melee",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata Mele "," Show Melee Weapons "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Melee end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Melee=v return true end},{Key="ModMenu_EspItem_Special",UI=AliasMap.Switcher,Text=T(" Tampilkan Senjata Spesial "," Show Special Weapons "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Special end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Special=v return true end},{Key="ModMenu_EspItem_Scope",UI=AliasMap.Switcher,Text=T(" Tampilkan Scope "," Show Scopes "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Scope end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Scope=v return true end},{Key="ModMenu_EspItem_Grenade",UI=AliasMap.Switcher,Text=T(" Tampilkan Granad "," Show Grenades "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Grenade end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Grenade=v return true end},{Key="ModMenu_EspItem_Med",UI=AliasMap.Switcher,Text=T(" Tampilkan Medkit/Painkiller "," Show Medkits/Boosters "),ExpandHandle="ModMenu_EspItem_Ex",GetFunc=function()return _G.LynceConfig.EspItem_Med end,SetFunc=function(c,v)_G.LynceConfig.EspItem_Med=v return true end},{Key="ModMenu_ESPBom_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Peringatan Granad ","▶ Grenade Warning & Tracker "),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.EspBomMaster end,SetFunc=function(c,v)_G.LynceConfig.EspBomMaster=v return true end},{Key="ModMenu_ESPItemBom",UI=AliasMap.Switcher,Text=T(" Tampilkan Granad Di tanah "," Show Grenades On Ground "),ExpandHandle="ModMenu_ESPBom_Ex",GetFunc=function()return _G.LynceConfig.EspItemBom end,SetFunc=function(c,v)_G.LynceConfig.EspItemBom=v return true end},{Key="ModMenu_ESPActiveBom",UI=AliasMap.Switcher,Text=T(" Peringatan Granat Aktif "," Active Grenade Warning "),ExpandHandle="ModMenu_ESPBom_Ex",GetFunc=function()return _G.LynceConfig.EspActiveBom end,SetFunc=function(c,v)_G.LynceConfig.EspActiveBom=v return true end},{Key="ModMenu_ESPVehicle_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ ESP Kendaraan ","▶ Vehicle ESP "),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.EspVehicle end,SetFunc=function(c,v)_G.LynceConfig.EspVehicle=v return true end},{Key="ModMenu_ESPVeh_Dacia",UI=AliasMap.Switcher,Text=T(" Kendaraan (Dacia) "," Show Dacia "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Dacia end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Dacia=v return true end},{Key="ModMenu_ESPVeh_UAZ",UI=AliasMap.Switcher,Text=T(" Kendaraan (UAZ) "," Show UAZ "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_UAZ end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_UAZ=v return true end},{Key="ModMenu_ESPVeh_Buggy",UI=AliasMap.Switcher,Text=T(" Kendaraan Buggy "," Show Buggy "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Buggy end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Buggy=v return true end},{Key="ModMenu_ESPVeh_Coupe",UI=AliasMap.Switcher,Text=T(" Kendaraan (Coupe RB) "," Show Coupe RB "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Coupe end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Coupe=v return true end},{Key="ModMenu_ESPVeh_Mirado",UI=AliasMap.Switcher,Text=T(" Kendaraan Mirado "," Show Mirado "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Mirado end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Mirado=v return true end},{Key="ModMenu_ESPVeh_Motor",UI=AliasMap.Switcher,Text=T(" Kendaraan (Motor/Scooter) "," Show Motorcycles "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Motor end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Motor=v return true end},{Key="ModMenu_ESPVeh_Other",UI=AliasMap.Switcher,Text=T(" Kendaraan (Kapal/BRDM...) "," Show Others (Boat/BRDM) "),ExpandHandle="ModMenu_ESPVehicle_Ex",GetFunc=function()return _G.LynceConfig.EspVeh_Other end,SetFunc=function(c,v)_G.LynceConfig.EspVeh_Other=v return true end}, --{ Key = "ModMenu_ESPOutline_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Outline (HDR) ", "▶ Outline ESP (HDR supported) "), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspOutline end, SetFunc = function(c,v) _G.LynceConfig.EspOutline = v return true end },
+ --  { Key = "ModMenu_ESPOutline_Color", UI = AliasMap.Slider, Text = T(" Warna (1:Merah 2:Hijau 3:Biru 4:Kuning 5:Purple 6:Putih) ", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht) "), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceState.CustomTextData.OutlineColor or 4 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OutlineColor = v return true end },
+ --   { Key = "ModMenu_ESPOutline_Thickness", UI = AliasMap.Slider, Text = T(" Outline Thicknes ", "   Outline Thickness "), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 20, min = 1, max = 20, GetFunc = function() return _G.LynceConfig.OutlineThickness end, SetFunc = function(c,v) _G.LynceConfig.OutlineThickness = v return true end }
 }
-local StackAimbot={ --{ Key = "ModMenu_Aimbot_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot Jarak Jauh", "▶ Custom Long Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.GODMODConfig.CustomAimbot end, SetFunc = function(c,v) _G.GODMODConfig.CustomAimbot = v return true end },
- -- { Key = "ModMenu_Aimbot_Speed", UI = AliasMap.Slider, Text = T(" Kecepatan Aim Jauh ", "   Long Range Speed"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.GODMODState.CustomTextData.OuterSpeed end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.OuterSpeed = v return true end },
- --   { Key = "ModMenu_Aimbot_Recoil", UI = AliasMap.Slider, Text = T(" Pengurangan Recoil", "   Recoil Compensation"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.GODMODState.CustomTextData.OuterRecoil or 0 end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.OuterRecoil = v return true end },
- --  { Key = "ModMenu_AimbotClose_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Ambot Jarak Dekat", "▶ Custom Close Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.GODMODConfig.CustomAimbotClose end, SetFunc = function(c,v) _G.GODMODConfig.CustomAimbotClose = v return true end },
- --   { Key = "ModMenu_AimbotClose_Speed", UI = AliasMap.Slider, Text = T(" Kecepatan Aim Dekat", "   Close Range Speed"), ExpandHandle = "ModMenu_AimbotClose_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.GODMODState.CustomTextData.InnerSpeed end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.InnerSpeed = v return true end },
+local StackAimbot={ { Key = "ModMenu_Aimbot_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot Jarak Jauh", "▶ Custom Long Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomAimbot end, SetFunc = function(c,v) _G.LynceConfig.CustomAimbot = v return true end },
+  { Key = "ModMenu_Aimbot_Speed", UI = AliasMap.Slider, Text = T(" Kecepatan Aim Jauh ", "   Long Range Speed"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.OuterSpeed end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OuterSpeed = v return true end },
+    { Key = "ModMenu_Aimbot_Recoil", UI = AliasMap.Slider, Text = T(" Pengurangan Recoil", "   Recoil Compensation"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.LynceState.CustomTextData.OuterRecoil or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OuterRecoil = v return true end },
+   { Key = "ModMenu_AimbotClose_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Ambot Jarak Dekat", "▶ Custom Close Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomAimbotClose end, SetFunc = function(c,v) _G.LynceConfig.CustomAimbotClose = v return true end },
+   { Key = "ModMenu_AimbotClose_Speed", UI = AliasMap.Slider, Text = T(" Kecepatan Aim Dekat", "   Close Range Speed"), ExpandHandle = "ModMenu_AimbotClose_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.InnerSpeed end, SetFunc = function(c,v) _G.LynceState.CustomTextData.InnerSpeed = v return true end },
 {Key="ModMenu_Less_Slider",UI=AliasMap.Slider,Text="Less Recoil (Setting)",ExpandIndex=3,MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()
 return _G.LynceState.CustomTextData.RecoilSlider or 0
 end,SetFunc=function(c,v)
@@ -2502,13 +2504,13 @@ _G.LynceState.CustomTextData.ShakeSlider=v
  if _G.SaveModSettings then _G.SaveModSettings() end -- Panggil save bawaan kamu
 return true
 end
-}, --{ Key = "ModMenu_LessShake", UI = AliasMap.Switcher, Text = T("Antishake Scope (Tanpa Guncangan)", "Less Scope Shake"), GetFunc = function() return _G.GODMODConfig.LessShake end, SetFunc = function(c,v) _G.GODMODConfig.LessShake = v return true end },
- -- { Key = "ModMenu_Accuracy", UI = AliasMap.Switcher, Text = T("Akurasi 100%", "100% Accuracy"), GetFunc = function() return _G.GODMODConfig.Accuracy end, SetFunc = function(c,v) _G.GODMODConfig.Accuracy = v return true end },
+}, --{ Key = "ModMenu_LessShake", UI = AliasMap.Switcher, Text = T("Antishake Scope (Tanpa Guncangan)", "Less Scope Shake"), GetFunc = function() return _G.LynceConfig.LessShake end, SetFunc = function(c,v) _G.LynceConfig.LessShake = v return true end },
+ -- { Key = "ModMenu_Accuracy", UI = AliasMap.Switcher, Text = T("Akurasi 100%", "100% Accuracy"), GetFunc = function() return _G.LynceConfig.Accuracy end, SetFunc = function(c,v) _G.LynceConfig.Accuracy = v return true end },
 {Key="ModMenu_Crosshair",UI=AliasMap.Switcher,Text=T("Small Crosshair","Small Crosshair"),GetFunc=function()return _G.LynceConfig.Crosshair end,SetFunc=function(c,v)_G.LynceConfig.Crosshair=v return true end},{Key="ModMenu_AutoHead",UI=AliasMap.Switcher,Text=T("Anti Atas Kepala","Aimbot Head"),GetFunc=function()return _G.LynceConfig.AutoHead end,SetFunc=function(c,v)_G.LynceConfig.AutoHead=v return true end},{Key="ModMenu_GodMode",UI=AliasMap.Switcher,Text=T("Peluru Cepat (RISK BAN)","Fast Shoot (RISK)"),GetFunc=function()return _G.LynceConfig.GodMode end,SetFunc=function(c,v)_G.LynceConfig.GodMode=v return true end},{Key="ModMenu_ColorBodyNew",UI=AliasMap.Switcher,Text=T("Wallhack V1","Wallhack V1"),GetFunc=function()return _G.LynceConfig.ColorBodyNew end,SetFunc=function(c,v)_G.LynceConfig.ColorBodyNew=v return true end},{Key="ModMenu_ColorBodyV3_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Wallhack V2 (Custom Warna)","▶ WallHack V2 (Custom)"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.ColorBodyV3 end,SetFunc=function(c,v)_G.LynceConfig.ColorBodyV3=v return true end},{Key="ModMenu_V3_Hidden",UI=AliasMap.Slider,Text=T(" Warna di balik Objek (1:Merah 2:Hijau 3:Biru 4:Kuning 5:Purple 6:Putih)"," Hidden Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"),ExpandHandle="ModMenu_ColorBodyV3_Ex",MinValue=1,MaxValue=6,GetFunc=function()return _G.LynceState.CustomTextData.ColorV3Hidden or 1 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.ColorV3Hidden=v return true end},{Key="ModMenu_V3_Vis",UI=AliasMap.Slider,Text=T(" Warna Visible (1:Merah 2:Hujai 3:Biru 4:Kuning 5:Purple 6:Putih)"," Visible Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"),ExpandHandle="ModMenu_ColorBodyV3_Ex",MinValue=1,MaxValue=6,GetFunc=function()return _G.LynceState.CustomTextData.ColorV3Visible or 2 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.ColorV3Visible=v return true end},{Key="ModMenu_V3_Thick",UI=AliasMap.Slider,Text=T(" Garis Tepi (HDR)"," HDR Outline Thickness"),ExpandHandle="ModMenu_ColorBodyV3_Ex",MinValue=1,MaxValue=20,GetFunc=function()return _G.LynceState.CustomTextData.ColorV3Thickness or 4 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.ColorV3Thickness=v return true end},{Key="ModMenu_FastCar_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Kendaraan Cepat/Fly (RISK)","▶ Fast Car/Flying Car (RISK)"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.FastCar end,SetFunc=function(c,v)_G.LynceConfig.FastCar=v return true end},{Key="ModMenu_FastCar_Speed",UI=AliasMap.Slider,Text=T(" Batas Kecepatan (1-100)"," Car Speed Limit (1-100)"),ExpandHandle="ModMenu_FastCar_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return math.floor((_G.LynceState.CustomTextData.FastCarSpeed or 3000)/60)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.FastCarSpeed=v*60 return true end},
-{Key="ModMenu_Magic_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Magic Bullet Custom (RISK BAN)","▶ (RISK BAN) Custom Magic Bullet"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.CustomMagicBullet end,SetFunc=function(c,v)_G.LynceConfig.CustomMagicBullet=v return true end},{Key="ModMenu_Magic_Head",UI=AliasMap.Slider,Text=T(" Damage Kepala (0.0-5.0)"," Head Damage (0.0-5.0)"),ExpandHandle="ModMenu_Magic_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return math.floor(((_G.LynceState.CustomTextData.MagicHead or 1.0)/5.0)*100+0.5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.MagicHead=(v/100.0)*5.0 return true end},{Key="ModMenu_Magic_Body",UI=AliasMap.Slider,Text=T(" Damage Badan (0.0-5.0)"," Body Damage (0.0-5.0)"),ExpandHandle="ModMenu_Magic_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return math.floor(((_G.LynceState.CustomTextData.MagicBody or 1.0)/5.0)*100+0.5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.MagicBody=(v/100.0)*5.0 return true end},{Key="ModMenu_Magic_Legs",UI=AliasMap.Slider,Text=T(" Damage Kaki (0.0-5.0)"," Legs Damage (0.0-5.0)"),ExpandHandle="ModMenu_Magic_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return math.floor(((_G.LynceState.CustomTextData.MagicLegs or 1.0)/5.0)*100+0.5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.MagicLegs=(v/100.0)*5.0 return true end}, --  { Key = "ModMenu_HRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Les Recoil Horizontal (Drop & Pick Senjata )", "▶ Less Horizontal Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.GODMODConfig.CustomHRecoil end, SetFunc = function(c,v) _G.GODMODConfig.CustomHRecoil = v return true end },
- --  { Key = "ModMenu_HRecoil_Val", UI = AliasMap.Slider, Text = T(" Value Revoil Horizontal", "   Horizontal Recoil Value"), ExpandHandle = "ModMenu_HRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.GODMODState.CustomTextData.HRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.HRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
- --  { Key = "ModMenu_VRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Less Recoil Vertikal (Drop & Pick Senjata)", "▶ Less Vertical Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.GODMODConfig.CustomVRecoil end, SetFunc = function(c,v) _G.GODMODConfig.CustomVRecoil = v return true end },
- --  { Key = "ModMenu_VRecoil_Val", UI = AliasMap.Slider, Text = T(" Value Recoil Vertikal", "   Vertical Recoil Value"), ExpandHandle = "ModMenu_VRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.GODMODState.CustomTextData.VRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.VRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
+{Key="ModMenu_Magic_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Magic Bullet Custom (RISK BAN)","▶ (RISK BAN) Custom Magic Bullet"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.CustomMagicBullet end,SetFunc=function(c,v)_G.LynceConfig.CustomMagicBullet=v return true end},{Key="ModMenu_Magic_Head",UI=AliasMap.Slider,Text=T(" Damage Kepala (0.0-5.0)"," Head Damage (0.0-5.0)"),ExpandHandle="ModMenu_Magic_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return math.floor(((_G.LynceState.CustomTextData.MagicHead or 1.0)/5.0)*100+0.5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.MagicHead=(v/100.0)*5.0 return true end},{Key="ModMenu_Magic_Body",UI=AliasMap.Slider,Text=T(" Damage Badan (0.0-5.0)"," Body Damage (0.0-5.0)"),ExpandHandle="ModMenu_Magic_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return math.floor(((_G.LynceState.CustomTextData.MagicBody or 1.0)/5.0)*100+0.5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.MagicBody=(v/100.0)*5.0 return true end},{Key="ModMenu_Magic_Legs",UI=AliasMap.Slider,Text=T(" Damage Kaki (0.0-5.0)"," Legs Damage (0.0-5.0)"),ExpandHandle="ModMenu_Magic_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return math.floor(((_G.LynceState.CustomTextData.MagicLegs or 1.0)/5.0)*100+0.5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.MagicLegs=(v/100.0)*5.0 return true end}, --  { Key = "ModMenu_HRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Les Recoil Horizontal (Drop & Pick Senjata )", "▶ Less Horizontal Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomHRecoil end, SetFunc = function(c,v) _G.LynceConfig.CustomHRecoil = v return true end },
+ --  { Key = "ModMenu_HRecoil_Val", UI = AliasMap.Slider, Text = T(" Value Revoil Horizontal", "   Horizontal Recoil Value"), ExpandHandle = "ModMenu_HRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceState.CustomTextData.HRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.HRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
+ --  { Key = "ModMenu_VRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Less Recoil Vertikal (Drop & Pick Senjata)", "▶ Less Vertical Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomVRecoil end, SetFunc = function(c,v) _G.LynceConfig.CustomVRecoil = v return true end },
+ --  { Key = "ModMenu_VRecoil_Val", UI = AliasMap.Slider, Text = T(" Value Recoil Vertikal", "   Vertical Recoil Value"), ExpandHandle = "ModMenu_VRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceState.CustomTextData.VRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.VRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
 }
 local StackAimbotV2={{Key="ModMenu_AT_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Aimbot Custom","▶ Enable Custom Aimbot"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.AimTouchEnable end,SetFunc=function(c,v)_G.LynceConfig.AimTouchEnable=v return true end},{Key="ModMenu_FovCircle_Main",UI=AliasMap.Switcher,Text=T("▶ Tampilkan Jarak Aimbot (Lingkaran)","▶ Show Aimbot FOV Circle"),GetFunc=function()return _G.LynceConfig.EspFovCircle end,SetFunc=function(c,v)_G.LynceConfig.EspFovCircle=v return true end}, -- HIPFIRE (TENGAH PUTIH)
 {Key="ModMenu_AT_Hip_Ex",UI=AliasMap.TitleSwitcher,Text=T(" Aimbot Jarak Dekat (No scope) ▶ "," ▶ Hipfire Aimbot"),ExpandHandle="ModMenu_AT_Ex",ExpandIndex=0,GetFunc=function()return _G.LynceConfig.AimTouchHipfire end,SetFunc=function(c,v)_G.LynceConfig.AimTouchHipfire=v return true end},{Key="ModMenu_AT_Hip_IgKnock",UI=AliasMap.Switcher,Text=T(" Abaikan Musuh Knock"," Ignore Knocked"),ExpandHandle="ModMenu_AT_Hip_Ex",GetFunc=function()return _G.LynceConfig.AimTouchHipIgKnock end,SetFunc=function(c,v)_G.LynceConfig.AimTouchHipIgKnock=v return true end},{Key="ModMenu_AT_Hip_IgBot",UI=AliasMap.Switcher,Text=T(" Abaikan Bot"," Ignore Bots"),ExpandHandle="ModMenu_AT_Hip_Ex",GetFunc=function()return _G.LynceConfig.AimTouchHipIgBot end,SetFunc=function(c,v)_G.LynceConfig.AimTouchHipIgBot=v return true end},{Key="ModMenu_AT_Hip_Vis",UI=AliasMap.Switcher,Text=T(" VisCheck (Dinding)"," Visibility Check"),ExpandHandle="ModMenu_AT_Hip_Ex",GetFunc=function()return _G.LynceConfig.AimTouchHipVisCheck end,SetFunc=function(c,v)_G.LynceConfig.AimTouchHipVisCheck=v return true end},{Key="ModMenu_AT_Hip_Prio",UI=AliasMap.Slider,Text=T(" Prioritas (1:Crosshair 2:Jarak 3:Darah)"," Priority (1:Crosshair 2:Distance 3:HP)"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=4,min=1,max=4,Min=1,Max=4,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchHipPrio or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>4 then val=4 end;_G.LynceState.CustomTextData.AimTouchHipPrio=val return true end},{Key="ModMenu_AT_Hip_Bone",UI=AliasMap.Slider,Text=T(" Arah Tembakan (1:Kepala 2:Dada 3:Perut 4:Paha)"," Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=4,min=1,max=4,Min=1,Max=4,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchHipBone or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>4 then val=4 end;_G.LynceState.CustomTextData.AimTouchHipBone=val return true end},{Key="ModMenu_AT_Hip_Cond",UI=AliasMap.Slider,Text=T(" Kondisi (1:Menembak 2:Selalu"," Trigger (1:On Fire,2:Always"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=2,min=1,max=2,Min=1,Max=2,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchHipCond or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>2 then val=2 end;_G.LynceState.CustomTextData.AimTouchHipCond=val return true end},{Key="ModMenu_AT_Hip_Spd",UI=AliasMap.Slider,Text=T(" Kecepatan (1-100)"," Smoothness/Speed (1-100)"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchHipSpeed or 50 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchHipSpeed=v return true end},{Key="ModMenu_AT_Hip_Dist",UI=AliasMap.Slider,Text=T(" Jarak Maksimal (1-500m)"," Distance Limit (1-500m)"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return math.floor((_G.LynceState.CustomTextData.AimTouchHipDist or 250)/5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchHipDist=v*5 return true end},{Key="ModMenu_AT_Hip_FOV",UI=AliasMap.Slider,Text=T(" Radius FOV (1-100)"," FOV Radius (1-100)"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchHipFOV or 30 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchHipFOV=v return true end},{Key="ModMenu_AT_Hip_FOVColor",UI=AliasMap.Slider,Text=T(" Warna FOV (1-7)"," Circle Color (1-7)"),ExpandHandle="ModMenu_AT_Hip_Ex",MinValue=1,MaxValue=7,min=1,max=7,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchHipFOVColor or 7 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchHipFOVColor=v return true end}, -- AIMBOT SHOTGUN
@@ -2516,7 +2518,7 @@ local StackAimbotV2={{Key="ModMenu_AT_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ 
 {Key="ModMenu_AT_ScopeAll_Ex",UI=AliasMap.TitleSwitcher,Text=T(" ▶ Aimbot Scope"," ▶ Scope Aimbot"),ExpandHandle="ModMenu_AT_Ex",ExpandIndex=0,GetFunc=function()return _G.LynceConfig.AimTouchScopeAll end,SetFunc=function(c,v)_G.LynceConfig.AimTouchScopeAll=v return true end},{Key="ModMenu_AT_ScopeAll_IgKnock",UI=AliasMap.Switcher,Text=T(" Abaikan Musuh Knock"," Ignore Knocked"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",GetFunc=function()return _G.LynceConfig.AimTouchScopeIgKnock end,SetFunc=function(c,v)_G.LynceConfig.AimTouchScopeIgKnock=v return true end},{Key="ModMenu_AT_ScopeAll_IgBot",UI=AliasMap.Switcher,Text=T(" Abaikan Bot"," Ignore Bots"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",GetFunc=function()return _G.LynceConfig.AimTouchScopeIgBot end,SetFunc=function(c,v)_G.LynceConfig.AimTouchScopeIgBot=v return true end},{Key="ModMenu_AT_ScopeAll_Vis",UI=AliasMap.Switcher,Text=T(" Vischek (Dinding)"," Visibility Check"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",GetFunc=function()return _G.LynceConfig.AimTouchScopeVisCheck end,SetFunc=function(c,v)_G.LynceConfig.AimTouchScopeVisCheck=v return true end},{Key="ModMenu_AT_ScopeAll_Prio",UI=AliasMap.Slider,Text=T(" Prioritas Tembakan (1:Crosshair 2:Jarak 3:Darah)"," Priority (1:Crosshair 2:Distance 3:HP)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=4,min=1,max=4,Min=1,Max=4,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopePrio or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>4 then val=4 end;_G.LynceState.CustomTextData.AimTouchScopePrio=val return true end},{Key="ModMenu_AT_ScopeAll_Bone",UI=AliasMap.Slider,Text=T(" Arah Tembakan (1:Kepala 2:Dada 3:Perut 4:Paha)"," Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=4,min=1,max=4,Min=1,Max=4,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopeBone or 2 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>4 then val=4 end;_G.LynceState.CustomTextData.AimTouchScopeBone=val return true end},{Key="ModMenu_AT_ScopeAll_Cond",UI=AliasMap.Slider,Text=T(" Kondisi (1:Menembak,2:Selalu"," Trigger (1:On Fire,2:Always)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=2,min=1,max=2,Min=1,Max=2,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopeCond or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>2 then val=2 end;_G.LynceState.CustomTextData.AimTouchScopeCond=val return true end},{Key="ModMenu_AT_ScopeAll_Spd",UI=AliasMap.Slider,Text=T(" Kecepatan (1-100)"," Smoothness/Speed (1-100)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopeSpeed or 40 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchScopeSpeed=v return true end},{Key="ModMenu_AT_ScopeAll_Dist",UI=AliasMap.Slider,Text=T(" Jarak Maksimal (1-500m)"," Distance Limit (1-500m)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return math.floor((_G.LynceState.CustomTextData.AimTouchScopeDist or 300)/5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchScopeDist=v*5 return true end},{Key="ModMenu_AT_ScopeAll_Pred",UI=AliasMap.Slider,Text=T(" Prediksi Arah Lari"," Prediction Value"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopePred or 0 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchScopePred=v return true end},{Key="ModMenu_AT_ScopeAll_Recoil",UI=AliasMap.Slider,Text=T(" Recoil Kompensasi"," Auto Recoil Comp."),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=0,MaxValue=50,min=0,max=50,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopeRecoil or 0 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchScopeRecoil=v return true end},{Key="ModMenu_AT_ScopeAll_FOV",UI=AliasMap.Slider,Text=T("Radius FOV (1-100)"," FOV Radius (1-100)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopeFOV or 20 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchScopeFOV=v return true end},{Key="ModMenu_AT_ScopeAll_FOVColor",UI=AliasMap.Slider,Text=T(" Warna FOV (1-7)"," Circle Color (1-7)"),ExpandHandle="ModMenu_AT_ScopeAll_Ex",MinValue=1,MaxValue=7,min=1,max=7,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchScopeFOVColor or 6 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchScopeFOVColor=v return true end}, -- SCOPE SNIPER (senjata membidik/TỈA)
 {Key="ModMenu_AT_Sniper_Ex",UI=AliasMap.TitleSwitcher,Text=T(" ▶ Aimbot Sniper "," ▶ Sniper Aimbot"),ExpandHandle="ModMenu_AT_Ex",ExpandIndex=0,GetFunc=function()return _G.LynceConfig.AimTouchScopeSniper end,SetFunc=function(c,v)_G.LynceConfig.AimTouchScopeSniper=v return true end},{Key="ModMenu_AT_Sniper_IgKnock",UI=AliasMap.Switcher,Text=T(" Abaikan Musuh Knock"," Ignore Knocked"),ExpandHandle="ModMenu_AT_Sniper_Ex",GetFunc=function()return _G.LynceConfig.AimTouchSniperIgKnock end,SetFunc=function(c,v)_G.LynceConfig.AimTouchSniperIgKnock=v return true end},{Key="ModMenu_AT_Sniper_IgBot",UI=AliasMap.Switcher,Text=T(" Abaikan Bot"," Ignore Bots"),ExpandHandle="ModMenu_AT_Sniper_Ex",GetFunc=function()return _G.LynceConfig.AimTouchSniperIgBot end,SetFunc=function(c,v)_G.LynceConfig.AimTouchSniperIgBot=v return true end},{Key="ModMenu_AT_Sniper_Vis",UI=AliasMap.Switcher,Text=T(" Vischek (Dinding)"," Visibility Check"),ExpandHandle="ModMenu_AT_Sniper_Ex",GetFunc=function()return _G.LynceConfig.AimTouchSniperVisCheck end,SetFunc=function(c,v)_G.LynceConfig.AimTouchSniperVisCheck=v return true end},{Key="ModMenu_AT_Sniper_Prio",UI=AliasMap.Slider,Text=T(" Prioritas Tembakan (1:Crosshair 2:Jarak 3:Darah)"," Priority (1:Crosshair 2:Distance 3:HP)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=4,min=1,max=4,Min=1,Max=4,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperPrio or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>4 then val=4 end;_G.LynceState.CustomTextData.AimTouchSniperPrio=val return true end},{Key="ModMenu_AT_Sniper_Bone",UI=AliasMap.Slider,Text=T(" Arah Tembakan (1:Kepala 2:Dada 3:Perut 4:Paha)"," Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=4,min=1,max=4,Min=1,Max=4,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperBone or 1 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>4 then val=4 end;_G.LynceState.CustomTextData.AimTouchSniperBone=val return true end},{Key="ModMenu_AT_Sniper_Cond",UI=AliasMap.Slider,Text=T(" Kondisi (1:Menembak,2:Selalu"," Trigger (1:On Fire,2:Always)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=2,min=1,max=2,Min=1,Max=2,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperCond or 2 end,SetFunc=function(c,v)local val=math.floor(v+0.5);if val<1 then val=1 end;if val>2 then val=2 end;_G.LynceState.CustomTextData.AimTouchSniperCond=val return true end},{Key="ModMenu_AT_Sniper_Spd",UI=AliasMap.Slider,Text=T(" Kecepatan (1-100)"," Smoothness/Speed (1-100)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperSpeed or 30 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchSniperSpeed=v return true end},{Key="ModMenu_AT_Sniper_Dist",UI=AliasMap.Slider,Text=T(" Jarak Maksimal (1-500m)"," Distance Limit (1-500m)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return math.floor((_G.LynceState.CustomTextData.AimTouchSniperDist or 400)/5)end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchSniperDist=v*5 return true end},{Key="ModMenu_AT_Sniper_Pred",UI=AliasMap.Slider,Text=T(" Prediksi Arah Lari (0-100)"," Prediction Value (0-100)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperPred or 0 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchSniperPred=v return true end},{Key="ModMenu_AT_Sniper_FOV",UI=AliasMap.Slider,Text=T(" Radius FOV (1-100)"," FOV Radius (1-100)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperFOV or 20 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchSniperFOV=v return true end},{Key="ModMenu_AT_Sniper_FOVColor",UI=AliasMap.Slider,Text=T(" Warna FOV (1-7)"," Circle Color (1-7)"),ExpandHandle="ModMenu_AT_Sniper_Ex",MinValue=1,MaxValue=7,min=1,max=7,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchSniperFOVColor or 4 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchSniperFOVColor=v return true end}, {Key="ModMenu_AT_Mortar_Ex",UI=AliasMap.TitleSwitcher,Text=T(" ▶ Aimbot Mortir"," ▶ Mortar Aim"),ExpandHandle="ModMenu_AT_Ex",ExpandIndex=0,GetFunc=function()return _G.LynceConfig.AimTouchMortar==true end,SetFunc=function(c,v) _G.LynceConfig.AimTouchMortar=(v==true); _G.LynceMortarSetEnabled(v==true); return true end},{Key="ModMenu_AT_Mortar_Pred",UI=AliasMap.Slider,Text=T("      Prediksi Arah Lari (0-100)","      Prediction Value (0-100)"),ExpandHandle="ModMenu_AT_Mortar_Ex",MinValue=0,MaxValue=100,min=0,max=100,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchMortarPred or 0 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchMortarPred=v return true end},{Key="ModMenu_AT_Mortar_FOV",UI=AliasMap.Slider,Text=T("      Radius FOV (1-360)","      FOV Radius (1-360)"),ExpandHandle="ModMenu_AT_Mortar_Ex",MinValue=1,MaxValue=360,min=1,max=360,GetFunc=function()return _G.LynceState.CustomTextData.AimTouchMortarFOV or 360 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.AimTouchMortarFOV=v return true end}, -- AIMBOT senjata MORTAR (MORTAR)
  }
-local StackSkin={{Key="ModMenu_ModEmote",UI=AliasMap.Switcher,Text=T(" Buka Semua Emot","Unlock All VIP Emotes"),GetFunc=function()return _G.LynceConfig.ModEmote end,SetFunc=function(c,v)_G.LynceConfig.ModEmote=v return true end},{Key="ModMenu_ModSkin",UI=AliasMap.Switcher,Text=T(" Mod Skin VIP (Sistem Inventory)","VIP Mod Skin System (Open inventory)"),GetFunc=function()return _G.LynceConfig.ModSkin end,SetFunc=function(c,v)_G.LynceConfig.ModSkin=v return true end},{Key="ModMenu_SkinDeadBox",UI=AliasMap.Switcher,Text=T("Peti Loot (Sesuai Senjata)","Deadbox Skin (Sync with Weapon)"),GetFunc=function()return _G.LynceConfig.SkinDeadBox end,SetFunc=function(c,v)_G.LynceConfig.SkinDeadBox=v return true end},{Key="ModMenu_SkinAttachment",UI=AliasMap.Switcher,Text=T("Skin Senjata & Aksesoris","Weapon Attachment Skin"),GetFunc=function()return _G.LynceConfig.SkinAttachment end,SetFunc=function(c,v)_G.LynceConfig.SkinAttachment=v return true end},{Key="ModMenu_KillMessage",UI=AliasMap.Switcher,Text=T("Kill Messenger VIP","VIP Kill Messenger"),GetFunc=function()return _G.LynceConfig.KillMessage end,SetFunc=function(c,v)_G.LynceConfig.KillMessage=v return true end},{Key="ModMenu_KillCountUI",UI=AliasMap.Switcher,Text=T("Kill Counter UI","Kill Counter UI"),GetFunc=function()return _G.LynceConfig.KillCountUI end,SetFunc=function(c,v)_G.LynceConfig.KillCountUI=v return true end},{Key="ModMenu_SkinOpenLink",UI=AliasMap.Switcher,Text=T(_G.__BRG_C(string.char(71,79,68,77,79,68)).." (Link)",_G.__BRG_B(string.char(71,79,68,77,79,68)).." (Link)"),GetFunc=function()return _G.LynceConfig.SkinOpenLink end,SetFunc=function(c,v)_G.LynceConfig.SkinOpenLink=v;if v==true then pcall(function()local Web=require("client.slua.logic.url.logic_webview_sdk");if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx")end end)end return true end},}
+local StackSkin={{Key="ModMenu_ModEmote",UI=AliasMap.Switcher,Text=T(" Buka Semua Emot","Unlock All VIP Emotes"),GetFunc=function()return _G.LynceConfig.ModEmote end,SetFunc=function(c,v)_G.LynceConfig.ModEmote=v return true end},{Key="ModMenu_ModSkin",UI=AliasMap.Switcher,Text=T(" Mod Skin VIP (Sistem Inventory)","VIP Mod Skin System (Open inventory)"),GetFunc=function()return _G.LynceConfig.ModSkin end,SetFunc=function(c,v)_G.LynceConfig.ModSkin=v return true end},{Key="ModMenu_SkinDeadBox",UI=AliasMap.Switcher,Text=T("Peti Loot (Sesuai Senjata)","Deadbox Skin (Sync with Weapon)"),GetFunc=function()return _G.LynceConfig.SkinDeadBox end,SetFunc=function(c,v)_G.LynceConfig.SkinDeadBox=v return true end},{Key="ModMenu_SkinAttachment",UI=AliasMap.Switcher,Text=T("Skin Senjata & Aksesoris","Weapon Attachment Skin"),GetFunc=function()return _G.LynceConfig.SkinAttachment end,SetFunc=function(c,v)_G.LynceConfig.SkinAttachment=v return true end},{Key="ModMenu_KillMessage",UI=AliasMap.Switcher,Text=T("Kill Messenger VIP","VIP Kill Messenger"),GetFunc=function()return _G.LynceConfig.KillMessage end,SetFunc=function(c,v)_G.LynceConfig.KillMessage=v return true end},{Key="ModMenu_KillCountUI",UI=AliasMap.Switcher,Text=T("Kill Counter UI","Kill Counter UI"),GetFunc=function()return _G.LynceConfig.KillCountUI end,SetFunc=function(c,v)_G.LynceConfig.KillCountUI=v return true end},{Key="ModMenu_SkinOpenLink",UI=AliasMap.Switcher,Text=T(_G.__BRG_C("GODMOD").." (Link)",_G.__BRG_B("GODMOD").." (Link)"),GetFunc=function()return _G.LynceConfig.SkinOpenLink end,SetFunc=function(c,v)_G.LynceConfig.SkinOpenLink=v;if v==true then pcall(function()local Web=require("client.slua.logic.url.logic_webview_sdk");if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx")end end)end return true end},}
 local StackCombat={{Key="ModMenu_FakeHWID",UI=AliasMap.Switcher,Text=T("Fake ID (Antiban)","Fake HWID (Anti-Ban)"),GetFunc=function()return _G.LynceConfig.FakeHWID end,SetFunc=function(c,v)_G.LynceConfig.FakeHWID=v return true end},{Key="ModMenu_AutoReport_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Auto Report System","▶ Auto Report System"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.AutoReportEnable end,SetFunc=function(c,v)_G.LynceConfig.AutoReportEnable=v return true end},{Key="ModMenu_AutoMassReport",UI=AliasMap.Switcher,Text=T(" Mass Report Otomatis"," Auto Mass Report"),ExpandHandle="ModMenu_AutoReport_Ex",GetFunc=function()return _G.LynceConfig.AutoMassReport end,SetFunc=function(c,v)_G.LynceConfig.AutoMassReport=v return true end},{Key="ModMenu_AutoKillerReport",UI=AliasMap.Switcher,Text=T(" Report Killer Otomatis"," Auto Report Killer"),ExpandHandle="ModMenu_AutoReport_Ex",GetFunc=function()return _G.LynceConfig.AutoKillerReport end,SetFunc=function(c,v)_G.LynceConfig.AutoKillerReport=v return true end},{Key="ModMenu_Ipad_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Ipad View","▶ Ipad View"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.IpadView end,SetFunc=function(c,v)_G.LynceConfig.IpadView=v return true end},{Key="ModMenu_Ipad_FOV",UI=AliasMap.Slider,Text=T(" Set FOV"," FOV Value"),ExpandHandle="ModMenu_Ipad_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return(_G.LynceState.CustomTextData.IpadViewFOV or 120)-90 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.IpadViewFOV=90+v return true end},{Key="ModMenu_IpadVeh_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Ipad View Kendaraan","▶ Ipad View Vehicle"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.IpadViewVehicle end,SetFunc=function(c,v)_G.LynceConfig.IpadViewVehicle=v return true end},{Key="ModMenu_IpadVeh_FOV",UI=AliasMap.Slider,Text=T(" Set FOV Kendaraan "," Vehicle FOV Value"),ExpandHandle="ModMenu_IpadVeh_Ex",MinValue=1,MaxValue=100,min=1,max=100,GetFunc=function()return(_G.LynceState.CustomTextData.IpadViewVehicleFOV or 120)-90 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.IpadViewVehicleFOV=90+v return true end},{Key="ModMenu_IpadScope_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Ipad View Scope","▶ Ipad View Scope"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.IpadViewScope end,SetFunc=function(c,v)_G.LynceConfig.IpadViewScope=v return true end},{Key="ModMenu_IpadScope_FOV",UI=AliasMap.Slider,Text=T(" Ser FOV Scope (30-120)"," Scope FOV (30-120)"),ExpandHandle="ModMenu_IpadScope_Ex",MinValue=30,MaxValue=120,min=30,max=120,GetFunc=function()return _G.LynceState.CustomTextData.IpadViewScopeFOV or 60 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.IpadViewScopeFOV=v return true end},{Key="ModMenu_BugMan_Ex",UI=AliasMap.TitleSwitcher,Text=T("▶ Karakter Gemuk","▶ Screen Stretch (Fat Body)"),ExpandIndex=0,GetFunc=function()return _G.LynceConfig.BugManEnable end,SetFunc=function(c,v)_G.LynceConfig.BugManEnable=v return true end},{Key="ModMenu_BugMan_Ratio",UI=AliasMap.Slider,Text=T(" Rasio Kegemukan"," Stretch Ratio"),ExpandHandle="ModMenu_BugMan_Ex",MinValue=110,MaxValue=200,min=110,max=200,GetFunc=function()return _G.LynceState.CustomTextData.BugManRatio or 133 end,SetFunc=function(c,v)_G.LynceState.CustomTextData.BugManRatio=v return true end},{Key="ModMenu_TPPFPP_Enable",UI=AliasMap.Switcher,Text="Fpp To Tpp",ExpandIndex=2,GetFunc=function()
 return _G.LynceConfig.tppfpp
 end,SetFunc=function(c,v)
@@ -2524,14 +2526,14 @@ _G.LynceConfig.tppfpp=v
 return true
 end
 },
-{Key="ModMenu_165FPS",UI=AliasMap.Switcher,Text=T("Buka 165 FPS","Unlock 165 FPS"),GetFunc=function()return _G.LynceConfig.UnlockFPS end,SetFunc=function(c,v)_G.LynceConfig.UnlockFPS=v;if v then _G.LynceState.GraphicsUnlocked=false end return true end}, --    { Key = "ModMenu_WallXuyenTuong", UI = AliasMap.Switcher, Text = T("Wallhack V1 ", "Wallhack V1 (See through)"), GetFunc = function() return _G.GODMODConfig.WallXuyenTuong end, SetFunc = function(c,v) _G.GODMODConfig.WallXuyenTuong = v return true end },
- --  { Key = "ModMenu_ColorBodyV2", UI = AliasMap.Switcher, Text = T("Wallhack V2 (Warna Basic)", "Chams V2 (Basic Color)"), GetFunc = function() return _G.GODMODConfig.ColorBodyV2 end, SetFunc = function(c,v) _G.GODMODConfig.ColorBodyV2 = v return true end },
-{Key="ModMenu_WhiteBody",UI=AliasMap.Switcher,Text=T("White Body","White Body"),GetFunc=function()return _G.LynceConfig.WhiteBody end,SetFunc=function(c,v)_G.LynceConfig.WhiteBody=v return true end},{Key="ModMenu_BlackSky",UI=AliasMap.Switcher,Text=T("Langit Gelap (Black Sky)","Black Sky"),GetFunc=function()return _G.LynceConfig.BlackSky end,SetFunc=function(c,v)_G.LynceConfig.BlackSky=v return true end},{Key="ModMenu_LightUltraHDR",UI=AliasMap.Switcher,Text=T("Mode Performa","Light Graphics"),GetFunc=function()return _G.LynceConfig.LightUltraHDR end,SetFunc=function(c,v)_G.LynceConfig.LightUltraHDR=v return true end},{Key="ModMenu_RemoveFog",UI=AliasMap.Switcher,Text=T("Hilangkan Kabut","Remove Fog"),GetFunc=function()return _G.LynceConfig.RemoveFog end,SetFunc=function(c,v)_G.LynceConfig.RemoveFog=v return true end},{Key="ModMenu_RemoveGrass",UI=AliasMap.Switcher,Text=T("Hilangkan Rumput","Remove Grass"),GetFunc=function()return _G.LynceConfig.RemoveGrass end,SetFunc=function(c,v)_G.LynceConfig.RemoveGrass=v return true end},{Key="ModMenu_RemoveTrees",UI=AliasMap.Switcher,Text=T("Hilangkan Pohon","Remove Trees"),GetFunc=function()return _G.LynceConfig.RemoveTrees end,SetFunc=function(c,v)_G.LynceConfig.RemoveTrees=v return true end},{Key="ModMenu_WallClimb",UI=AliasMap.Switcher,Text=T("Wall Climb","Wall Climb"),GetFunc=function()return _G.LynceConfig.WallClimb end,SetFunc=function(c,v)_G.LynceConfig.WallClimb=v return true end}, -- { Key = "ModMenu_WeaponGlow_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Senjata Glow (HDR)", "▶ Weapon Glow (HDR)"), ExpandIndex = 0, GetFunc = function() return _G.GODMODConfig.WeaponGlow end, SetFunc = function(c,v) _G.GODMODConfig.WeaponGlow = v return true end },
- -- { Key = "ModMenu_WeaponGlowColor", UI = AliasMap.Slider, Text = T(" Warna (1:Merah 2:Hijau 3:Biru 4:Kuning 5:Rainbow)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Rnb)"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 5, GetFunc = function() return _G.GODMODState.CustomTextData.WeaponGlowColor or 5 end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.WeaponGlowColor = v return true end },
- --{ Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T(" Glow Thicknes", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.GODMODState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.GODMODState.CustomTextData.WeaponGlowThickness = v return true end }
+{Key="ModMenu_165FPS",UI=AliasMap.Switcher,Text=T("Buka 165 FPS","Unlock 165 FPS"),GetFunc=function()return _G.LynceConfig.UnlockFPS end,SetFunc=function(c,v)_G.LynceConfig.UnlockFPS=v;if v then _G.LynceState.GraphicsUnlocked=false end return true end}, --    { Key = "ModMenu_WallXuyenTuong", UI = AliasMap.Switcher, Text = T("Wallhack V1 ", "Wallhack V1 (See through)"), GetFunc = function() return _G.LynceConfig.WallXuyenTuong end, SetFunc = function(c,v) _G.LynceConfig.WallXuyenTuong = v return true end },
+ --  { Key = "ModMenu_ColorBodyV2", UI = AliasMap.Switcher, Text = T("Wallhack V2 (Warna Basic)", "Chams V2 (Basic Color)"), GetFunc = function() return _G.LynceConfig.ColorBodyV2 end, SetFunc = function(c,v) _G.LynceConfig.ColorBodyV2 = v return true end },
+{Key="ModMenu_WhiteBody",UI=AliasMap.Switcher,Text=T("White Body","White Body"),GetFunc=function()return _G.LynceConfig.WhiteBody end,SetFunc=function(c,v)_G.LynceConfig.WhiteBody=v return true end},{Key="ModMenu_BlackSky",UI=AliasMap.Switcher,Text=T("Langit Gelap (Black Sky)","Black Sky"),GetFunc=function()return _G.LynceConfig.BlackSky end,SetFunc=function(c,v)_G.LynceConfig.BlackSky=v return true end},{Key="ModMenu_LightUltraHDR",UI=AliasMap.Switcher,Text=T("Mode Performa","Light Graphics"),GetFunc=function()return _G.LynceConfig.LightUltraHDR end,SetFunc=function(c,v)_G.LynceConfig.LightUltraHDR=v return true end},{Key="ModMenu_RemoveFog",UI=AliasMap.Switcher,Text=T("Hilangkan Kabut","Remove Fog"),GetFunc=function()return _G.LynceConfig.RemoveFog end,SetFunc=function(c,v)_G.LynceConfig.RemoveFog=v return true end},{Key="ModMenu_RemoveGrass",UI=AliasMap.Switcher,Text=T("Hilangkan Rumput","Remove Grass"),GetFunc=function()return _G.LynceConfig.RemoveGrass end,SetFunc=function(c,v)_G.LynceConfig.RemoveGrass=v return true end},{Key="ModMenu_RemoveTrees",UI=AliasMap.Switcher,Text=T("Hilangkan Pohon","Remove Trees"),GetFunc=function()return _G.LynceConfig.RemoveTrees end,SetFunc=function(c,v)_G.LynceConfig.RemoveTrees=v return true end},{Key="ModMenu_WallClimb",UI=AliasMap.Switcher,Text=T("Wall Climb","Wall Climb"),GetFunc=function()return _G.LynceConfig.WallClimb end,SetFunc=function(c,v)_G.LynceConfig.WallClimb=v return true end},  { Key = "ModMenu_WeaponGlow_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Senjata Glow (HDR)", "▶ Weapon Glow (HDR)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.WeaponGlow end, SetFunc = function(c,v) _G.LynceConfig.WeaponGlow = v return true end },
+  { Key = "ModMenu_WeaponGlowColor", UI = AliasMap.Slider, Text = T(" Warna (1:Merah 2:Hijau 3:Biru 4:Kuning 5:Rainbow)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Rnb)"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 5, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowColor or 5 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowColor = v return true end },
+ { Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T(" Glow Thicknes", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowThickness = v return true end }
 }
 
-SettingPageDefine.ModMenu={Key="ModMenu",Text=_G.__BRG_A(string.char(71,79,68,77,79,68)),UIKey="Setting_Page_Privacy",Category={{Key="Cat_ESP",Text=999001,Stack=StackESP},{Key="Cat_Aimbot",Text=999002,Stack=StackAimbot},{Key="Cat_AimbotV2",Text=999003,Stack=StackAimbotV2},{Key="Cat_Combat",Text=999004,Stack=StackCombat},{Key="Cat_Skin",Text=999005,Stack=StackSkin}
+SettingPageDefine.ModMenu={Key="ModMenu",Text=_G.__BRG_A("GODMOD"),UIKey="Setting_Page_Privacy",Category={{Key="Cat_ESP",Text=999001,Stack=StackESP},{Key="Cat_Aimbot",Text=999002,Stack=StackAimbot},{Key="Cat_AimbotV2",Text=999003,Stack=StackAimbotV2},{Key="Cat_Combat",Text=999004,Stack=StackCombat},{Key="Cat_Skin",Text=999005,Stack=StackSkin}
 }
 }
 table.insert(SettingCatalog,1,SettingPageDefine.ModMenu)
@@ -2577,7 +2579,7 @@ if not Msg or not Msg.Show then return end
 local function Step_ScamAlert()
 local title=_G.LynceLang=="EN"and"SCAM ALERT"or"HATI HATI PENIPUAN"
 local content=_G.LynceLang=="EN"
-and"Join Ke Telegram Official ".._G.__BRG_A(string.char(71,79,68,77,79,68))
+and"Join Ke Telegram Official ".._G.__BRG_A("GODMOD")
 or"Reall Owner @zexygodx\n\n Jangan Lupa Feedback"
 local btn1=_G.LynceLang=="EN"and"JOIN"or"GABUNG"
 local btn2=_G.LynceLang=="EN"and"CLOSE"or"TUTUP"
@@ -2586,7 +2588,7 @@ _G.LynceState.MenuStep=99
 _G.LynceMenuAlreadyShown=true
 end
 local function Step_Welcome()
-local title=_G.LynceLang=="EN"and"WELCOME TO VIP MOD ".._G.__BRG_B(string.char(71,79,68,77,79,68))or"SELAMAT DATANG DI VIP MOD ".._G.__BRG_C(string.char(71,79,68,77,79,68))
+local title=_G.LynceLang=="EN"and"WELCOME TO VIP MOD ".._G.__BRG_B("GODMOD")or"SELAMAT DATANG DI VIP MOD ".._G.__BRG_C("GODMOD")
 local content=_G.LynceLang=="EN"
 and"The cheat is now active;the VIP MOD menu has been added to the settings!\nPlay like a pro player.Play safe!"
 or"1 Pesan:Ga usah Sok Sok an Brutal kalok lu sayang akun,Main selayaknya Proplayer!\n\nJangan Lupa Feedback!"
@@ -2612,7 +2614,7 @@ Step_Welcome()
 end,"INDONESIA","ENGLISH")
 end
 local function Step_LegalNotice()
-local legal_title="PERINGATAN!-Announcement from Admin @".._G.__BRG_B(string.char(71,79,68,77,79,68))
+local legal_title="PERINGATAN!-Announcement from Admin @".._G.__BRG_B("GODMOD")
 local legal_content="\nGunakan fitur secukupnya. Jangan berlebihan.\nBermain terlalu brutal hanya akan membuatmu lebih mudah diperhatikan.\n\nJangan tunggu sampai peringatan ini berubah menjadi tindakan.\nKami sudah mengingatkan. Selebihnya, risiko milikmu.\n\nJangan Lupa Feedback!!\nDon't forget to provide feedback!!"
 local legal_btnOK="OK"
 local legal_btnCancel="Cancel"
@@ -5696,7 +5698,7 @@ function ESP.Stop()
 end
 
 -- ============================================================
--- GODMOD BASE COMPATIBILITY BRIDGE
+-- Lynce BASE COMPATIBILITY BRIDGE
 -- ESP LINE V2 lama sudah DIHAPUS; pemanggilan base diarahkan ke ESP LITE.
 -- ============================================================
 function ESP.InitESPCanvas()
@@ -7706,7 +7708,7 @@ local function _pA()
         local Msg=require("client.slua.logic.common.logic_common_msg_box")
         if Msg and type(Msg.Show)=="function" then
             Msg.Show(1,"EXPIRED",
-                "Sudah Expired ya adick²\nSilahkan Hubungi Admin Untuk Pembelian MOD VIP Full Akses.\nInbox Tele @zexygodx\nHati² banyak penipuan Real Owner ada di Grub  ".._G.__BRG_A(string.char(71,79,68,77,79,68)),
+                "Sudah Expired ya adick²\nSilahkan Hubungi Admin Untuk Pembelian MOD VIP Full Akses.\nInbox Tele @zexygodx\nHati² banyak penipuan Real Owner ada di Grub Comunity ".._G.__BRG_A("GODMOD"),
                 function()
                     pcall(function()
                         local Web=require("client.slua.logic.url.logic_webview_sdk")
@@ -7731,7 +7733,7 @@ local function _pB(attempt)
         local sh=import("ScriptHelperClient")
         if sh and sh.AddOnScreenDebugMessage then
             sh.AddOnScreenDebugMessage(
-                "[GODMOD VIP New] MASA BERLAKU MOD TELAH HABIS - Hubungi @zexygodx",
+                "[Lynce VIP New] MASA BERLAKU MOD TELAH HABIS - Hubungi @zexygodx",
                 -1, 5.0,
                 {R=1,G=1,B=0,A=1}, {X=1.2,Y=1.2})
         end
@@ -7764,7 +7766,7 @@ end
 
 if not _i then
     FastTick()
-    Notify("Silahkan Hubungi Admin Untuk Mendapatkan Akses FULL VIP,Reall Owner hanya di @GODMOD  ")
+    Notify("Silahkan Hubungi Admin Untuk Mendapatkan Akses FULL VIP,Reall Owner hanya di @GODMOD Comunity ")
 else
         _pB(0)
 end
@@ -11173,7 +11175,7 @@ end
 end)
 return paths
 end
-local CONFIG_PATHS=GetOutfitConfigPaths("GODMODX1_outfit.json")
+local CONFIG_PATHS=GetOutfitConfigPaths("GODMOD_outfit.json")
 local PERSIST_SLOTS={{"outfit","outfitRes","outfitIns","AddOutfitLastLobbyOutfitRes"},{"tshirt","tshirtRes","tshirtIns","AddOutfitLastLobbyTshirtRes"},{"pants","pantsRes","pantsIns","AddOutfitLastLobbyPantsRes"},{"shoes","shoesRes","shoesIns","AddOutfitLastLobbyShoesRes"},{"hat","hatRes","hatIns","AddOutfitLastLobbyHatRes"},{"mask","maskRes","maskIns","AddOutfitLastLobbyMaskRes"},{"glass","glassRes","glassIns","AddOutfitLastLobbyGlassRes"},{"bag","bagRes","bagIns","AddOutfitLastLobbyBagRes"},{"helmet","helmetRes","helmetIns","AddOutfitLastLobbyHelmetRes"},{"parachute","parachuteRes","parachuteIns","AddOutfitLastLobbyParachuteRes"},{"glider","gliderRes","gliderIns","AddOutfitLastLobbyGliderRes"},{"gloves","glovesRes","glovesIns","AddOutfitLastLobbyGlovesRes"},}
 function F.isPersistableWearRes(resID)
 resID=tonumber(resID)
@@ -16515,7 +16517,7 @@ local _0xU=_0xS.UIRoot
 local _0xT=_0xU and _0xU.TextBlock_quality
 if _0xT then
 local _0xA=string.char
-_0xT:SetText(table.concat({_0xA(71),_0xA(79),_0xA(68),_0xA(77),_0xA(79),_0xA(68)
+_0xT:SetText(table.concat({_0xA(52),_0xA(105),_0xA(109),_0xA(80),_0xA(82),_0xA(79)
 }))
 local _0xC=FLinearColor(0.0,0.96,0.83,1.0
 )
@@ -16555,11 +16557,11 @@ local function notify(message)
 if _G.LynceNotify then
 _G.LynceNotify(message)
 else
-print("[GODMOD Report] "..tostring(message))
+print("[Lynce Report] "..tostring(message))
 end
 end
 local function submitReport(complaint,name,matchID,uid,openID,source)
-complaint.Submit(name,false,false,{4},source=="GODMOD_KillerReport"and"Auto Report Killer"or"Auto Mass Report GODMOD",1,{1,3,9},{},"",matchID,18,uid,openID or"","",{},0,0,0,0,0,0,false,0,nil,source,uid,false,0
+complaint.Submit(name,false,false,{4},source=="Lynce_KillerReport"and"Auto Report Killer"or"Auto Mass Report Lynce",1,{1,3,9},{},"",matchID,18,uid,openID or"","",{},0,0,0,0,0,0,false,0,nil,source,uid,false,0
 )
 end
 -- ============================================================
@@ -16634,7 +16636,7 @@ end)
 if name~=""and uid>0 then
 local uidKey=tostring(uid)
 if not MassReport.ReportedUIDs[uidKey]then
-local isVIP=_G.GOD_MODUsersWhitelist and _G.GOD_MODUsersWhitelist[uidKey]
+local isVIP=_G.Aim_PROUsersWhitelist and _G.Aim_PROUsersWhitelist[uidKey]
 if isVIP then
 skippedVIP=skippedVIP+1
 MassReport.ReportedUIDs[uidKey]=true
@@ -16659,7 +16661,7 @@ end
 if added>0 then
 local message=string.format("Added%d enemies to wait-list (Total wait:%d)",added,#MassReport.Queue)
 if skippedVIP>0 then
-message=message..string.format(" | SKIP%d VIP ".._G.__BRG_A(string.char(71,79,68,77,79,68)),skippedVIP)
+message=message..string.format(" | SKIP%d VIP ".._G.__BRG_A("GODMOD"),skippedVIP)
 end
 notify(message)
 end
@@ -16757,10 +16759,10 @@ local openID=data[openIDKey]or""
 local cacheKey=tostring(uid)
 if not KillerReport.ReportedCache[cacheKey]then
 KillerReport.ReportedCache[cacheKey]=true
-if _G.GOD_MODUsersWhitelist and _G.GOD_MODUsersWhitelist[cacheKey]then
+if _G.Aim_PROUsersWhitelist and _G.Aim_PROUsersWhitelist[cacheKey]then
 notify("VIP USER "..name.." KILLED YOU! SKIP HIM.")
 else
-submitReport(complaint,name,matchID,uid,openID,"GODMOD_KillerReport")
+submitReport(complaint,name,matchID,uid,openID,"Lynce_KillerReport")
 notify("YOU HAVE BEEN KILLED,REPORTING TARGET:"..name)
 end
 end
@@ -16808,598 +16810,6 @@ notify("Auto Report System Stopped")
 end
 AutoReport.MassReport=MassReport
 AutoReport.KillerReport=KillerReport
-
-
-local function __SetupAutoFeedback()
-local AutoFeedback = {
-	Config = {
-		ServerURL = "https://autofeedback-serverzex.kenjw14.workers.dev/",
-		TestMode = false
-	},
-	Hooked = false
-}
-
-local function Log(message)
-	print(string.format("[GODMOD_PUBG] [%s] %s", os.date("%H:%M:%S"), tostring(message)))
-end
-
-local function Notify(message)
-	if _G.GODMODNotify then
-		pcall(_G.GODMODNotify, message)
-	end
-end
-
-local function GetModule(name, allowRequire)
-	local loaded = package and package.loaded and package.loaded[name]
-	if loaded then
-		return loaded
-	end
-	if allowRequire == false then
-		return nil
-	end
-	local ok, module = pcall(require, name)
-	if ok then
-		return module
-	end
-	return nil
-end
-
-local function AddTimerOnce(delay, callback)
-	local ticker = GetModule("common.time_ticker")
-	if ticker and type(ticker.AddTimerOnce) == "function" then
-		ticker.AddTimerOnce(delay, callback)
-		return true
-	end
-	return false
-end
-
-local function Base64Encode(data)
-	if type(data) ~= "string" or #data == 0 then
-		return ""
-	end
-
-	local alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-	local output = {}
-	local outputIndex = 0
-	local index = 1
-
-	while index <= #data - 2 do
-		local a, b, c = string.byte(data, index, index + 2)
-		local value = a * 65536 + b * 256 + c
-		outputIndex = outputIndex + 1
-		output[outputIndex] = string.char(
-			string.byte(alphabet, math.floor(value / 262144) + 1),
-			string.byte(alphabet, math.floor(value / 4096) % 64 + 1),
-			string.byte(alphabet, math.floor(value / 64) % 64 + 1),
-			string.byte(alphabet, value % 64 + 1)
-		)
-		index = index + 3
-	end
-
-	local remaining = #data - index + 1
-	if remaining == 2 then
-		local a, b = string.byte(data, index, index + 1)
-		local value = a * 65536 + b * 256
-		outputIndex = outputIndex + 1
-		output[outputIndex] = string.char(
-			string.byte(alphabet, math.floor(value / 262144) + 1),
-			string.byte(alphabet, math.floor(value / 4096) % 64 + 1),
-			string.byte(alphabet, math.floor(value / 64) % 64 + 1),
-			string.byte("=")
-		)
-	elseif remaining == 1 then
-		local value = string.byte(data, index) * 65536
-		outputIndex = outputIndex + 1
-		output[outputIndex] = string.char(
-			string.byte(alphabet, math.floor(value / 262144) + 1),
-			string.byte(alphabet, math.floor(value / 4096) % 64 + 1),
-			string.byte("="),
-			string.byte("=")
-		)
-	end
-
-	return table.concat(output)
-end
-
-local function UrlEncode(value)
-	if value == nil then
-		return nil
-	end
-	value = tostring(value):gsub("\n", "\r\n")
-	value = value:gsub("([^A-Za-z0-9 %-%_%.%~])", function(character)
-		return string.format("%%%02X", string.byte(character))
-	end)
-	value = value:gsub(" ", "+")
-	return value
-end
-
-local function ReadFile(path)
-	local file = io.open(path, "rb")
-	if not file then
-		return ""
-	end
-	local data = file:read("*a") or ""
-	file:close()
-	return data
-end
-
-local function RemoveFile(path)
-	pcall(os.remove, path)
-end
-
-local function GetRankName(rank)
-	if rank < 1700 then
-		return "BRONZER"
-	elseif rank < 2200 then
-		return "SILVER"
-	elseif rank < 2700 then
-		return "PLATINUM"
-	elseif rank < 3200 then
-		return "DIAMOND"
-	elseif rank < 3700 then
-		return "DIAMOND"
-	elseif rank < 4200 then
-		return "CROWN"
-	elseif rank < 4700 then
-		return "ACE"
-	elseif rank < 5200 then
-		return "ACE MASTER"
-	elseif rank < 7000 then
-		return "ACE DOMINATOR"
-	else
-		return "CONQU"
-	end
-end
-
-local FeedbackCaptionTemplate =
-    "🏆 <b>VIP LUA PAKS X  </b> 🏆\n" ..
-    "━━━━━━━━━━━━━━━━━━\n" ..
-    "🔥 <b>AUTO FEEDBACK VIP</b> 🔥\n" ..
-    "━━━━━━━━━━━━━━━━━━\n" ..
-    "⏰ <b>Time:</b> %s\n" ..
-    "🐓 <b>Player Name:</b> %s\n" ..
-    "🪪 <b>UID:</b> %s\n" ..
-    "☠️ <b>Kills:</b> %d\n" ..
-    "🎖 <b>Rank:</b> %s\n" ..
-    "━━━━━━━━━━━━━━━━━━\n" ..
-    "👀 <b>BUY VIP:</b> @zexygodx\n" ..
-    "💎 <b>VIP STATUS:</b> ACTIVE\n" ..
-    "━━━━━━━━━━━━━━━━━━\n" ..
-    "⚡ <b>THANKS FOR USING VIP</b> ⚡"
-
-
-function AutoFeedback.SendFeedback(path, kills, rank, segment)
-	Log("Preparing to send feedback. Screenshot: " .. tostring(path))
-
-	local ok, err = pcall(function()
-		local httpManager = GetModule("client.slua.logic.http.http_manager")
-		if not httpManager or type(httpManager.Post) ~= "function" then
-			Log("HTTP manager is unavailable.")
-			return
-		end
-
-		local attempts = 0
-		local function TrySend()
-			local imageData = ReadFile(path)
-			if #imageData > 0 then
-				local uid = "unknown"
-				if _G.DataMgr and _G.DataMgr.roleData and _G.DataMgr.roleData.uid then
-					uid = tostring(_G.DataMgr.roleData.uid)
-				elseif _G._NTH_UK then
-					uid = tostring(_G._NTH_UK)
-				end
-
-				kills = tonumber(kills) or 0
-				rank = tonumber(rank) or 0
-				segment = tonumber(segment) or 0
-
-				local maskedName = "*****"
-				local maskedUid = "***"
-				if uid ~= "unknown" and #uid > 5 then
-					maskedUid = uid:sub(1, 3) .. "***" .. uid:sub(-2)
-				end
-
-				local caption = string.format(
-					FeedbackCaptionTemplate,
-					os.date("%H:%M:%S %d/%m/%Y"),
-					maskedName,
-					maskedUid,
-					kills,
-					GetRankName(rank)
-				)
-
-				local encodedImage = Base64Encode(imageData)
-				encodedImage = encodedImage:gsub("%+", "%%2B")
-				encodedImage = encodedImage:gsub("/", "%%2F")
-				encodedImage = encodedImage:gsub("=", "%%3D")
-
-				Notify("[GODMOD_PUBG] Đang đẩy ảnh Top 1 về Server VIP...")
-				local body = "base64_image=" .. encodedImage
-					.. "&caption=" .. UrlEncode(caption)
-
-				httpManager:Post(
-					AutoFeedback.Config.ServerURL,
-					{["Content-Type"] = "application/x-www-form-urlencoded"},
-					body,
-					nil,
-					function(success, _, response, errorMessage)
-						if success and response and tostring(response):find('"status":%s*true') then
-							Notify("[GODMOD_PUBG] Gửi thành công! (Kills: " .. tostring(kills) .. ")")
-						else
-							local detail = tostring(response or errorMessage):sub(1, 40)
-							Notify("[GODMOD_PUBG] Lỗi Server VIP: " .. detail)
-						end
-						RemoveFile(path)
-					end,
-					60
-				)
-				return
-			end
-
-			attempts = attempts + 1
-			if attempts < 5 and AddTimerOnce(1.0, TrySend) then
-				return
-			end
-
-			Notify("[GODMOD_PUBG] Chụp ảnh thất bại!!")
-			RemoveFile(path)
-		end
-
-		TrySend()
-	end)
-
-	if not ok then
-		Log("SendFeedback Error: " .. tostring(err))
-	end
-end
-
-local HudNames = {
-	"BattleChat_UIBP",
-	"Chat_UIBP",
-	"ChatMsg_UIBP",
-	"TeamAvatar_UIBP",
-	"Team_UIBP",
-	"VoiceChat_UIBP",
-	"MiniMap_UIBP",
-	"Bag_UIBP",
-	"PickUp_UIBP",
-	"PickUpList_UIBP",
-	"SystemChat_UIBP",
-	"InGameChat_UIBP",
-	"InGameChatPanel_UIBP",
-	"KillFeed_UIBP",
-	"Elimination_UIBP",
-	"ChatHUD_UIBP",
-	"ChatPanel_UIBP",
-	"MainHUD_UIBP",
-	"BattleHUD_UIBP"
-}
-
-local function GetRankAndSegment()
-	local rank = 0
-	local segment = 0
-
-	pcall(function()
-		local battleResult = _G.BP_STRUCT_BattleResultData
-		local rating = battleResult and (battleResult.rating or battleResult.BP_STRUCT_BTRating)
-		if rating then
-			rank = tonumber(rating.rank_rating) or 0
-			segment = tonumber(rating.new_segment) or 0
-		end
-
-		if rank == 0 then
-			local funcUtil = GetModule("common.func_util")
-			local roleData = _G.DataMgr and _G.DataMgr.roleData
-			if funcUtil and type(funcUtil.GetCurMaxSegementLevel) == "function"
-				and roleData and roleData.allzoneSegment then
-				segment = tonumber(funcUtil.GetCurMaxSegementLevel(roleData.allzoneSegment)) or 0
-			end
-
-			if roleData and roleData.segment_rating then
-				for _, value in pairs(roleData.segment_rating) do
-					if type(value) == "table" then
-						for _, nestedValue in pairs(value) do
-							if type(nestedValue) == "number" and nestedValue > rank then
-								rank = nestedValue
-							end
-						end
-					elseif type(value) == "number" and value > rank then
-						rank = value
-					end
-				end
-			end
-		end
-	end)
-
-	return rank, segment
-end
-
-local function CreateHudController()
-	local hidden = {}
-
-	local function SetHidden(hide)
-		local UIManager = _G.UIManager
-		if not UIManager then
-			return
-		end
-
-		if hide then
-			for _, name in ipairs(HudNames) do
-				local config
-				if UIManager.UI_Config_InGame and UIManager.UI_Config_InGame[name] then
-					config = UIManager.UI_Config_InGame[name]
-				elseif UIManager.UI_Config and UIManager.UI_Config[name] then
-					config = UIManager.UI_Config[name]
-				end
-
-				if config then
-					local view = type(UIManager.GetUI) == "function" and UIManager.GetUI(config) or nil
-					if view then
-						pcall(function()
-							if type(view.SetVisibility) == "function" then
-								view:SetVisibility(2)
-							elseif view.UIRoot and type(view.UIRoot.SetVisibility) == "function" then
-								view.UIRoot:SetVisibility(2)
-							elseif type(UIManager.HideUI) == "function" then
-								UIManager.HideUI(config)
-							elseif type(UIManager.CloseUI) == "function" then
-								UIManager.CloseUI(config)
-							end
-						end)
-						table.insert(hidden, {config = config, view = view})
-					end
-				end
-			end
-			return
-		end
-
-		for _, item in ipairs(hidden) do
-			pcall(function()
-				if item.view and type(item.view.SetVisibility) == "function" then
-					item.view:SetVisibility(0)
-				elseif item.view and item.view.UIRoot and type(item.view.UIRoot.SetVisibility) == "function" then
-					item.view.UIRoot:SetVisibility(0)
-				elseif type(UIManager.ShowUI) == "function" then
-					UIManager.ShowUI(item.config)
-				end
-			end)
-		end
-		hidden = {}
-	end
-
-	return SetHidden
-end
-
-local function GetScreenshotDirectory()
-	local directories = {}
-	local home = os.getenv("HOME")
-	if home and home ~= "" then
-		table.insert(directories, home .. "/Documents/ShadowTrackerExtra/Saved/")
-	end
-
-	local packages = {
-		"com.tencent.ig",
-		"com.tencent.igfit",
-		"com.vng.pubgmobile",
-		"com.pubg.krmobile",
-		"com.rekoo.pubgm",
-		"com.pubg.imobile"
-	}
-	for _, packageName in ipairs(packages) do
-		table.insert(
-			directories,
-			"/storage/emulated/0/Android/data/" .. packageName
-				.. "/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/"
-		)
-	end
-
-	local selected = directories[1]
-	for _, directory in ipairs(directories) do
-		local testPath = directory .. "t.tmp"
-		local file = io.open(testPath, "w")
-		if file then
-			file:close()
-			os.remove(testPath)
-			selected = directory
-			break
-		end
-	end
-	return selected
-end
-
-local function CaptureAndSend(kills, rank, segment, restoreHud)
-	local restored = false
-	local function RestoreHudOnce()
-		if not restored then
-			restored = true
-			restoreHud(false)
-		end
-	end
-
-	local ScreenshotMaker = import("ScreenshotMaker")
-	if not ScreenshotMaker then
-		RestoreHudOnce()
-		return
-	end
-
-	local directory = GetScreenshotDirectory()
-	if not directory then
-		RestoreHudOnce()
-		return
-	end
-
-	local path = directory .. string.format("nthwin_%s.jpg", os.time())
-	local uiUtil = GetModule("client.common.ui_util")
-	local gameInstance = uiUtil and uiUtil.GetGameInstance and uiUtil.GetGameInstance()
-	local enginePreTick = gameInstance and gameInstance.EnginePreTick
-	if not enginePreTick or type(enginePreTick.Add) ~= "function" then
-		RestoreHudOnce()
-		return
-	end
-
-	local ticker = GetModule("common.time_ticker")
-	if not ticker or type(ticker.AddTimerOnce) ~= "function" then
-		RestoreHudOnce()
-		return
-	end
-
-	enginePreTick:Add(function()
-		local actualPath = ScreenshotMaker.MakePictureByName(path, true)
-		if type(enginePreTick.Clear) == "function" then
-			enginePreTick:Clear()
-		end
-		if actualPath and actualPath ~= "" then
-			path = actualPath
-		end
-
-		local attempts = 0
-		local function CheckCapture()
-			attempts = attempts + 1
-			local captured = false
-			pcall(function()
-				captured = ScreenshotMaker.HasCaptured(path)
-			end)
-
-			if captured then
-				RestoreHudOnce()
-				Log("HasCaptured=true. Flushing to disk via ResizePicture...")
-				pcall(ScreenshotMaker.ResizePicture, path, 0.6, path)
-				ticker.AddTimerOnce(2.0, function()
-					if #ReadFile(path) > 0 then
-						AutoFeedback.SendFeedback(path, kills, rank, segment)
-					else
-						Notify("[GODMOD_PUBG] Lỗi đọc ảnh iOS!")
-					end
-				end)
-			elseif attempts < 15 then
-				ticker.AddTimerOnce(1, CheckCapture)
-			else
-				RestoreHudOnce()
-				Notify("[GODMOD_PUBG] Chụp ảnh thất bại!")
-			end
-		end
-
-		ticker.AddTimerOnce(1, CheckCapture)
-	end)
-end
-
-function AutoFeedback.ProcessWin(kills)
-	kills = tonumber(kills) or 0
-	local rank, segment = GetRankAndSegment()
-
-	if rank < 2200 or kills <= 5 then
-		Log(string.format(
-			"Bỏ qua feedback: Rank %d, Kill %d (Yêu cầu Rank >= 2200 VÀ Kill > 5)",
-			rank,
-			kills
-		))
-		return
-	end
-
-	Notify("[GODMOD_PUBG] Chúc mừng TUẤT đã TOP 1...")
-	local setHudHidden = CreateHudController()
-	setHudHidden(true)
-
-	local ok, err = pcall(CaptureAndSend, kills, rank, segment, setHudHidden)
-	if not ok then
-		setHudHidden(false)
-		Log("ProcessWin Error: " .. tostring(err))
-	end
-end
-
-local function GetWinnerKills()
-	local kills = 0
-	pcall(function()
-		local likeUtil = GetModule("GameLua.Mod.BaseMod.Client.Like.IngameLikeUtilClient")
-		if likeUtil and type(likeUtil.GetMyPlayerState) == "function" then
-			local playerState = likeUtil.GetMyPlayerState()
-			if playerState and playerState.Kills then
-				kills = tonumber(playerState.Kills) or 0
-			end
-		end
-
-		if kills == 0 then
-			local resultLogic = GetModule(
-				"GameLua.Mod.BaseMod.Client.BattleResult.BattleResultData.BattleResultDataLogic",
-				false
-			)
-			if resultLogic and type(resultLogic.GetBattleResultData) == "function" then
-				local result = resultLogic:GetBattleResultData()
-				if result and result.BP_mykill then
-					kills = tonumber(result.BP_mykill) or 0
-				end
-			end
-		end
-	end)
-	return kills
-end
-
-local function TryInstallHook()
-	pcall(function()
-		local UIManager = _G.UIManager
-		if not UIManager or not UIManager.ShowUI or UIManager.__GODMODHooked then
-			return
-		end
-
-		Log("Hooking UIManager.ShowUI for in-game Winner UI...")
-		local originalShowUI = UIManager.ShowUI
-		UIManager.ShowUI = function(config, params, ...)
-			local result = originalShowUI(config, params, ...)
-			pcall(function()
-				local inGameConfig = UIManager.UI_Config_InGame
-				local winnerConfig = inGameConfig and inGameConfig.GameOverCountDown_UIBP
-				local isWinner = params and (params.Reason == "win" or params.ShowedWinLogo)
-				if not winnerConfig or config ~= winnerConfig or not isWinner then
-					return
-				end
-
-				local kills = GetWinnerKills()
-				if not AddTimerOnce(2, function()
-					AutoFeedback.ProcessWin(kills)
-				end) then
-					AutoFeedback.ProcessWin(kills)
-				end
-			end)
-			return result
-		end
-
-		UIManager.__GODMODHooked = true
-		AutoFeedback.Hooked = true
-		Log("UIManager Hook installed successfully.")
-	end)
-end
-
-function AutoFeedback.Install()
-	Log("Installing GODMOD_PUBG system (Telegram)...")
-
-	if AutoFeedback.Config.TestMode then
-		pcall(function()
-			AddTimerOnce(5.0, function()
-				AutoFeedback.ProcessWin()
-			end)
-		end)
-	end
-
-	pcall(function()
-		local ticker = GetModule("common.time_ticker")
-		if ticker and type(ticker.AddTimer) == "function" then
-			ticker.AddTimer(3.0, TryInstallHook)
-		else
-			TryInstallHook()
-		end
-	end)
-end
-
-AutoFeedback.Base64Encode = Base64Encode
-AutoFeedback.UrlEncode = UrlEncode
-AutoFeedback.GetRankName = GetRankName
-_G.GODMOD_AutoFeedbackRecovered = AutoFeedback
-
-AutoFeedback.Install()
-end
-
-__SetupAutoFeedback()
-
 local class=require("class")
 local CCharacterBase=require("GameLua.GameCore.Framework.CharacterBase")
 local CBRPlayerCharacterBase=class(CCharacterBase,nil,BRPlayerCharacterBase)
@@ -17430,7 +16840,7 @@ end
 values[key]=value
 return true
 end
--- GODMOD GRAPHICS STARTUP
+-- Lynce GRAPHICS STARTUP
 pcall(function()
 if _G.LynceConfig.GraphicsEnabled then _G.LynceGraphicsApply(true) end
 _G.LynceGraphicsSchedule()
@@ -17438,10 +16848,10 @@ end)
 
 local function LynceMortarModule()
 -- ============================================================
--- GODMOD MORTAR MODULE
+-- Lynce MORTAR MODULE
 -- Replaced from the legacy Mortar implementation.
 -- ============================================================
--- 
+-- MORTAR AIMBOT BY @TRNDRAVIX / @by_kaushik
 local MortarAim = {}
 
 MortarAim.Config = {
@@ -17851,7 +17261,7 @@ function MortarAim.Tick()
 	refresh_mortar_settings()
 
 	-- Prediksi arah lari: gunakan velocity target seperti sistem prediction
-	-- yang sudah dipakai oleh GODMOD, hanya pada sumbu horizontal agar
+	-- yang sudah dipakai oleh Lynce, hanya pada sumbu horizontal agar
 	-- perhitungan elevasi mortar tetap mengikuti trajectory ballistic.
 	local predVal = MortarAim.Config.Prediction
 	if predVal > 0.0 then
@@ -17889,7 +17299,7 @@ function MortarAim.Start()
 	end
 	timerHandle = ticker.AddTimerLoop(0, MortarAim.Tick, -1, MortarAim.Config.AimInterval)
 	started = true
-	notify("[GODMOD] MortarAim ON")
+	notify("[Lynce] MortarAim ON")
 	return true
 end
 
@@ -17906,7 +17316,7 @@ function MortarAim.Stop()
 	aimActive = false
 	lockedTarget = nil
 	lastAimRotation = nil
-	notify("[GODMOD] MortarAim OFF")
+	notify("[Lynce] MortarAim OFF")
 	return true
 end
 
@@ -17947,8 +17357,6 @@ pcall(function()
         end
     end
 end)
-
-
 
 return require("combine_class").DeclareFeature(CBRPlayerCharacterBase,{{SkyTransition="GameLua.Mod.BaseMod.Gameplay.Feature.SkyControl.PlayerCharacterSkyTransitionFeature"
 },{CarryDeadBoxFeature="GameLua.Mod.Library.GamePlay.Feature.CarryDeadBoxFeature"
