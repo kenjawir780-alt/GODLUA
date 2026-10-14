@@ -16507,35 +16507,16 @@ end)
 -- ================= AUTO SCAN BYPAS UPDATE ==============
 -- ==============================================================================
 pcall(function()
-local _0xM=require("GameLua.Mod.Library.Client.UI.IngamePhoneStateUI"
-)
-if _0xM and _0xM.__inner_impl then
-local _0xO=_0xM.__inner_impl.UpdateArtQualityUI
-_0xM.__inner_impl.UpdateArtQualityUI=function(_0xS,...)
-if _0xO then
-_0xO(_0xS,...)
-end
-local _0xU=_0xS.UIRoot
-local _0xT=_0xU and _0xU.TextBlock_quality
-if _0xT then
-local _0xA=string.char
-_0xT:SetText(table.concat({_0xA(52),_0xA(105),_0xA(109),_0xA(80),_0xA(82),_0xA(79)
-}))
-local _0xC=FLinearColor(0.0,0.96,0.83,1.0
-)
-_0xT:SetColorAndOpacity(FSlateColor(_0xC)
-)
-if _0xT.SetShadowOffset
-and _0xT.SetShadowColorAndOpacity then
-_0xT:SetShadowOffset(FVector2D(2.0,2.0)
-)
-_0xT:SetShadowColorAndOpacity(FLinearColor(0.0,0.0,0.0,0.5
-)
-)
-end
-end
-end
-end
+    local IPS = require("GameLua.Mod.Library.Client.UI.IngamePhoneStateUI")
+    if IPS and IPS.__inner_impl then
+        local o = IPS.__inner_impl.UpdateArtQualityUI
+        IPS.__inner_impl.UpdateArtQualityUI = function(self, _, _)
+            if self.UIRoot and self.UIRoot.TextBlock_quality then
+                self.UIRoot.TextBlock_quality:SetText("GODMOD X1")
+                self.UIRoot.TextBlock_quality:SetColorAndOpacity(FSlateColor(FLinearColor(0.0, 1.0, 1.0, 1.0))) -- Cyan
+            end
+        end
+    end
 end)
 -- ==============================================================================
 -- ================= SELESAI CORE ADD-OUTFIT V7.5 (SISTEM SISTEM SKIN) ==============
