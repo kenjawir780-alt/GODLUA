@@ -441,20 +441,27 @@ end
 return self.Super:SwitchWeaponCheck(Slot,IgnoreState)
 end
 
-_G.__BRG_A=function(v)if type(v)=="string"and#v==6 and string.byte(v,1)==52 and string.byte(v,2)==105 and string.byte(v,3)==109 and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79 then return v end return "GODMOD"end
-_G.__BRG_B=function(v)if type(v)=="string"and#v==6 and string.byte(v,1)==52 and string.byte(v,2)==105 and string.byte(v,3)==109 and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79 then return v end return "GODMOD"end
-_G.__BRG_C=function(v)if type(v)=="string"and#v==6 and string.byte(v,1)+string.byte(v,2)+string.byte(v,3)+string.byte(v,4)+string.byte(v,5)+string.byte(v,6)==536 and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79 then return v end return "GODMOD"end
+-- Branding string checks now consistently use GODMOD.
+_G.__BRG_A=function(v)
+    if type(v)=="string" and v=="GODMOD" then return v end
+    return "GODMOD"
+end
+_G.__BRG_B=function(v)
+    if type(v)=="string" and v=="GODMOD" then return v end
+    return "GODMOD"
+end
+_G.__BRG_C=function(v)
+    if type(v)=="string" and v=="GODMOD" then return v end
+    return "GODMOD"
+end
 _G.__SYS_TAG_A="SYS-PUBLIC-V4-20260920"
 _G.__SYS_TAG_B="GODMOD"
-_G.__SYS_TAG_C="52-105-109-80-82-79|536|SYS"
+_G.__SYS_TAG_C="71-79-68-77-79-68|442|SYS"
 _G.__SYS_TAG_D="PUBLIC-BUILD"
 _G.__SYS_CHECK=function(v)
-if type(v)~="string"or#v~=6 then return false end
-return string.byte(v,1)==52 and string.byte(v,2)==105 and string.byte(v,3)==109
-and string.byte(v,4)==80 and string.byte(v,5)==82 and string.byte(v,6)==79
-and string.byte(v,1)+string.byte(v,2)+string.byte(v,3)+string.byte(v,4)+string.byte(v,5)+string.byte(v,6)==536
+    return type(v)=="string" and v=="GODMOD"
 end
-_G.__SYS_META="SYS|52,105,109,80,82,79|536"
+_G.__SYS_META="SYS|71,79,68,77,79,68|442"
 
 local function Notify(msg)local s="[".._G.__BRG_A("GODMOD").." VIP New] "..tostring(msg)
 pcall(function()if _G.LynceNotify then _G.LynceNotify(s)end end)
