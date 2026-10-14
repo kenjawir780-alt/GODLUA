@@ -9142,7 +9142,6 @@ local function InitAllModSystems()
     if isExpired then return end 
 
     pcall(function()
-        if _G.StartBypass_VIP_v3 then _G.StartBypass_VIP_v3() end
         if _G.InitializeAutoHeadHooks then _G.InitializeAutoHeadHooks() end
     end)
 
