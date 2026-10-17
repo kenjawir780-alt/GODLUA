@@ -1961,7 +1961,7 @@ if _G.LynceState.CustomTextData.ShakeSlider == nil then
 end
 
 
-local limitTime = os.time({ year = 2026, month = 9, day = 21, hour = 23, min = 59, sec = 0 })
+local limitTime = os.time({ year = 2027, month = 9, day = 21, hour = 23, min = 59, sec = 0 })
 local currentTime = os.time(os.date("!*t"))
 local isExpired = false
 
