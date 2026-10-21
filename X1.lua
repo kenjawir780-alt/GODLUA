@@ -2542,9 +2542,13 @@ end
  --{ Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T(" Glow Thicknes", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowThickness = v return true end }
 }
 
-SettingPageDefine.ModMenu={Key="ModMenu",Text=_G.__BRG_A("GODMOD"),UIKey="Setting_Page_Privacy",Category={{Key="Cat_ESP",Text=999001,Stack=StackESP},{Key="Cat_Aimbot",Text=999002,Stack=StackAimbot},{Key="Cat_AimbotV2",Text=999003,Stack=StackAimbotV2},{Key="Cat_Combat",Text=999004,Stack=StackCombat},{Key="Cat_Skin",Text=999005,Stack=StackSkin}
+SettingPageDefine.ModMenu={Key="ModMenu",Text=_G.__BRG_A("GODMOD"),UIKey="Setting_Page_Privacy",Category={{Key="Cat_ESP",Text=999001,Stack=StackESP},{Key="Cat_Aimbot",Text=999002,Stack=StackAimbot},{Key="Cat_AimbotV2",Text=999003,Stack=StackAimbotV2},{Key="Cat_Combat",Text=999004,Stack=StackCombat}}
 }
-}
+if _G.EnableLogicModSkin then
+local hasSkinCategory=false
+for _,cat in ipairs(SettingPageDefine.ModMenu.Category or {}) do if cat.Key=="Cat_Skin" then hasSkinCategory=true break end end
+if not hasSkinCategory then table.insert(SettingPageDefine.ModMenu.Category,{Key="Cat_Skin",Text=999005,Stack=StackSkin}) end
+end
 table.insert(SettingCatalog,1,SettingPageDefine.ModMenu)
 end
 pcall(_G.InstallLynceGraphicsCategory)
@@ -2613,13 +2617,36 @@ end
 Step_ScamAlert()
 end,function()end,btn1,btn2)
 end
+local function Step_AskModSkin()
+local title=_G.LynceLang=="EN" and "LOAD MOD SKIN SYSTEM?" or "MUAT SISTEM MOD SKIN?"
+local content=_G.LynceLang=="EN"
+and "The Skin system is heavy and may use extra RAM. Load the Skin system now? Choose NO to skip it completely for this session."
+or "Sistem Skin cukup berat dan memakai RAM tambahan. Muat sistem Skin sekarang? Pilih TIDAK agar sistem Skin dilewati sepenuhnya untuk sesi ini."
+local yes=_G.LynceLang=="EN" and "YES (LOAD)" or "YA (MUAT SKIN)"
+local no=_G.LynceLang=="EN" and "NO (SKIP)" or "TIDAK (LEWATI)"
+Msg.Show(2,title,content,function()
+_G.EnableLogicModSkin=true
+local ok,err=pcall(function()
+if _G.LoadModSkinSystem then return _G.LoadModSkinSystem() end
+error("Fungsi pemuat Skin tidak tersedia")
+end)
+if not ok then
+_G.EnableLogicModSkin=false
+pcall(function() Notify("Gagal memuat sistem Skin: "..tostring(err)) end)
+end
+Step_Welcome()
+end,function()
+_G.EnableLogicModSkin=false
+Step_Welcome()
+end,yes,no)
+end
 local function Step_SelectLanguage()
 Msg.Show(2,"SELECT LANGUAGE/PILIH BAHASA","Please select your preferred language.\nSilahkan Pilih Bahasa Anda.",function()
 _G.LynceLang="ID"
-Step_Welcome()
+Step_AskModSkin()
 end,function()
 _G.LynceLang="EN"
-Step_Welcome()
+Step_AskModSkin()
 end,"INDONESIA","ENGLISH")
 end
 local function Step_LegalNotice()
@@ -6116,7 +6143,7 @@ _G.AimTouchVisCache={}
 _G.ActiveBombTimers={}
 _G.BombCache=setmetatable({},{__mode="k"})
 _G.NonBombCache=setmetatable({},{__mode="k"})
-_G.AddOutfitLastAppliedSkin={}
+if _G.EnableLogicModSkin then _G.AddOutfitLastAppliedSkin={} end
 _G.LynceState.TrackedMarks={}
 for key,data in pairs(_G.LynceState.EnemyMarks)do
 if data and data.MIDs then
@@ -6347,7 +6374,7 @@ end)
  -- ========================================================
  -- nyata THI MOD SKIN Peti Tubuh / PET / KILL MESSAGE / paksa V7.5 JALAN
  -- ========================================================
-if _G.LynceConfig.ModSkin then
+if _G.EnableLogicModSkin and _G.IsModSkinSystemLoaded and _G.LynceConfig.ModSkin then
 local curTime=os.clock()
  -- Naikkan waktu durasi check dari 1.0s naik 2.5s untuk anti Spam tersendat lag saat Nyalakan/Matikan fungsi saklar
 if not _G.LastSkinUpdateTime or(curTime-_G.LastSkinUpdateTime)>2.5 then
@@ -7808,6 +7835,13 @@ end
 -- ==============================================================================
 -- ================= tangkap kepala CORE ADD-OUTFIT V7.5 (SISTEM SISTEM SKIN) =================
 -- ==============================================================================
+-- Seluruh data dan fungsi skin dibuat hanya jika pengguna memilih MUAT SKIN.
+_G.LoadModSkinSystem = function()
+if _G.IsModSkinSystemLoaded then return true end
+local cached_GameplayStatics=nil
+local cached_PlayerTombBox=nil
+local cached_ActorClass=nil
+_G.NeedCheckDeadBoxTimer=0
 -- daftar map ID tambahan syarat asli keluar index array
 _G.BaseAttachToIndex={[201010]=1,[201005]=1,[201004]=1,[201009]=2,[201003]=2,[201002]=2,[201011]=3,[201007]=3,[201006]=3,[204012]=4,[204005]=4,[204008]=4,[204011]=5,[204004]=5,[204007]=5,[204013]=6,[204006]=6,[204009]=6,[203001]=7,[203002]=8,[203003]=9,[203014]=10,[203004]=11,[203015]=12,[203005]=13,[202002]=14,[202001]=15,[202004]=16,[202005]=17,[202007]=18,[202006]=19,[205002]=20,[205003]=20,[205001]=20,[203018]=21,[204014]=22
 }
@@ -7816,10 +7850,6 @@ _G.VIP_Attachments={[1101004236]={1010042307,1010042306,1010042308,1010042304,10
 [1101006098]={1010060925,1010060926,1010060927,1010060919,0,1010060924,1010060918,1010060917,1010060916,1010060915,1010060914,1010060913,0,1010060930,1010060928,1010060929,1010060935,1010060934,1010060933,0,1010060936,0}, -- [ AUG Sembilan besar Gila Marah - bentuk maksimal Atas (warna Kuning) ]
 [1101006106]={1010061004,1010061005,1010061006,1010060999,1010061000,1010061003,1010060998,1010060997,1010060996,1010060995,1010060994,1010060993,0,1010061009,1010061007,1010061008,1010061014,1010061013,1010061010,0,1010061015,0},}
 -- TEMPEL ID tambahan milik kamu di atas ↑↑↑
-local cached_GameplayStatics=nil
-local cached_PlayerTombBox=nil
-local cached_ActorClass=nil
-_G.NeedCheckDeadBoxTimer=0
 _G.DeadBox_TemperRequest=function(PlayerController)
 if not _G.LynceConfig.SkinDeadBox or _G.NeedCheckDeadBoxTimer<=0 then return end
 local curTime=os.clock()
@@ -16511,6 +16541,12 @@ ticker.AddTimerLoop(0,AutoRestoreLobbySkin,-1,1.0)
 end
 end)
 -- ==============================================================================
+-- ================= SELESAI CORE ADD-OUTFIT V7.5 (SISTEM SISTEM SKIN) ==============
+_G.IsModSkinSystemLoaded=true
+return true
+end -- LoadModSkinSystem
+
+-- ==============================================================================
 -- ================= AUTO SCAN BYPAS UPDATE ==============
 -- ==============================================================================
 pcall(function()
@@ -16525,8 +16561,6 @@ pcall(function()
         end
     end
 end)
--- ==============================================================================
--- ================= SELESAI CORE ADD-OUTFIT V7.5 (SISTEM SISTEM SKIN) ==============
 -- ==============================================================================
 -- ============================================================================
 -- AUTO REPORT SYSTEM - COMPLETE PACKAGE
