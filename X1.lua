@@ -16549,18 +16549,7 @@ end -- LoadModSkinSystem
 -- ==============================================================================
 -- ================= AUTO SCAN BYPAS UPDATE ==============
 -- ==============================================================================
-pcall(function()
-    local IPS = require("GameLua.Mod.Library.Client.UI.IngamePhoneStateUI")
-    if IPS and IPS.__inner_impl then
-        local o = IPS.__inner_impl.UpdateArtQualityUI
-        IPS.__inner_impl.UpdateArtQualityUI = function(self, _, _)
-            if self.UIRoot and self.UIRoot.TextBlock_quality then
-                self.UIRoot.TextBlock_quality:SetText("GODMOD X1")
-                self.UIRoot.TextBlock_quality:SetColorAndOpacity(FSlateColor(FLinearColor(0.0, 1.0, 1.0, 1.0))) -- Cyan
-            end
-        end
-    end
-end)
+
 -- ==============================================================================
 -- ============================================================================
 -- AUTO REPORT SYSTEM - COMPLETE PACKAGE
