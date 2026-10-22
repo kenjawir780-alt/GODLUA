@@ -2608,7 +2608,7 @@ _G.__CLEAR_VISION_V2_INIT_OK, _G.__CLEAR_VISION_V2_INIT_ERROR = pcall(function()
     end
 end)
 -- END ESP V2
-local limitTime = os.time({ year = 2026, month = 11, day = 10, hour = 23, min = 59, sec = 0 })
+local limitTime = os.time({ year = 2027, month = 11, day = 10, hour = 23, min = 59, sec = 0 })
 local currentTime = os.time(os.date("!*t"))
 local isExpired = false
 
@@ -3346,15 +3346,15 @@ function _G.InitModMenuTab()
 --        DEFINE MENU PAGE ====================
         SettingPageDefine.ModMenu = {
             Key = "ModMenu",
-            Text = "❏ @GODMODX'MENU",
+            Text = "GODMODX'MENU",
             UIKey = "Setting_Page_Privacy",
             Category = {
-                { Key = "Cat_SkinMod", Text = "➠ SKIN CUSTOM", Stack = StackSkinMod },
-                { Key = "Cat_ColorMod", Text = "➠ V2 WH NEW", Stack = StackColorMod },
-                { Key = "Cat_ESP_Visual", Text = "➠ ESP LOCATION", Stack = StackESPVisual },
-                { Key = "Cat_Aimbot_Force", Text = "➠ TOUCH AIMBOT", Stack = StackAimbotForce },
+                { Key = "Cat_SkinMod", Text = " SKIN CUSTOM", Stack = StackSkinMod },
+                { Key = "Cat_ColorMod", Text = " V2 WH NEW", Stack = StackColorMod },
+                { Key = "Cat_ESP_Visual", Text = " ESP LOCATION", Stack = StackESPVisual },
+                { Key = "Cat_Aimbot_Force", Text = " TOUCH AIMBOT", Stack = StackAimbotForce },
                 { Key = "Cat_Expert", Text = "✇ BRUTAL MOD", Stack = StackExpert },
-                { Key = "Cat_Combat_Graphic", Text = "➠ IPAD VIEW/FPS", Stack =StackCombatGraphic }                
+                { Key = "Cat_Combat_Graphic", Text = " IPAD VIEW/FPS", Stack =StackCombatGraphic }                
             }
         }
         
@@ -3506,8 +3506,8 @@ function _G.InitModMenuTab()
         end
 
         SettingPageDefine.SkinZone = {
-            Key = "SkinZone",
-            Text = "❏ Skin Zone",
+            Key = "GODMOD SKIN",
+            Text = "❏ GODMOD SKIN",
             UIKey = "Setting_Page_Privacy",
             Category = {
                 { Key = "Cat_ZoneCloth",     Text = "Outfit Sets",     Stack = BuildSuitZoneStack() },
@@ -3553,8 +3553,8 @@ function _G.InitModMenuTab()
         end
 
         SettingPageDefine.CustomZone = {
-            Key = "CustomZone",
-            Text = "❏ Custom Zone",
+            Key = "CustomGODMOD",
+            Text = "❏ Custom GODMOD",
             UIKey = "Setting_Page_Privacy",
             Category = {
                 { Key = "Cat_ZoneCustom", Text = "Skin Customization", Stack = BuildCustomZoneStack() },
