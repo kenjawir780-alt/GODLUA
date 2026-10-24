@@ -1112,11 +1112,13 @@ function _G.InitModMenuTab()
     
     -- 1. TẠO BẢNG ID ẢO VỚI TEXT MỚI (Hỗ trợ 2 ngôn ngữ)
     local FakeTextMap = {
-        [999000] = T("VIP GODMOD", ""),
-        [999001] = T(" ESP VISUAL", "ESP VISUAL"),
-        [999002] = T(" AIMBOT ORIGINAL", " AIMBOT ORIGINAL"),
-        [999003] = T(" AIMTOUCH", " AIMTOUCH"),
-        [999004] = T("OPTIMIZE VISUAL", " OPTIMIZE VISUAL"),
+        [999000] = T("GOD MOD VIP"),
+        [999001] = T(" ESP"),
+        [999002] = T("AIM V1"),
+        [999003] = T("AIMTOUCH"),
+        [999004] = T("SUPORT"),
+        [999005] = T("SKIN MOD"),
+        [999006] = T(" ESP V2")
     }
     -- 2. HOOK TOÀN BỘ HÀM ĐỌC TEXT CỦA GAME (FIX LỖI TRỐNG THANH TAB)
     if LocUtil and not LocUtil._IsModMenuHooked_V2 then
@@ -1295,12 +1297,16 @@ local StackAimbotV2 = {
      { Key = "ModMenu_AT_Mortar_FOVColor", UI = AliasMap.Slider, Text = T("      Warna Lingkaran FOV Mortir (1-7)", "      Circle Color (1-7)"), ExpandHandle = "ModMenu_AT_Mortar_Ex", MinValue = 1, MaxValue = 7, min = 1, max = 7, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchMortarFOVColor or 5 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchMortarFOVColor = v return true end }
  }
 
- --local StackSkin = {
-     
-     --{ Key = "ModMenu_ModEmote", UI = AliasMap.Switcher, Text = T("Buka Semua Emote VIP", "Unlock All VIP Emotes"), GetFunc = function() return _G.LynceConfig.ModEmote end, SetFunc = function(c,v) _G.LynceConfig.ModEmote = v return true end },
-     --{ Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("Kill Messenger VIP", "VIP Kill Messenger"), GetFunc = function() return _G.LynceConfig.KillMessage end, SetFunc = function(c,v) _G.LynceConfig.KillMessage = v return true end },
-     --{ Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Tampilkan jumlah Kill)", "Kill Counter UI"), GetFunc = function() return _G.LynceConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceConfig.KillCountUI = v return true end },
- --}
+        local StackSkin = {
+            
+            { Key = "ModMenu_ModEmote", UI = AliasMap.Switcher, Text = T("#UNLOCK EMOTE", "#UNLOCK EMOTE"), GetFunc = function() return _G.LynceConfig.ModEmote end, SetFunc = function(c,v) _G.LynceConfig.ModEmote = v return true end },
+            { Key = "ModMenu_ModSkin", UI = AliasMap.Switcher, Text = T("#UNLOCK SKIN", "#UNLOCK SKIN"), GetFunc = function() return _G.LynceConfig.ModSkin end, SetFunc = function(c,v) _G.LynceConfig.ModSkin = v return true end },
+            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("#SKIN DEADBOX", "#SKIN DEADBOX"), GetFunc = function() return _G.LynceConfig.SkinDeadBox end, SetFunc = function(c,v) _G.LynceConfig.SkinDeadBox = v return true end },
+            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("#UNLOCK SKIN ATTACHMENT", "UNLOCK SKIN ATTACHMENT"), GetFunc = function() return _G.LynceConfig.SkinAttachment end, SetFunc = function(c,v) _G.LynceConfig.SkinAttachment = v return true end },
+            { Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("#UNLOCK KILL MESSEGE", "UNLOCK KILL MESSEGE"), GetFunc = function() return _G.LynceConfig.KillMessage end, SetFunc = function(c,v) _G.LynceConfig.KillMessage = v return true end },
+            { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("#UNLOCK KILL COUNT", "#UNLOCK KILL COUNT"), GetFunc = function() return _G.LynceConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceConfig.KillCountUI = v return true end },
+        }
+
 
 local StackCombat = {
 
