@@ -1430,7 +1430,7 @@ local function GetConfigPaths(fileName)
     return paths
 end
 
-local ConfigFileName = "godmodingx_settings.txt"
+local ConfigFileName = "Lyncex11_settings.txt"
 _G.LastConfigSaveStr = ""
 
 -- fungsi simpan konfigurasi
@@ -9474,7 +9474,7 @@ local function GetOutfitConfigPaths(fileName)
     return paths
 end
 
-local CONFIG_PATHS = GetOutfitConfigPaths("GODMODINGX_outfit.json")
+local CONFIG_PATHS = GetOutfitConfigPaths("Lyncex11_outfit.json")
 
 local PERSIST_SLOTS = {
     { "outfit", "outfitRes", "outfitIns", "AddOutfitLastLobbyOutfitRes" },
