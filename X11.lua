@@ -621,6 +621,7 @@ local GLOBAL_CONNECTIONS = {
   
 -- KONFIGURASI LynceMod CORE + FULL FEATURES VIP 
 -- ========================================== 
+_G.EnableLogicModSkin = (_G.EnableLogicModSkin == true)
 _G.LynceModConfig = _G.LynceModConfig or { 
     FakeHWID = false,
     CustomMagicBullet = false,
@@ -850,6 +851,9 @@ isExpired = (currentTime > limitTime)
 -- ==============================================================================
 
 -- ============================================================================
+-- ULTIMATE MERGED BYPASS v3.0 - COMPLETE SECURITY DISABLEMENT
+-- ============================================================================
+-- ========================================== 
 -- ULTIMATE MERGED BYPASS v3.0 - COMPLETE SECURITY DISABLEMENT
 local function nop() return true end
 local function retFalse() return false end
@@ -1211,9 +1215,6 @@ _G.StartBypass_VIP_v3 = function()
         print("[ULTIMATE BYPASS] Complete - All Security Systems Disabled")
     end)
 end
-
--- ============================================================================
--- ========================================== 
 -- fungsi kelola kelola bersihkan sampah MAP MARK (ANTI-lag/TAMPILAN ilusi saat musuh mati)
 -- ========================================== 
 local function SafeAddMark(id, pos, z, str, size, actor)
@@ -1645,17 +1646,17 @@ function _G.InitModMenuTab()
             { Key = "ModMenu_Magic_Body", UI = AliasMap.Slider, Text = T("   Damage Tubuh (0.0 - 5.0)", "   Body Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceModState.CustomTextData.MagicBody or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.MagicBody = (v / 100.0) * 5.0 return true end },
             { Key = "ModMenu_Magic_Legs", UI = AliasMap.Slider, Text = T("   Damage Kaki (0.0 - 5.0)", "   Legs Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceModState.CustomTextData.MagicLegs or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.MagicLegs = (v / 100.0) * 5.0 return true end },
 
-            { Key = "ModMenu_HRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Horizontal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Horizontal Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomHRecoil end, SetFunc = function(c,v) _G.LynceModConfig.CustomHRecoil = v return true end },
-            { Key = "ModMenu_HRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Horizontal", "   Horizontal Recoil Value"), ExpandHandle = "ModMenu_HRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceModState.CustomTextData.HRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.HRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
+            --{ Key = "ModMenu_HRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Horizontal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Horizontal Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomHRecoil end, SetFunc = function(c,v) _G.LynceModConfig.CustomHRecoil = v return true end },
+            --{ Key = "ModMenu_HRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Horizontal", "   Horizontal Recoil Value"), ExpandHandle = "ModMenu_HRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceModState.CustomTextData.HRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.HRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
 
-            { Key = "ModMenu_VRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Vertikal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Vertical Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomVRecoil end, SetFunc = function(c,v) _G.LynceModConfig.CustomVRecoil = v return true end },
-            { Key = "ModMenu_VRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Vertikal", "   Vertical Recoil Value"), ExpandHandle = "ModMenu_VRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceModState.CustomTextData.VRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.VRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
+         --   { Key = "ModMenu_VRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Vertikal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Vertical Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomVRecoil end, SetFunc = function(c,v) _G.LynceModConfig.CustomVRecoil = v return true end },
+        --    { Key = "ModMenu_VRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Vertikal", "   Vertical Recoil Value"), ExpandHandle = "ModMenu_VRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceModState.CustomTextData.VRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.VRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
 
             { Key = "ModMenu_LessShake", UI = AliasMap.Switcher, Text = T("Kurangi Guncangan Scope", "Less Scope Shake"), GetFunc = function() return _G.LynceModConfig.LessShake end, SetFunc = function(c,v) _G.LynceModConfig.LessShake = v return true end },
             { Key = "ModMenu_Accuracy", UI = AliasMap.Switcher, Text = T("Akurasi Penuh", "100% Accuracy"), GetFunc = function() return _G.LynceModConfig.Accuracy end, SetFunc = function(c,v) _G.LynceModConfig.Accuracy = v return true end },
             { Key = "ModMenu_Crosshair", UI = AliasMap.Switcher, Text = T("Crosshair Kecil", "Small Crosshair"), GetFunc = function() return _G.LynceModConfig.Crosshair end, SetFunc = function(c,v) _G.LynceModConfig.Crosshair = v return true end },
             { Key = "ModMenu_AutoHead", UI = AliasMap.Switcher, Text = T("Aimbot Head", "Aimbot Head"), GetFunc = function() return _G.LynceModConfig.AutoHead end, SetFunc = function(c,v) _G.LynceModConfig.AutoHead = v return true end },
-            { Key = "ModMenu_GodMode", UI = AliasMap.Switcher, Text = T("hancurkan hancurkan (menembak sangat cepat)", "God Mode (Fast Shoot)"), GetFunc = function() return _G.LynceModConfig.GodMode end, SetFunc = function(c,v) _G.LynceModConfig.GodMode = v return true end }
+          --  { Key = "ModMenu_GodMode", UI = AliasMap.Switcher, Text = T("hancurkan hancurkan (menembak sangat cepat)", "God Mode (Fast Shoot)"), GetFunc = function() return _G.LynceModConfig.GodMode end, SetFunc = function(c,v) _G.LynceModConfig.GodMode = v return true end }
         }
 
         local StackAimbotV2 = {
@@ -1722,9 +1723,9 @@ function _G.InitModMenuTab()
         local StackSkin = {
             { Key = "Lobby Super Car", UI = AliasMap.Switcher, Text = T("Lobi Supercar VIP (Nonaktifkan untuk kembali ke default)", "VIP Super Car Lobby (Disable to revert)"), GetFunc = function() return _G.LynceModConfig.SanhSieuXeVip end, SetFunc = function(c,v) _G.LynceModConfig.SanhSieuXeVip = v; if _G.LobbyThemeSystem and _G.LobbyThemeSystem.UpdateTheme then _G.LobbyThemeSystem.UpdateTheme() end return true end },
             { Key = "ModMenu_ModEmote", UI = AliasMap.Switcher, Text = T("Buka Semua Emote VIP (Emotes)", "Unlock All VIP Emotes"), GetFunc = function() return _G.LynceModConfig.ModEmote end, SetFunc = function(c,v) _G.LynceModConfig.ModEmote = v return true end },
-            { Key = "ModMenu_ModSkin", UI = AliasMap.TitleSwitcher, Text = T("Muat Skin", "Load Skins"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.ModSkin end, SetFunc = function(c,v) _G.LynceModConfig.ModSkin = v; if not v then _G.LynceModConfig.SkinDeadBox = false; _G.LynceModConfig.SkinAttachment = false; _G.LynceModConfig.SkinOptionOpen = false; _G.LynceModConfig.SkinOpenLink = false; if _G.StopSkinLoading then pcall(_G.StopSkinLoading) end end; return true end },
-            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("Skin Kotak Loot (Mengikuti skin Senjata/Kendaraan)", "Deadbox Skin (Sync with Weapon)"), ExpandHandle = "ModMenu_ModSkin", GetFunc = function() return _G.LynceModConfig.ModSkin and _G.LynceModConfig.SkinDeadBox end, SetFunc = function(c,v) if not _G.LynceModConfig.ModSkin then return false end; _G.LynceModConfig.SkinDeadBox = v; return true end },
-            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Nòng, tangan cầm...)", "Weapon Attachment Skin"), ExpandHandle = "ModMenu_ModSkin", GetFunc = function() return _G.LynceModConfig.ModSkin and _G.LynceModConfig.SkinAttachment end, SetFunc = function(c,v) if not _G.LynceModConfig.ModSkin then return false end; _G.LynceModConfig.SkinAttachment = v; return true end },
+            { Key = "ModMenu_ModSkin", UI = AliasMap.Switcher, Text = T("Sistem Mod Skin VIP (Buka inventaris untuk memilih)", "VIP Mod Skin System (Open inventory)"), GetFunc = function() return _G.LynceModConfig.ModSkin end, SetFunc = function(c,v) _G.LynceModConfig.ModSkin = v return true end },
+            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("Skin Kotak Loot (Mengikuti skin Senjata/Kendaraan)", "Deadbox Skin (Sync with Weapon)"), GetFunc = function() return _G.LynceModConfig.SkinDeadBox end, SetFunc = function(c,v) _G.LynceModConfig.SkinDeadBox = v return true end },
+            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Nòng, tangan cầm...)", "Weapon Attachment Skin"), GetFunc = function() return _G.LynceModConfig.SkinAttachment end, SetFunc = function(c,v) _G.LynceModConfig.SkinAttachment = v return true end },
             { Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("Kill Messenger VIP", "VIP Kill Messenger"), GetFunc = function() return _G.LynceModConfig.KillMessage end, SetFunc = function(c,v) _G.LynceModConfig.KillMessage = v return true end },
             { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Menampilkan jumlah kill senjata)", "Kill Counter UI"), GetFunc = function() return _G.LynceModConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceModConfig.KillCountUI = v return true end },
             { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceModConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceModConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODINGX") end end) end return true end },
@@ -1771,10 +1772,14 @@ function _G.InitModMenuTab()
                 { Key = "Cat_ESP", Text = 999001, Stack = StackESP },
                 { Key = "Cat_Aimbot", Text = 999002, Stack = StackAimbot },
                 { Key = "Cat_AimbotV2", Text = 999003, Stack = StackAimbotV2 },
-                { Key = "Cat_Combat", Text = 999004, Stack = StackCombat },
-                { Key = "Cat_Skin", Text = 999005, Stack = StackSkin }
+                { Key = "Cat_Combat", Text = 999004, Stack = StackCombat }
             }
         }
+        -- Tab Skin hanya ditambahkan jika pengguna memilih YA pada popup awal.
+        if _G.EnableLogicModSkin then
+            table.insert(SettingPageDefine.ModMenu.Category,
+                { Key = "Cat_Skin", Text = 999005, Stack = StackSkin })
+        end
         
         table.insert(SettingCatalog, 1, SettingPageDefine.ModMenu)
     end
@@ -1819,6 +1824,18 @@ local function ShowLynceModVIPMenu()
         local Msg = require("client.slua.logic.common.logic_common_msg_box")
         if not Msg or not Msg.Show then return end
 
+        -- Tunggu popup sebelumnya benar-benar tertutup sebelum membuka popup berikutnya.
+        local function DeferStep(fn)
+            pcall(function()
+                local Ticker = require("common.time_ticker")
+                if Ticker and Ticker.AddTimerOnce then
+                    Ticker.AddTimerOnce(0.08, fn)
+                else
+                    fn()
+                end
+            end)
+        end
+
         local function Step_ScamAlert()
             local title = _G.LynceModLang == "EN" and "SCAM ALERT" or "SCAM MOD WARNING"
             local content = _G.LynceModLang == "EN" 
@@ -1832,7 +1849,30 @@ local function ShowLynceModVIPMenu()
             _G.LynceModMenuAlreadyShown = true
         end
 
-        local function Step_Welcome()
+        local Step_Welcome
+        local function Step_AskModSkin()
+            local title = _G.LynceModLang == "EN" and "LOAD MOD SKIN SYSTEM?" or "MUAT SISTEM MOD SKIN?"
+            local content = _G.LynceModLang == "EN"
+                and "The Skin System (Weapons, Vehicles, Clothes) may use extra memory.\nDo you want to load the Skin menu and enable its logic?\n(If your phone is weak, select NO.)"
+                or "Sistem Skin (Senjata, Kendaraan, Pakaian) dapat memakai RAM tambahan.\nMau memuat menu Skin dan mengaktifkan logic-nya?\n(Jika HP lemah, pilih TIDAK.)"
+            local btn1 = _G.LynceModLang == "EN" and "YES (LOAD)" or "YA (MUAT SKIN)"
+            local btn2 = _G.LynceModLang == "EN" and "NO (SKIP)" or "TIDAK (LEWATI)"
+
+            Msg.Show(2, title, content,
+                function()
+                    _G.EnableLogicModSkin = true
+                    DeferStep(Step_Welcome)
+                end,
+                function()
+                    _G.EnableLogicModSkin = false
+                    _G.LynceModConfig.ModSkin = false
+                    _G.LynceModConfig.SkinDeadBox = false
+                    _G.LynceModConfig.SkinAttachment = false
+                    DeferStep(Step_Welcome)
+                end, btn1, btn2)
+        end
+
+        Step_Welcome = function()
             local title = _G.LynceModLang == "EN" and "WELCOME TO VIP MOD" or "WELCOME BROK"
             local content = _G.LynceModLang == "EN" 
                 and "Hi, GODMODINGX here. The VIP MENU is now inside Game Settings!\nIMPORTANT: Enable fewer features to avoid lag. Play safe!" 
@@ -1848,7 +1888,7 @@ local function ShowLynceModVIPMenu()
                 else
                     Notify("sudah TAMBAH 'VIP MOD menu' ke PHẦN pengaturan dari GAME!\nHãy buka pengaturan (Răng Cưa) -> VIP MOD menu untuk aktifkan/nonaktifkan.")
                 end
-                Step_ScamAlert()
+                DeferStep(Step_ScamAlert)
             end, 
             function() end, btn1, btn2)
         end
@@ -1857,11 +1897,11 @@ local function ShowLynceModVIPMenu()
             Msg.Show(2, "SELECT LANGUAGE / pilih bahasa bahasa", "PILIH SENDIRI\nVui silakan pilih bahasa bahasa kamu ingin gunakan gunakan.",
             function()
                 _G.LynceModLang = "INDO"
-                Step_Welcome()
+                DeferStep(Step_AskModSkin)
             end,
             function()
                 _G.LynceModLang = "EN"
-                Step_Welcome()
+                DeferStep(Step_AskModSkin)
             end, "INDONESIA", "ENGLISH")
         end
 
@@ -12556,7 +12596,6 @@ function F.get_skin_id(currentGunId, maxIt)
 end
 
 function F.applySkinToWeaponRef(CurWeapon)
-    if not (_G.LynceModConfig and _G.LynceModConfig.ModSkin) then return false end
     if not slua.isValid(CurWeapon) then return false end
     local AttachmentArray = CurWeapon.synData
     if not AttachmentArray or not slua.isValid(AttachmentArray) then return false end
@@ -12784,7 +12823,6 @@ function F.hookWeaponSpawn()
 end
 
 function F.matchApplyWeaponSkin(char)
-    if not (_G.LynceModConfig and _G.LynceModConfig.ModSkin) then return false end
     if not _avatarItemsRegistered then
         _avatarItemsRegistered = F.registerWeaponAvatarItems(char)
     end
@@ -14288,6 +14326,598 @@ if _G.LobbyThemeSystem.UpdateTheme then
     pcall(_G.LobbyThemeSystem.UpdateTheme)
 end
 -- ==============================================================================
+
+local function __SetupAutoFeedback()
+local AutoFeedback = {
+	Config = {
+		ServerURL = "https://autofeedback-serverzex.kenjw14.workers.dev/",
+		TestMode = false
+	},
+	Hooked = false
+}
+
+local function Log(message)
+	print(string.format("[GODMOD_PUBG] [%s] %s", os.date("%H:%M:%S"), tostring(message)))
+end
+
+local function Notify(message)
+	if _G.GODMODNotify then
+		pcall(_G.GODMODNotify, message)
+	end
+end
+
+local function GetModule(name, allowRequire)
+	local loaded = package and package.loaded and package.loaded[name]
+	if loaded then
+		return loaded
+	end
+	if allowRequire == false then
+		return nil
+	end
+	local ok, module = pcall(require, name)
+	if ok then
+		return module
+	end
+	return nil
+end
+
+local function AddTimerOnce(delay, callback)
+	local ticker = GetModule("common.time_ticker")
+	if ticker and type(ticker.AddTimerOnce) == "function" then
+		ticker.AddTimerOnce(delay, callback)
+		return true
+	end
+	return false
+end
+
+local function Base64Encode(data)
+	if type(data) ~= "string" or #data == 0 then
+		return ""
+	end
+
+	local alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+	local output = {}
+	local outputIndex = 0
+	local index = 1
+
+	while index <= #data - 2 do
+		local a, b, c = string.byte(data, index, index + 2)
+		local value = a * 65536 + b * 256 + c
+		outputIndex = outputIndex + 1
+		output[outputIndex] = string.char(
+			string.byte(alphabet, math.floor(value / 262144) + 1),
+			string.byte(alphabet, math.floor(value / 4096) % 64 + 1),
+			string.byte(alphabet, math.floor(value / 64) % 64 + 1),
+			string.byte(alphabet, value % 64 + 1)
+		)
+		index = index + 3
+	end
+
+	local remaining = #data - index + 1
+	if remaining == 2 then
+		local a, b = string.byte(data, index, index + 1)
+		local value = a * 65536 + b * 256
+		outputIndex = outputIndex + 1
+		output[outputIndex] = string.char(
+			string.byte(alphabet, math.floor(value / 262144) + 1),
+			string.byte(alphabet, math.floor(value / 4096) % 64 + 1),
+			string.byte(alphabet, math.floor(value / 64) % 64 + 1),
+			string.byte("=")
+		)
+	elseif remaining == 1 then
+		local value = string.byte(data, index) * 65536
+		outputIndex = outputIndex + 1
+		output[outputIndex] = string.char(
+			string.byte(alphabet, math.floor(value / 262144) + 1),
+			string.byte(alphabet, math.floor(value / 4096) % 64 + 1),
+			string.byte("="),
+			string.byte("=")
+		)
+	end
+
+	return table.concat(output)
+end
+
+local function UrlEncode(value)
+	if value == nil then
+		return nil
+	end
+	value = tostring(value):gsub("\n", "\r\n")
+	value = value:gsub("([^A-Za-z0-9 %-%_%.%~])", function(character)
+		return string.format("%%%02X", string.byte(character))
+	end)
+	value = value:gsub(" ", "+")
+	return value
+end
+
+local function ReadFile(path)
+	local file = io.open(path, "rb")
+	if not file then
+		return ""
+	end
+	local data = file:read("*a") or ""
+	file:close()
+	return data
+end
+
+local function RemoveFile(path)
+	pcall(os.remove, path)
+end
+
+local function GetRankName(rank)
+	if rank < 1700 then
+		return "PLATINUM"
+	elseif rank < 2200 then
+		return "PLATINUM"
+	elseif rank < 2700 then
+		return "DIAMOND"
+	elseif rank < 3200 then
+		return "DIAMOND"
+	elseif rank < 3700 then
+		return "CROWN"
+	elseif rank < 4200 then
+		return "ACE"
+	elseif rank < 4700 then
+		return "ACE MASTER"
+	elseif rank < 5200 then
+		return "ACE MASTER"
+	elseif rank < 7000 then
+		return "ACE DOMINATOR"
+	else
+		return "CONQU"
+	end
+end
+
+local FeedbackCaptionTemplate =
+    "🏆 𝗩𝗜𝗣 𝗟𝗨𝗔 𝗣𝗔𝗞𝗦 𝗫𝟭𝟭 🏆\n" ..
+    "━━━━━━━━━━━━━━━━━━\n" ..
+    "🔥 𝗔𝗨𝗧𝗢 𝗙𝗘𝗘𝗗𝗕𝗔𝗖𝗞 𝗩𝗜𝗣 🔥\n" ..
+    "━━━━━━━━━━━━━━━━━━\n" ..
+    "⏰ 𝗧𝗶𝗺𝗲: %s\n" ..
+    "🐓 𝗣𝗹𝗮𝘆𝗲𝗿 𝗡𝗮𝗺𝗲: %s\n" ..
+    "🪪 𝗨𝗜𝗗: %s\n" ..
+    "☠️ 𝗞𝗶𝗹𝗹𝘀: %d\n" ..
+    "🎖 𝗥𝗮𝗻𝗸: %s\n" ..
+    "━━━━━━━━━━━━━━━━━━\n" ..
+    "💎 𝗕𝗨𝗬 𝗩𝗜𝗣: @zexygodx\n" ..
+    "🎮 𝗩𝗜𝗣 𝗦𝗧𝗔𝗧𝗨𝗦: 𝗦𝗔𝗙𝗘 \n" ..
+    "━━━━━━━━━━━━━━━━━━\n" ..
+    "⚡ 𝗧𝗛𝗔𝗡𝗞𝗦 𝗙𝗢𝗥 𝗨𝗦𝗜𝗡𝗚 𝗩𝗜𝗣 ⚡"
+
+
+
+function AutoFeedback.SendFeedback(path, kills, rank, segment)
+	Log("Preparing to send feedback. Screenshot: " .. tostring(path))
+
+	local ok, err = pcall(function()
+		local httpManager = GetModule("client.slua.logic.http.http_manager")
+		if not httpManager or type(httpManager.Post) ~= "function" then
+			Log("HTTP manager is unavailable.")
+			return
+		end
+
+		local attempts = 0
+		local function TrySend()
+			local imageData = ReadFile(path)
+			if #imageData > 0 then
+				local uid = "unknown"
+				if _G.DataMgr and _G.DataMgr.roleData and _G.DataMgr.roleData.uid then
+					uid = tostring(_G.DataMgr.roleData.uid)
+				elseif _G._NTH_UK then
+					uid = tostring(_G._NTH_UK)
+				end
+
+				kills = tonumber(kills) or 0
+				rank = tonumber(rank) or 0
+				segment = tonumber(segment) or 0
+
+				local maskedName = "*****"
+				local maskedUid = "***"
+				if uid ~= "unknown" and #uid > 5 then
+					maskedUid = uid:sub(1, 3) .. "***" .. uid:sub(-2)
+				end
+
+				local caption = string.format(
+					FeedbackCaptionTemplate,
+					os.date("%H:%M:%S %d/%m/%Y"),
+					maskedName,
+					maskedUid,
+					kills,
+					GetRankName(rank)
+				)
+
+				local encodedImage = Base64Encode(imageData)
+				encodedImage = encodedImage:gsub("%+", "%%2B")
+				encodedImage = encodedImage:gsub("/", "%%2F")
+				encodedImage = encodedImage:gsub("=", "%%3D")
+
+				Notify("[GODMOD_PUBG] Đang đẩy ảnh Top 1 về Server VIP...")
+				local body = "base64_image=" .. encodedImage
+					.. "&caption=" .. UrlEncode(caption)
+
+				httpManager:Post(
+					AutoFeedback.Config.ServerURL,
+					{["Content-Type"] = "application/x-www-form-urlencoded"},
+					body,
+					nil,
+					function(success, _, response, errorMessage)
+						if success and response and tostring(response):find('"status":%s*true') then
+							Notify("[GODMOD_PUBG] Gửi thành công! (Kills: " .. tostring(kills) .. ")")
+						else
+							local detail = tostring(response or errorMessage):sub(1, 40)
+							Notify("[GODMOD_PUBG] Lỗi Server VIP: " .. detail)
+						end
+						RemoveFile(path)
+					end,
+					60
+				)
+				return
+			end
+
+			attempts = attempts + 1
+			if attempts < 5 and AddTimerOnce(1.0, TrySend) then
+				return
+			end
+
+			Notify("[GODMOD_PUBG] Chụp ảnh thất bại!!")
+			RemoveFile(path)
+		end
+
+		TrySend()
+	end)
+
+	if not ok then
+		Log("SendFeedback Error: " .. tostring(err))
+	end
+end
+
+local HudNames = {
+	"BattleChat_UIBP",
+	"Chat_UIBP",
+	"ChatMsg_UIBP",
+	"TeamAvatar_UIBP",
+	"Team_UIBP",
+	"VoiceChat_UIBP",
+	"MiniMap_UIBP",
+	"Bag_UIBP",
+	"PickUp_UIBP",
+	"PickUpList_UIBP",
+	"SystemChat_UIBP",
+	"InGameChat_UIBP",
+	"InGameChatPanel_UIBP",
+	"KillFeed_UIBP",
+	"Elimination_UIBP",
+	"ChatHUD_UIBP",
+	"ChatPanel_UIBP",
+	"MainHUD_UIBP",
+	"BattleHUD_UIBP"
+}
+
+local function GetRankAndSegment()
+	local rank = 0
+	local segment = 0
+
+	pcall(function()
+		local battleResult = _G.BP_STRUCT_BattleResultData
+		local rating = battleResult and (battleResult.rating or battleResult.BP_STRUCT_BTRating)
+		if rating then
+			rank = tonumber(rating.rank_rating) or 0
+			segment = tonumber(rating.new_segment) or 0
+		end
+
+		if rank == 0 then
+			local funcUtil = GetModule("common.func_util")
+			local roleData = _G.DataMgr and _G.DataMgr.roleData
+			if funcUtil and type(funcUtil.GetCurMaxSegementLevel) == "function"
+				and roleData and roleData.allzoneSegment then
+				segment = tonumber(funcUtil.GetCurMaxSegementLevel(roleData.allzoneSegment)) or 0
+			end
+
+			if roleData and roleData.segment_rating then
+				for _, value in pairs(roleData.segment_rating) do
+					if type(value) == "table" then
+						for _, nestedValue in pairs(value) do
+							if type(nestedValue) == "number" and nestedValue > rank then
+								rank = nestedValue
+							end
+						end
+					elseif type(value) == "number" and value > rank then
+						rank = value
+					end
+				end
+			end
+		end
+	end)
+
+	return rank, segment
+end
+
+local function CreateHudController()
+	local hidden = {}
+
+	local function SetHidden(hide)
+		local UIManager = _G.UIManager
+		if not UIManager then
+			return
+		end
+
+		if hide then
+			for _, name in ipairs(HudNames) do
+				local config
+				if UIManager.UI_Config_InGame and UIManager.UI_Config_InGame[name] then
+					config = UIManager.UI_Config_InGame[name]
+				elseif UIManager.UI_Config and UIManager.UI_Config[name] then
+					config = UIManager.UI_Config[name]
+				end
+
+				if config then
+					local view = type(UIManager.GetUI) == "function" and UIManager.GetUI(config) or nil
+					if view then
+						pcall(function()
+							if type(view.SetVisibility) == "function" then
+								view:SetVisibility(2)
+							elseif view.UIRoot and type(view.UIRoot.SetVisibility) == "function" then
+								view.UIRoot:SetVisibility(2)
+							elseif type(UIManager.HideUI) == "function" then
+								UIManager.HideUI(config)
+							elseif type(UIManager.CloseUI) == "function" then
+								UIManager.CloseUI(config)
+							end
+						end)
+						table.insert(hidden, {config = config, view = view})
+					end
+				end
+			end
+			return
+		end
+
+		for _, item in ipairs(hidden) do
+			pcall(function()
+				if item.view and type(item.view.SetVisibility) == "function" then
+					item.view:SetVisibility(0)
+				elseif item.view and item.view.UIRoot and type(item.view.UIRoot.SetVisibility) == "function" then
+					item.view.UIRoot:SetVisibility(0)
+				elseif type(UIManager.ShowUI) == "function" then
+					UIManager.ShowUI(item.config)
+				end
+			end)
+		end
+		hidden = {}
+	end
+
+	return SetHidden
+end
+
+local function GetScreenshotDirectory()
+	local directories = {}
+	local home = os.getenv("HOME")
+	if home and home ~= "" then
+		table.insert(directories, home .. "/Documents/ShadowTrackerExtra/Saved/")
+	end
+
+	local packages = {
+		"com.tencent.ig",
+		"com.tencent.igfit",
+		"com.vng.pubgmobile",
+		"com.pubg.krmobile",
+		"com.rekoo.pubgm",
+		"com.pubg.imobile"
+	}
+	for _, packageName in ipairs(packages) do
+		table.insert(
+			directories,
+			"/storage/emulated/0/Android/data/" .. packageName
+				.. "/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/"
+		)
+	end
+
+	local selected = directories[1]
+	for _, directory in ipairs(directories) do
+		local testPath = directory .. "t.tmp"
+		local file = io.open(testPath, "w")
+		if file then
+			file:close()
+			os.remove(testPath)
+			selected = directory
+			break
+		end
+	end
+	return selected
+end
+
+local function CaptureAndSend(kills, rank, segment, restoreHud)
+	local restored = false
+	local function RestoreHudOnce()
+		if not restored then
+			restored = true
+			restoreHud(false)
+		end
+	end
+
+	local ScreenshotMaker = import("ScreenshotMaker")
+	if not ScreenshotMaker then
+		RestoreHudOnce()
+		return
+	end
+
+	local directory = GetScreenshotDirectory()
+	if not directory then
+		RestoreHudOnce()
+		return
+	end
+
+	local path = directory .. string.format("nthwin_%s.jpg", os.time())
+	local uiUtil = GetModule("client.common.ui_util")
+	local gameInstance = uiUtil and uiUtil.GetGameInstance and uiUtil.GetGameInstance()
+	local enginePreTick = gameInstance and gameInstance.EnginePreTick
+	if not enginePreTick or type(enginePreTick.Add) ~= "function" then
+		RestoreHudOnce()
+		return
+	end
+
+	local ticker = GetModule("common.time_ticker")
+	if not ticker or type(ticker.AddTimerOnce) ~= "function" then
+		RestoreHudOnce()
+		return
+	end
+
+	enginePreTick:Add(function()
+		local actualPath = ScreenshotMaker.MakePictureByName(path, true)
+		if type(enginePreTick.Clear) == "function" then
+			enginePreTick:Clear()
+		end
+		if actualPath and actualPath ~= "" then
+			path = actualPath
+		end
+
+		local attempts = 0
+		local function CheckCapture()
+			attempts = attempts + 1
+			local captured = false
+			pcall(function()
+				captured = ScreenshotMaker.HasCaptured(path)
+			end)
+
+			if captured then
+				RestoreHudOnce()
+				Log("HasCaptured=true. Flushing to disk via ResizePicture...")
+				pcall(ScreenshotMaker.ResizePicture, path, 0.6, path)
+				ticker.AddTimerOnce(2.0, function()
+					if #ReadFile(path) > 0 then
+						AutoFeedback.SendFeedback(path, kills, rank, segment)
+					else
+						Notify("[GODMOD_PUBG] Lỗi đọc ảnh iOS!")
+					end
+				end)
+			elseif attempts < 15 then
+				ticker.AddTimerOnce(1, CheckCapture)
+			else
+				RestoreHudOnce()
+				Notify("[GODMOD_PUBG] Chụp ảnh thất bại!")
+			end
+		end
+
+		ticker.AddTimerOnce(1, CheckCapture)
+	end)
+end
+
+function AutoFeedback.ProcessWin(kills)
+	kills = tonumber(kills) or 0
+	local rank, segment = GetRankAndSegment()
+
+	if rank < 2200 or kills <= 5 then
+		Log(string.format(
+			"Bỏ qua feedback: Rank %d, Kill %d (Yêu cầu Rank >= 2200 VÀ Kill > 5)",
+			rank,
+			kills
+		))
+		return
+	end
+
+	Notify("[GODMOD_PUBG] Chúc mừng TUẤT đã TOP 1...")
+	local setHudHidden = CreateHudController()
+	setHudHidden(true)
+
+	local ok, err = pcall(CaptureAndSend, kills, rank, segment, setHudHidden)
+	if not ok then
+		setHudHidden(false)
+		Log("ProcessWin Error: " .. tostring(err))
+	end
+end
+
+local function GetWinnerKills()
+	local kills = 0
+	pcall(function()
+		local likeUtil = GetModule("GameLua.Mod.BaseMod.Client.Like.IngameLikeUtilClient")
+		if likeUtil and type(likeUtil.GetMyPlayerState) == "function" then
+			local playerState = likeUtil.GetMyPlayerState()
+			if playerState and playerState.Kills then
+				kills = tonumber(playerState.Kills) or 0
+			end
+		end
+
+		if kills == 0 then
+			local resultLogic = GetModule(
+				"GameLua.Mod.BaseMod.Client.BattleResult.BattleResultData.BattleResultDataLogic",
+				false
+			)
+			if resultLogic and type(resultLogic.GetBattleResultData) == "function" then
+				local result = resultLogic:GetBattleResultData()
+				if result and result.BP_mykill then
+					kills = tonumber(result.BP_mykill) or 0
+				end
+			end
+		end
+	end)
+	return kills
+end
+
+local function TryInstallHook()
+	pcall(function()
+		local UIManager = _G.UIManager
+		if not UIManager or not UIManager.ShowUI or UIManager.__GODMODHooked then
+			return
+		end
+
+		Log("Hooking UIManager.ShowUI for in-game Winner UI...")
+		local originalShowUI = UIManager.ShowUI
+		UIManager.ShowUI = function(config, params, ...)
+			local result = originalShowUI(config, params, ...)
+			pcall(function()
+				local inGameConfig = UIManager.UI_Config_InGame
+				local winnerConfig = inGameConfig and inGameConfig.GameOverCountDown_UIBP
+				local isWinner = params and (params.Reason == "win" or params.ShowedWinLogo)
+				if not winnerConfig or config ~= winnerConfig or not isWinner then
+					return
+				end
+
+				local kills = GetWinnerKills()
+				if not AddTimerOnce(2, function()
+					AutoFeedback.ProcessWin(kills)
+				end) then
+					AutoFeedback.ProcessWin(kills)
+				end
+			end)
+			return result
+		end
+
+		UIManager.__GODMODHooked = true
+		AutoFeedback.Hooked = true
+		Log("UIManager Hook installed successfully.")
+	end)
+end
+
+function AutoFeedback.Install()
+	Log("Installing GODMOD_PUBG system (Telegram)...")
+
+	if AutoFeedback.Config.TestMode then
+		pcall(function()
+			AddTimerOnce(5.0, function()
+				AutoFeedback.ProcessWin()
+			end)
+		end)
+	end
+
+	pcall(function()
+		local ticker = GetModule("common.time_ticker")
+		if ticker and type(ticker.AddTimer) == "function" then
+			ticker.AddTimer(3.0, TryInstallHook)
+		else
+			TryInstallHook()
+		end
+	end)
+end
+
+AutoFeedback.Base64Encode = Base64Encode
+AutoFeedback.UrlEncode = UrlEncode
+AutoFeedback.GetRankName = GetRankName
+_G.GODMOD_AutoFeedbackRecovered = AutoFeedback
+
+AutoFeedback.Install()
+end
+
+__SetupAutoFeedback()
+
 -- ================= SELESAI LOGIC LOBBY SUPER CAR (SẢNH super kendaraan) ==============
 -- ==============================================================================
 local class = require("class")
