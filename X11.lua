@@ -752,18 +752,19 @@ _G.LynceModState = _G.LynceModState or {
     PrevGraphicsState = {}
 }
 
-_G.LynceState.CustomTextData = _G.LynceState.CustomTextData or {}
+_G.LynceModState.CustomTextData = _G.LynceModState.CustomTextData or {}
 
 -- Cache nilai asli slider di tabel Lua, jangan disimpan sebagai field entity game.
-_G.LynceSliderOriginalCache = _G.LynceSliderOriginalCache or setmetatable({}, { __mode = "k" })
+_G.LynceModSliderOriginalCache = _G.LynceModSliderOriginalCache or setmetatable({}, { __mode = "k" })
 
-if _G.LynceState.CustomTextData.RecoilSlider == nil then
-    _G.LynceState.CustomTextData.RecoilSlider = 0
+if _G.LynceModState.CustomTextData.RecoilSlider == nil then
+    _G.LynceModState.CustomTextData.RecoilSlider = 0
 end
 
-if _G.LynceState.CustomTextData.ShakeSlider == nil then
-    _G.LynceState.CustomTextData.ShakeSlider = 0
+if _G.LynceModState.CustomTextData.ShakeSlider == nil then
+    _G.LynceModState.CustomTextData.ShakeSlider = 0
 end
+
 
 
 local limitTime = os.time({ year = 2027, month = 8, day = 20, hour = 23, min = 59, sec = 0 })
@@ -1670,10 +1671,10 @@ function _G.InitModMenuTab()
     ExpandIndex = 3, 
     MinValue = 0, MaxValue = 100, min = 0, max = 100,
     GetFunc = function() 
-        return _G.LynceState.CustomTextData.RecoilSlider or 0 
+        return _G.LynceModState.CustomTextData.RecoilSlider or 0 
     end, 
     SetFunc = function(c, v) 
-        _G.LynceState.CustomTextData.RecoilSlider = v 
+        _G.LynceModState.CustomTextData.RecoilSlider = v 
         if _G.SaveModSettings then _G.SaveModSettings() end -- Panggil save bawaan kamu
         return true 
     end 
@@ -1685,15 +1686,14 @@ function _G.InitModMenuTab()
     ExpandIndex = 3, 
     MinValue = 0, MaxValue = 100, min = 0, max = 100,
     GetFunc = function() 
-        return _G.LynceState.CustomTextData.ShakeSlider or 0 
+        return _G.LynceModState.CustomTextData.ShakeSlider or 0 
     end, 
     SetFunc = function(c, v) 
-        _G.LynceState.CustomTextData.ShakeSlider = v 
+        _G.LynceModState.CustomTextData.ShakeSlider = v 
         if _G.SaveModSettings then _G.SaveModSettings() end -- Panggil save bawaan kamu
         return true 
     end 
 },
-
             { Key = "ModMenu_LessShake", UI = AliasMap.Switcher, Text = T("LESS SHAKE", "Less Scope Shake"), GetFunc = function() return _G.LynceModConfig.LessShake end, SetFunc = function(c,v) _G.LynceModConfig.LessShake = v return true end },
             { Key = "ModMenu_Accuracy", UI = AliasMap.Switcher, Text = T("ACCURACY"), GetFunc = function() return _G.LynceModConfig.Accuracy end, SetFunc = function(c,v) _G.LynceModConfig.Accuracy = v return true end },
             { Key = "ModMenu_Crosshair", UI = AliasMap.Switcher, Text = T("Small CRosshair", "Small Crosshair"), GetFunc = function() return _G.LynceModConfig.Crosshair end, SetFunc = function(c,v) _G.LynceModConfig.Crosshair = v return true end },
@@ -1772,6 +1772,211 @@ function _G.InitModMenuTab()
             { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Menampilkan jumlah kill senjata)", "Kill Counter UI"), GetFunc = function() return _G.LynceModConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceModConfig.KillCountUI = v return true end },
             { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceModConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceModConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end end) end return true end },
         }
+
+_G.LynceModGraphicsConfig = _G.LynceModGraphicsConfig or {
+    Enabled = false,
+    Resolution = 3,
+    Shadow = true,
+    Texture = true,
+    Material = true,
+    AA = true,
+    Bloom = true,
+    MotionBlur = true,
+    DOF = true,
+    ViewDistance = false,
+}
+
+local LynceModGraphicsResolutionMap = {
+    [1] = "30",
+    [2] = "45",
+    [3] = "67",
+    [4] = "100",
+}
+
+local LynceModGraphicsResolutionName = {
+    [1] = "360p",
+    [2] = "480p",
+    [3] = "720p",
+    [4] = "Default",
+}
+
+local function ApplyLynceModGraphicsSettings()
+    pcall(function()
+        local GameplayData = require("GameLua.GameCore.Data.GameplayData")
+        local pc = GameplayData and GameplayData.GetPlayerController and GameplayData.GetPlayerController()
+        if not pc or not slua.isValid(pc) then return end
+
+        local KSL = import("KismetSystemLibrary")
+        if not KSL or not KSL.ExecuteConsoleCommand then return end
+
+        local cfg = _G.LynceModGraphicsConfig
+        local res = LynceModGraphicsResolutionMap[cfg.Resolution] or "100"
+
+        KSL.ExecuteConsoleCommand(pc, "r.ScreenPercentage " .. res)
+        KSL.ExecuteConsoleCommand(pc, "r.MobileContentScaleFactor 0")
+        KSL.ExecuteConsoleCommand(pc, "r.SecondaryScreenPercentage.GameViewport " .. res)
+
+        if cfg.Shadow then
+            KSL.ExecuteConsoleCommand(pc, "r.ShadowQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Mobile.ShadowQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Shadow.CSM.MaxCascades 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Mobile.Shadow.CSM 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Mobile.Shadow.CSM.MaxCascades 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Shadow.DistanceScale 0.5")
+            KSL.ExecuteConsoleCommand(pc, "r.DistanceFieldShadowing 0")
+            KSL.ExecuteConsoleCommand(pc, "r.AmbientOcclusionLevels 0")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.ShadowQuality 2")
+            KSL.ExecuteConsoleCommand(pc, "r.Mobile.ShadowQuality 2")
+            KSL.ExecuteConsoleCommand(pc, "r.Shadow.CSM.MaxCascades 2")
+            KSL.ExecuteConsoleCommand(pc, "r.Mobile.Shadow.CSM 1")
+            KSL.ExecuteConsoleCommand(pc, "r.Mobile.Shadow.CSM.MaxCascades 2")
+            KSL.ExecuteConsoleCommand(pc, "r.Shadow.DistanceScale 1.0")
+            KSL.ExecuteConsoleCommand(pc, "r.DistanceFieldShadowing 1")
+            KSL.ExecuteConsoleCommand(pc, "r.AmbientOcclusionLevels 1")
+        end
+
+        if cfg.Texture then
+            KSL.ExecuteConsoleCommand(pc, "r.TextureQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Streaming.MipBias 2")
+            KSL.ExecuteConsoleCommand(pc, "r.MaxAnisotropy 0")
+            KSL.ExecuteConsoleCommand(pc, "r.MipMapLODBias 2")
+            KSL.ExecuteConsoleCommand(pc, "r.Streaming.PoolSize 256")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.TextureQuality 1")
+            KSL.ExecuteConsoleCommand(pc, "r.Streaming.MipBias 0")
+            KSL.ExecuteConsoleCommand(pc, "r.MaxAnisotropy 4")
+            KSL.ExecuteConsoleCommand(pc, "r.MipMapLODBias 0")
+            KSL.ExecuteConsoleCommand(pc, "r.Streaming.PoolSize 1000")
+        end
+
+        if cfg.Material then
+            KSL.ExecuteConsoleCommand(pc, "r.MaterialQualityLevel 0")
+            KSL.ExecuteConsoleCommand(pc, "r.SkeletalMeshLODBias 2")
+            KSL.ExecuteConsoleCommand(pc, "r.ParticleLODBias 2")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.MaterialQualityLevel 1")
+            KSL.ExecuteConsoleCommand(pc, "r.SkeletalMeshLODBias 0")
+            KSL.ExecuteConsoleCommand(pc, "r.ParticleLODBias 0")
+        end
+
+        if cfg.AA then
+            KSL.ExecuteConsoleCommand(pc, "r.PostProcessAAQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.TemporalAAQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.DefaultFeature.AntiAliasing 0")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.PostProcessAAQuality 2")
+            KSL.ExecuteConsoleCommand(pc, "r.TemporalAAQuality 2")
+            KSL.ExecuteConsoleCommand(pc, "r.DefaultFeature.AntiAliasing 2")
+        end
+
+        if cfg.Bloom then
+            KSL.ExecuteConsoleCommand(pc, "r.BloomQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.BloomIntensity 0")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.BloomQuality 4")
+            KSL.ExecuteConsoleCommand(pc, "r.BloomIntensity 1.0")
+        end
+
+        if cfg.MotionBlur then
+            KSL.ExecuteConsoleCommand(pc, "r.MotionBlurQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.DefaultFeature.MotionBlur 0")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.MotionBlurQuality 2")
+            KSL.ExecuteConsoleCommand(pc, "r.DefaultFeature.MotionBlur 1")
+        end
+
+        if cfg.DOF then
+            KSL.ExecuteConsoleCommand(pc, "r.DepthOfFieldQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.DefaultFeature.DepthOfField 0")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.DepthOfFieldQuality 2")
+            KSL.ExecuteConsoleCommand(pc, "r.DefaultFeature.DepthOfField 1")
+        end
+
+        if cfg.ViewDistance then
+            KSL.ExecuteConsoleCommand(pc, "r.ViewDistanceScale 0.5")
+            KSL.ExecuteConsoleCommand(pc, "r.StaticMeshLODDistanceScale 0.5")
+        else
+            KSL.ExecuteConsoleCommand(pc, "r.ViewDistanceScale 1.0")
+            KSL.ExecuteConsoleCommand(pc, "r.StaticMeshLODDistanceScale 1.0")
+        end
+
+        if cfg.Enabled then
+            KSL.ExecuteConsoleCommand(pc, "r.EmitterSpawnRateScale 0.3")
+            KSL.ExecuteConsoleCommand(pc, "r.Particle.MaxDrawDistance 500")
+            KSL.ExecuteConsoleCommand(pc, "r.LightMaxDrawDistanceScale 0.3")
+            KSL.ExecuteConsoleCommand(pc, "r.MinScreenRadiusForLights 0.1")
+            KSL.ExecuteConsoleCommand(pc, "r.LightShaftQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.LensFlareQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.SceneColorFringeQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.RefractionQuality 0")
+            KSL.ExecuteConsoleCommand(pc, "r.VSync 0")
+        end
+    end)
+end
+
+local StackGraphics = {
+    { Key = "ModMenu_Graphics_Ex", UI = AliasMap.TitleSwitcher,
+      Text = "▶ GRAFIK & PERFORMA", ExpandIndex = 0,
+      GetFunc = function() return _G.LynceModGraphicsConfig.Enabled end,
+      SetFunc = function(c,v)
+          _G.LynceModGraphicsConfig.Enabled = v
+          ApplyLynceModGraphicsSettings()
+          return true
+      end },
+
+    { Key = "ModMenu_GP_Res", UI = AliasMap.Switcher,
+      Text = "   Resolusi", ExpandHandle = "ModMenu_Graphics_Ex",
+      SwitcherText = {"360p","480p","720p","Default"},
+      SwitcherValue = {1,2,3,4},
+      GetFunc = function() return _G.LynceModGraphicsConfig.Resolution or 3 end,
+      SetFunc = function(c,v)
+          _G.LynceModGraphicsConfig.Resolution = v
+          ApplyLynceModGraphicsSettings()
+          return true
+      end },
+
+    { Key = "ModMenu_GP_Shadow", UI = AliasMap.Switcher,
+      Text = "   Shadow LOW", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.Shadow end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Shadow = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_Texture", UI = AliasMap.Switcher,
+      Text = "   Texture LOW", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.Texture end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Texture = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_Material", UI = AliasMap.Switcher,
+      Text = "   Material LOW", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.Material end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Material = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_AA", UI = AliasMap.Switcher,
+      Text = "   Anti-Aliasing OFF", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.AA end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.AA = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_Bloom", UI = AliasMap.Switcher,
+      Text = "   Bloom OFF", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.Bloom end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Bloom = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_MotionBlur", UI = AliasMap.Switcher,
+      Text = "   Motion Blur OFF", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.MotionBlur end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.MotionBlur = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_DOF", UI = AliasMap.Switcher,
+      Text = "   Depth Of Field OFF", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.DOF end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.DOF = v ApplyLynceModGraphicsSettings() return true end },
+
+    { Key = "ModMenu_GP_ViewDist", UI = AliasMap.Switcher,
+      Text = "   View Distance LOW", ExpandHandle = "ModMenu_Graphics_Ex",
+      GetFunc = function() return _G.LynceModGraphicsConfig.ViewDistance end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.ViewDistance = v ApplyLynceModGraphicsSettings() return true end },
+}
 
         local StackCombat = {
             { Key = "ModMenu_FakeHWID", UI = AliasMap.Switcher, Text = T("Ubah HWID Virtual (Mencegah ID Perangkat Terkunci)", "Fake HWID (Anti-Ban)"), GetFunc = function() return _G.LynceModConfig.FakeHWID end, SetFunc = function(c,v) _G.LynceModConfig.FakeHWID = v return true end },
@@ -4167,7 +4372,7 @@ local function MainLoop()
         -- =========================================================================
         -- BACA NILAI DARI GODMODState.CustomTextData
         -- =========================================================================
-        local customData  = (_G.LynceState and _G.LynceState.CustomTextData) or {}
+        local customData  = (_G.LynceModState and _G.LynceModState.CustomTextData) or {}
         local rawAccuracy = tonumber(customData.AccuracyLevel) or 0
         local rawRecoil   = tonumber(customData.RecoilSlider) or 0
         local rawShake    = tonumber(customData.ShakeSlider) or 0
@@ -4186,7 +4391,7 @@ local function MainLoop()
             -- Simpan nilai asli di cache Lua eksternal.
             -- Jangan menambahkan field baru ke entity/userdata game karena bisa gagal diam-diam
             -- dan menghentikan seluruh blok slider di dalam pcall.
-            local cache = _G.LynceSliderOriginalCache
+            local cache = _G.LynceModSliderOriginalCache
             local orig = cache[entity]
 
             if not orig then
