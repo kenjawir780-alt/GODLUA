@@ -576,8 +576,8 @@ end
 -- ============================ MULAI FULL LOGIC MOD ==========================
 -- ==============================================================================
 
-local function Notify(msg) local s = "[GODMODINGX VIP New] " .. tostring(msg)
-pcall(function() if _G.LynceNotify then _G.LynceNotify(s) end end)
+local function Notify(msg) local s = "[GODMODX VIP New] " .. tostring(msg)
+pcall(function() if _G.LynceModNotify then _G.LynceModNotify(s) end end)
 pcall(function() local sh = import("ScriptHelperClient") if sh and
 sh.AddOnScreenDebugMessage then sh.AddOnScreenDebugMessage(s, -1, 3.0, {R=1,
 G=1, B=0, A=1}, {X=1.2, Y=1.2}) end end) print(s) end
@@ -619,10 +619,10 @@ local GLOBAL_CONNECTIONS = {
 
 
   
--- KONFIGURASI Lynce CORE + FULL FEATURES VIP 
+-- KONFIGURASI LynceMod CORE + FULL FEATURES VIP 
 -- ========================================== 
 _G.EnableLogicModSkin = (_G.EnableLogicModSkin == true)
-_G.LynceConfig = _G.LynceConfig or { 
+_G.LynceModConfig = _G.LynceModConfig or { 
     FakeHWID = false,
     CustomMagicBullet = false,
     AutoHead = false, 
@@ -736,7 +736,7 @@ _G.LynceConfig = _G.LynceConfig or {
 }
 
 -- CHỨA STATE sistem telah OPTIMASI sepenuhnya RAM TRỐNG
-_G.LynceState = _G.LynceState or { 
+_G.LynceModState = _G.LynceModState or { 
     LoopToken = 0, 
     NativeESPReady = false,
     GraphicsUnlocked = false, 
@@ -752,17 +752,17 @@ _G.LynceState = _G.LynceState or {
     PrevGraphicsState = {}
 }
 
-_G.LynceState.CustomTextData = _G.LynceState.CustomTextData or {}
+_G.LynceModState.CustomTextData = _G.LynceModState.CustomTextData or {}
 
 -- Cache nilai asli slider di tabel Lua, jangan disimpan sebagai field entity game.
-_G.LynceSliderOriginalCache = _G.LynceSliderOriginalCache or setmetatable({}, { __mode = "k" })
+_G.LynceModSliderOriginalCache = _G.LynceModSliderOriginalCache or setmetatable({}, { __mode = "k" })
 
-if _G.LynceState.CustomTextData.RecoilSlider == nil then
-    _G.LynceState.CustomTextData.RecoilSlider = 0
+if _G.LynceModState.CustomTextData.RecoilSlider == nil then
+    _G.LynceModState.CustomTextData.RecoilSlider = 0
 end
 
-if _G.LynceState.CustomTextData.ShakeSlider == nil then
-    _G.LynceState.CustomTextData.ShakeSlider = 0
+if _G.LynceModState.CustomTextData.ShakeSlider == nil then
+    _G.LynceModState.CustomTextData.ShakeSlider = 0
 end
 
 
@@ -1237,7 +1237,7 @@ local function SafeAddMark(id, pos, z, str, size, actor)
         local InGameMarkTools = require("GameLua.Mod.BaseMod.Common.InGameMarkTools")
         if InGameMarkTools and InGameMarkTools.ClientAddMapMark then
             mark = InGameMarkTools.ClientAddMapMark(id, pos, z, str, size, actor)
-            if mark then _G.LynceState.TrackedMarks[mark] = true end
+            if mark then _G.LynceModState.TrackedMarks[mark] = true end
         end
     end)
     return mark
@@ -1254,7 +1254,7 @@ local function SafeRemoveMark(mark)
             InGameMarkTools.RemoveMapMark(mark)
         end
     end)
-    _G.LynceState.TrackedMarks[mark] = nil
+    _G.LynceModState.TrackedMarks[mark] = nil
 end
 
 -- ========================================== 
@@ -1317,13 +1317,13 @@ function _G.InitializeAutoHeadHooks()
             if hitLogic then
                 local original_GetHitBodyType = hitLogic.GetHitBodyType
                 hitLogic.GetHitBodyType = function(self, ImpactResult, InImpactVec)
-                    if _G.LynceConfig.AutoHead then return EAvatarDamagePosition.BigHead end
+                    if _G.LynceModConfig.AutoHead then return EAvatarDamagePosition.BigHead end
                     if original_GetHitBodyType then return original_GetHitBodyType(self, ImpactResult, InImpactVec) end
                 end
 
                 local original_GetHitBodyTypeByHitPos = hitLogic.GetHitBodyTypeByHitPos
                 hitLogic.GetHitBodyTypeByHitPos = function(self, InImpactVec)
-                    if _G.LynceConfig.AutoHead then return EAvatarDamagePosition.BigHead end
+                    if _G.LynceModConfig.AutoHead then return EAvatarDamagePosition.BigHead end
                     if original_GetHitBodyTypeByHitPos then return original_GetHitBodyTypeByHitPos(self, InImpactVec) end
                 end
             end
@@ -1336,11 +1336,11 @@ _G.ApplyWeaponGlow = function(PlayerCharacter)
         local WeaponManager = PlayerCharacter:GetWeaponManager()
         if not slua.isValid(WeaponManager) then return end
 
-        local isGlowEnabled = _G.LynceConfig.WeaponGlow
+        local isGlowEnabled = _G.LynceModConfig.WeaponGlow
         local LinearColorClass = import("LinearColor") or _G.FLinearColor
         local glowIntensity = 80.0 
-        local thickness = _G.LynceState.CustomTextData.WeaponGlowThickness or 3
-        local colorMode = _G.LynceState.CustomTextData.WeaponGlowColor or 5
+        local thickness = _G.LynceModState.CustomTextData.WeaponGlowThickness or 3
+        local colorMode = _G.LynceModState.CustomTextData.WeaponGlowColor or 5
         
         local r, g, b = 1.0, 1.0, 0.0
         if colorMode == 1 then r, g, b = 1.0, 0.0, 0.0
@@ -1436,13 +1436,13 @@ _G.LastConfigSaveStr = ""
 -- fungsi simpan konfigurasi
 _G.SaveModSettings = function()
     pcall(function()
-        local data = "return {\nLynceConfig = {\n"
-        for k, v in pairs(_G.LynceConfig or {}) do
+        local data = "return {\nLynceModConfig = {\n"
+        for k, v in pairs(_G.LynceModConfig or {}) do
             data = data .. "  [\"" .. tostring(k) .. "\"] = " .. tostring(v) .. ",\n"
         end
         data = data .. "},\nCustomTextData = {\n"
-        if _G.LynceState and _G.LynceState.CustomTextData then
-            for k, v in pairs(_G.LynceState.CustomTextData) do
+        if _G.LynceModState and _G.LynceModState.CustomTextData then
+            for k, v in pairs(_G.LynceModState.CustomTextData) do
                 data = data .. "  [\"" .. tostring(k) .. "\"] = " .. tostring(v) .. ",\n"
             end
         end
@@ -1483,15 +1483,15 @@ _G.LoadModSettings = function()
             if func then
                 local savedData = func()
                 if savedData and type(savedData) == "table" then
-                    if savedData.LynceConfig then
-                        for k, v in pairs(savedData.LynceConfig) do
-                            _G.LynceConfig[k] = v
+                    if savedData.LynceModConfig then
+                        for k, v in pairs(savedData.LynceModConfig) do
+                            _G.LynceModConfig[k] = v
                         end
                     end
                     if savedData.CustomTextData then
-                        _G.LynceState.CustomTextData = _G.LynceState.CustomTextData or {}
+                        _G.LynceModState.CustomTextData = _G.LynceModState.CustomTextData or {}
                         for k, v in pairs(savedData.CustomTextData) do
-                            _G.LynceState.CustomTextData[k] = v
+                            _G.LynceModState.CustomTextData[k] = v
                         end
                     end
                 end
@@ -1535,10 +1535,10 @@ function _G.InitModMenuTab()
 
     -- Fungsi bantu bantu dịch bahasa bahasa (Otomatis pilih EN atau VN)
     local function T(vnText, enText)
-        return _G.LynceLang == "EN" and enText or vnText
+        return _G.LynceModLang == "EN" and enText or vnText
     end
 
-    _G.LynceState.CustomTextData = _G.LynceState.CustomTextData or {
+    _G.LynceModState.CustomTextData = _G.LynceModState.CustomTextData or {
         OuterSpeed = 10, InnerSpeed = 10, OuterRecoil = 0, HRecoil = 0.3, VRecoil = 0.3, MagicHead = 1.0, MagicBody = 1.0, MagicLegs = 1.0, IpadViewFOV = 120,
         AimTouchHipPrio = 1, AimTouchHipBone = 1, AimTouchHipCond = 1, AimTouchHipSpeed = 50, AimTouchHipFOV = 30, AimTouchHipDist = 250,
         AimTouchSGPrio = 1, AimTouchSGBone = 2, AimTouchSGCond = 1, AimTouchSGSpeed = 80, AimTouchSGFOV = 40, AimTouchSGDist = 30,
@@ -1596,75 +1596,75 @@ function _G.InitModMenuTab()
         local AliasMap = require("client.slua.umg.NewSetting.Item.AliasMap")
         
         local StackESP = {
-            { Key = "ModMenu_ESP1", UI = AliasMap.Switcher, Text = T("ESP Jenis 1 (Peringatan 360-HP-Nama)", "ESP Type 1 (360 Alert-HP-Name)"), GetFunc = function() return _G.LynceConfig.EspVip end, SetFunc = function(c,v) _G.LynceConfig.EspVip = v return true end },
-            { Key = "ModMenu_ESP2", UI = AliasMap.Switcher, Text = T("ESP Jenis 2 (Jarak )", "ESP Type 2 (Distance Meter)"), GetFunc = function() return _G.LynceConfig.EspDistance end, SetFunc = function(c,v) _G.LynceConfig.EspDistance = v return true end },
+            { Key = "ModMenu_ESP1", UI = AliasMap.Switcher, Text = T("ESP Jenis 1 (Peringatan 360-HP-Nama)", "ESP Type 1 (360 Alert-HP-Name)"), GetFunc = function() return _G.LynceModConfig.EspVip end, SetFunc = function(c,v) _G.LynceModConfig.EspVip = v return true end },
+            { Key = "ModMenu_ESP2", UI = AliasMap.Switcher, Text = T("ESP Jenis 2 (Jarak )", "ESP Type 2 (Distance Meter)"), GetFunc = function() return _G.LynceModConfig.EspDistance end, SetFunc = function(c,v) _G.LynceModConfig.EspDistance = v return true end },
             
-            { Key = "ModMenu_ESP3_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Jenis 3 (HP Vertikal & Nama)", "▶ ESP Type 3 (Vertical HP & Name)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspVipPro end, SetFunc = function(c,v) _G.LynceConfig.EspVipPro = v return true end },
-            { Key = "ModMenu_ESP3_Name", UI = AliasMap.Switcher, Text = T("   Tampilkan Nama Pemain", "   Show Player Name"), ExpandHandle = "ModMenu_ESP3_Ex", GetFunc = function() return _G.LynceConfig.Esp3ShowName end, SetFunc = function(c,v) _G.LynceConfig.Esp3ShowName = v return true end },
-            { Key = "ModMenu_ESP3_HP", UI = AliasMap.Switcher, Text = T("   Tampilkan Bar HP Vertikal", "   Show Vertical HP Bar"), ExpandHandle = "ModMenu_ESP3_Ex", GetFunc = function() return _G.LynceConfig.Esp3ShowHP end, SetFunc = function(c,v) _G.LynceConfig.Esp3ShowHP = v return true end },
+            { Key = "ModMenu_ESP3_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Jenis 3 (HP Vertikal & Nama)", "▶ ESP Type 3 (Vertical HP & Name)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspVipPro end, SetFunc = function(c,v) _G.LynceModConfig.EspVipPro = v return true end },
+            { Key = "ModMenu_ESP3_Name", UI = AliasMap.Switcher, Text = T("   Tampilkan Nama Pemain", "   Show Player Name"), ExpandHandle = "ModMenu_ESP3_Ex", GetFunc = function() return _G.LynceModConfig.Esp3ShowName end, SetFunc = function(c,v) _G.LynceModConfig.Esp3ShowName = v return true end },
+            { Key = "ModMenu_ESP3_HP", UI = AliasMap.Switcher, Text = T("   Tampilkan Bar HP Vertikal", "   Show Vertical HP Bar"), ExpandHandle = "ModMenu_ESP3_Ex", GetFunc = function() return _G.LynceModConfig.Esp3ShowHP end, SetFunc = function(c,v) _G.LynceModConfig.Esp3ShowHP = v return true end },
             
-            { Key = "ModMenu_ESP4", UI = AliasMap.Switcher, Text = T("ESP Jenis 4 (Radar 360)", "ESP Type 4 (Radar 360)"), GetFunc = function() return _G.LynceConfig.EspRadar end, SetFunc = function(c,v) _G.LynceConfig.EspRadar = v return true end },
-            { Key = "ModMenu_ESP5", UI = AliasMap.Switcher, Text = T("ESP Jenis 5 (Khung Box)", "ESP Type 5 (Box ESP)"), GetFunc = function() return _G.LynceConfig.EspLoai5 end, SetFunc = function(c,v) _G.LynceConfig.EspLoai5 = v return true end },
-            { Key = "ModMenu_ESP6", UI = AliasMap.Switcher, Text = T("ESP Jenis 6 (tulang)", "ESP Type 6 (Skeleton)"), GetFunc = function() return _G.LynceConfig.EspLoai6 end, SetFunc = function(c,v) _G.LynceConfig.EspLoai6 = v return true end },
-            { Key = "ModMenu_ESP7_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Jenis 7 (Informasi Detail)", "▶ ESP Type 7 (Detail Info)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspLoai7 end, SetFunc = function(c,v) _G.LynceConfig.EspLoai7 = v return true end },
-            { Key = "ModMenu_ESP7_SoLuong", UI = AliasMap.Switcher, Text = T("   Tampilkan Jumlah Musuh Di Sekitar", "   Show Enemies Count Around"), ExpandHandle = "ModMenu_ESP7_Ex", GetFunc = function() return _G.LynceConfig.Esp7_SoLuong end, SetFunc = function(c,v) _G.LynceConfig.Esp7_SoLuong = v return true end },
-            { Key = "ModMenu_ESP7_VuKhi", UI = AliasMap.Switcher, Text = T("   Tampilkan Senjata Musuh Dipegang", "   Show Enemy Weapon"), ExpandHandle = "ModMenu_ESP7_Ex", GetFunc = function() return _G.LynceConfig.Esp7_VuKhi end, SetFunc = function(c,v) _G.LynceConfig.Esp7_VuKhi = v return true end },
-            { Key = "ModMenu_ESP7_TuThe", UI = AliasMap.Switcher, Text = T("   Tampilkan postur posisi (berdiri/jongkok/tiarap)", "   Show Posture (Stand/Crouch/Prone)"), ExpandHandle = "ModMenu_ESP7_Ex", GetFunc = function() return _G.LynceConfig.Esp7_TuThe end, SetFunc = function(c,v) _G.LynceConfig.Esp7_TuThe = v return true end },
-            { Key = "ModMenu_ESP8", UI = AliasMap.Switcher, Text = T("ESP Jenis 8 (Bar HP terpasang Kepala)", "ESP Type 8 (Head HP Bar)"), GetFunc = function() return _G.LynceConfig.EspLoai8 end, SetFunc = function(c,v) _G.LynceConfig.EspLoai8 = v return true end },
+            { Key = "ModMenu_ESP4", UI = AliasMap.Switcher, Text = T("ESP Jenis 4 (Radar 360)", "ESP Type 4 (Radar 360)"), GetFunc = function() return _G.LynceModConfig.EspRadar end, SetFunc = function(c,v) _G.LynceModConfig.EspRadar = v return true end },
+            { Key = "ModMenu_ESP5", UI = AliasMap.Switcher, Text = T("ESP Jenis 5 (Khung Box)", "ESP Type 5 (Box ESP)"), GetFunc = function() return _G.LynceModConfig.EspLoai5 end, SetFunc = function(c,v) _G.LynceModConfig.EspLoai5 = v return true end },
+            { Key = "ModMenu_ESP6", UI = AliasMap.Switcher, Text = T("ESP Jenis 6 (tulang)", "ESP Type 6 (Skeleton)"), GetFunc = function() return _G.LynceModConfig.EspLoai6 end, SetFunc = function(c,v) _G.LynceModConfig.EspLoai6 = v return true end },
+            { Key = "ModMenu_ESP7_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Jenis 7 (Informasi Detail)", "▶ ESP Type 7 (Detail Info)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspLoai7 end, SetFunc = function(c,v) _G.LynceModConfig.EspLoai7 = v return true end },
+            { Key = "ModMenu_ESP7_SoLuong", UI = AliasMap.Switcher, Text = T("   Tampilkan Jumlah Musuh Di Sekitar", "   Show Enemies Count Around"), ExpandHandle = "ModMenu_ESP7_Ex", GetFunc = function() return _G.LynceModConfig.Esp7_SoLuong end, SetFunc = function(c,v) _G.LynceModConfig.Esp7_SoLuong = v return true end },
+            { Key = "ModMenu_ESP7_VuKhi", UI = AliasMap.Switcher, Text = T("   Tampilkan Senjata Musuh Dipegang", "   Show Enemy Weapon"), ExpandHandle = "ModMenu_ESP7_Ex", GetFunc = function() return _G.LynceModConfig.Esp7_VuKhi end, SetFunc = function(c,v) _G.LynceModConfig.Esp7_VuKhi = v return true end },
+            { Key = "ModMenu_ESP7_TuThe", UI = AliasMap.Switcher, Text = T("   Tampilkan postur posisi (berdiri/jongkok/tiarap)", "   Show Posture (Stand/Crouch/Prone)"), ExpandHandle = "ModMenu_ESP7_Ex", GetFunc = function() return _G.LynceModConfig.Esp7_TuThe end, SetFunc = function(c,v) _G.LynceModConfig.Esp7_TuThe = v return true end },
+            { Key = "ModMenu_ESP8", UI = AliasMap.Switcher, Text = T("ESP Jenis 8 (Bar HP terpasang Kepala)", "ESP Type 8 (Head HP Bar)"), GetFunc = function() return _G.LynceModConfig.EspLoai8 end, SetFunc = function(c,v) _G.LynceModConfig.EspLoai8 = v return true end },
             
-            { Key = "ModMenu_EspItem_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Item (di bawah 70m)", "▶ Item ESP (Under 70m)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspItem_Master end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Master = v return true end },
-            { Key = "ModMenu_EspItem_AR", UI = AliasMap.Switcher, Text = T("   Tampilkan senjata AR", "   Show AR Weapons"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_AR end, SetFunc = function(c,v) _G.LynceConfig.EspItem_AR = v return true end },
-            { Key = "ModMenu_EspItem_Sniper", UI = AliasMap.Switcher, Text = T("   Tampilkan senapan runduk", "   Show Sniper Rifles"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Sniper end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Sniper = v return true end },
-            { Key = "ModMenu_EspItem_SMG", UI = AliasMap.Switcher, Text = T("   Tampilkan senjata SMG", "   Show SMGs"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_SMG end, SetFunc = function(c,v) _G.LynceConfig.EspItem_SMG = v return true end },
-            { Key = "ModMenu_EspItem_Shotgun", UI = AliasMap.Switcher, Text = T("   Tampilkan Shotgun", "   Show Shotguns"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Shotgun end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Shotgun = v return true end },
-            { Key = "ModMenu_EspItem_LMG", UI = AliasMap.Switcher, Text = T("   Tampilkan senapan mesin LMG", "   Show LMGs"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_LMG end, SetFunc = function(c,v) _G.LynceConfig.EspItem_LMG = v return true end },
-            { Key = "ModMenu_EspItem_Pistol", UI = AliasMap.Switcher, Text = T("   Tampilkan pistol / meriam", "   Show Pistols / Flares"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Pistol end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Pistol = v return true end },
-            { Key = "ModMenu_EspItem_Melee", UI = AliasMap.Switcher, Text = T("   Tampilkan jarak dekat pertempuran", "   Show Melee Weapons"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Melee end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Melee = v return true end },
-            { Key = "ModMenu_EspItem_Special", UI = AliasMap.Switcher, Text = T("   Tampilkan Senjata khusus", "   Show Special Weapons"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Special end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Special = v return true end },
-            { Key = "ModMenu_EspItem_Scope", UI = AliasMap.Switcher, Text = T("   Tampilkan teropong bidik", "   Show Scopes"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Scope end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Scope = v return true end },
-            { Key = "ModMenu_EspItem_Grenade", UI = AliasMap.Switcher, Text = T("   Tampilkan granat Peluru", "   Show Grenades"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceConfig.EspItem_Grenade end, SetFunc = function(c,v) _G.LynceConfig.EspItem_Grenade = v return true end },
+            { Key = "ModMenu_EspItem_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP Item (di bawah 70m)", "▶ Item ESP (Under 70m)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspItem_Master end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Master = v return true end },
+            { Key = "ModMenu_EspItem_AR", UI = AliasMap.Switcher, Text = T("   Tampilkan senjata AR", "   Show AR Weapons"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_AR end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_AR = v return true end },
+            { Key = "ModMenu_EspItem_Sniper", UI = AliasMap.Switcher, Text = T("   Tampilkan senapan runduk", "   Show Sniper Rifles"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Sniper end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Sniper = v return true end },
+            { Key = "ModMenu_EspItem_SMG", UI = AliasMap.Switcher, Text = T("   Tampilkan senjata SMG", "   Show SMGs"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_SMG end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_SMG = v return true end },
+            { Key = "ModMenu_EspItem_Shotgun", UI = AliasMap.Switcher, Text = T("   Tampilkan Shotgun", "   Show Shotguns"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Shotgun end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Shotgun = v return true end },
+            { Key = "ModMenu_EspItem_LMG", UI = AliasMap.Switcher, Text = T("   Tampilkan senapan mesin LMG", "   Show LMGs"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_LMG end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_LMG = v return true end },
+            { Key = "ModMenu_EspItem_Pistol", UI = AliasMap.Switcher, Text = T("   Tampilkan pistol / meriam", "   Show Pistols / Flares"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Pistol end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Pistol = v return true end },
+            { Key = "ModMenu_EspItem_Melee", UI = AliasMap.Switcher, Text = T("   Tampilkan jarak dekat pertempuran", "   Show Melee Weapons"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Melee end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Melee = v return true end },
+            { Key = "ModMenu_EspItem_Special", UI = AliasMap.Switcher, Text = T("   Tampilkan Senjata khusus", "   Show Special Weapons"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Special end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Special = v return true end },
+            { Key = "ModMenu_EspItem_Scope", UI = AliasMap.Switcher, Text = T("   Tampilkan teropong bidik", "   Show Scopes"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Scope end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Scope = v return true end },
+            { Key = "ModMenu_EspItem_Grenade", UI = AliasMap.Switcher, Text = T("   Tampilkan granat Peluru", "   Show Grenades"), ExpandHandle = "ModMenu_EspItem_Ex", GetFunc = function() return _G.LynceModConfig.EspItem_Grenade end, SetFunc = function(c,v) _G.LynceModConfig.EspItem_Grenade = v return true end },
             
-            { Key = "ModMenu_ESPBom_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ peringatan & pelacakan bom", "▶ Grenade Warning & Tracker"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspBomMaster end, SetFunc = function(c,v) _G.LynceConfig.EspBomMaster = v return true end },
-            { Key = "ModMenu_ESPItemBom", UI = AliasMap.Switcher, Text = T("   pelacakan Item bom di bawah tanah", "   Show Grenades On Ground"), ExpandHandle = "ModMenu_ESPBom_Ex", GetFunc = function() return _G.LynceConfig.EspItemBom end, SetFunc = function(c,v) _G.LynceConfig.EspItemBom = v return true end },
-            { Key = "ModMenu_ESPActiveBom", UI = AliasMap.Switcher, Text = T("   peringatan Musuh Dipegang & Ném bom", "   Active Grenade Warning"), ExpandHandle = "ModMenu_ESPBom_Ex", GetFunc = function() return _G.LynceConfig.EspActiveBom end, SetFunc = function(c,v) _G.LynceConfig.EspActiveBom = v return true end },
+            { Key = "ModMenu_ESPBom_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ peringatan & pelacakan bom", "▶ Grenade Warning & Tracker"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspBomMaster end, SetFunc = function(c,v) _G.LynceModConfig.EspBomMaster = v return true end },
+            { Key = "ModMenu_ESPItemBom", UI = AliasMap.Switcher, Text = T("   pelacakan Item bom di bawah tanah", "   Show Grenades On Ground"), ExpandHandle = "ModMenu_ESPBom_Ex", GetFunc = function() return _G.LynceModConfig.EspItemBom end, SetFunc = function(c,v) _G.LynceModConfig.EspItemBom = v return true end },
+            { Key = "ModMenu_ESPActiveBom", UI = AliasMap.Switcher, Text = T("   peringatan Musuh Dipegang & Ném bom", "   Active Grenade Warning"), ExpandHandle = "ModMenu_ESPBom_Ex", GetFunc = function() return _G.LynceModConfig.EspActiveBom end, SetFunc = function(c,v) _G.LynceModConfig.EspActiveBom = v return true end },
             
             -- [BARU DITAMBAHKAN] menu peringatan musuh bidik
-            { Key = "ModMenu_EspAimWarning_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ peringatan Musuh bidik menembak", "▶ Enemy Aim Warning"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspAimWarning end, SetFunc = function(c,v) _G.LynceConfig.EspAimWarning = v return true end },
-            { Key = "ModMenu_EspAimWarning_Vis", UI = AliasMap.Switcher, Text = T("   Periksa Visibilitas (hanya notifikasi saat terlihat terlihat)", "   Visibility Check"), ExpandHandle = "ModMenu_EspAimWarning_Ex", GetFunc = function() return _G.LynceConfig.EspAimWarningVisCheck end, SetFunc = function(c,v) _G.LynceConfig.EspAimWarningVisCheck = v return true end },
+            { Key = "ModMenu_EspAimWarning_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ peringatan Musuh bidik menembak", "▶ Enemy Aim Warning"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspAimWarning end, SetFunc = function(c,v) _G.LynceModConfig.EspAimWarning = v return true end },
+            { Key = "ModMenu_EspAimWarning_Vis", UI = AliasMap.Switcher, Text = T("   Periksa Visibilitas (hanya notifikasi saat terlihat terlihat)", "   Visibility Check"), ExpandHandle = "ModMenu_EspAimWarning_Ex", GetFunc = function() return _G.LynceModConfig.EspAimWarningVisCheck end, SetFunc = function(c,v) _G.LynceModConfig.EspAimWarningVisCheck = v return true end },
             
-            { Key = "ModMenu_ESPVehicle_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP pelacakan kendaraan", "▶ Vehicle ESP"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspVehicle end, SetFunc = function(c,v) _G.LynceConfig.EspVehicle = v return true end },
-            { Key = "ModMenu_ESPVeh_Dacia", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Con (Dacia)", "   Show Dacia"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_Dacia end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_Dacia = v return true end },
-            { Key = "ModMenu_ESPVeh_UAZ", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Jeep (UAZ)", "   Show UAZ"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_UAZ end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_UAZ = v return true end },
-            { Key = "ModMenu_ESPVeh_Buggy", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Buggy", "   Show Buggy"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_Buggy end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_Buggy = v return true end },
-            { Key = "ModMenu_ESPVeh_Coupe", UI = AliasMap.Switcher, Text = T("   Tampilkan kendaraan bentuk Thao (Coupe RB)", "   Show Coupe RB"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_Coupe end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_Coupe = v return true end },
-            { Key = "ModMenu_ESPVeh_Mirado", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Mirado", "   Show Mirado"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_Mirado end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_Mirado = v return true end },
-            { Key = "ModMenu_ESPVeh_Motor", UI = AliasMap.Switcher, Text = T("   Tampilkan sepeda motor (Motor/Scooter)", "   Show Motorcycles"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_Motor end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_Motor = v return true end },
-            { Key = "ModMenu_ESPVeh_Other", UI = AliasMap.Switcher, Text = T("   Tampilkan kendaraan lain (perahu/BRDM...)", "   Show Others (Boat/BRDM)"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceConfig.EspVeh_Other end, SetFunc = function(c,v) _G.LynceConfig.EspVeh_Other = v return true end },
+            { Key = "ModMenu_ESPVehicle_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP pelacakan kendaraan", "▶ Vehicle ESP"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspVehicle end, SetFunc = function(c,v) _G.LynceModConfig.EspVehicle = v return true end },
+            { Key = "ModMenu_ESPVeh_Dacia", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Con (Dacia)", "   Show Dacia"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_Dacia end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_Dacia = v return true end },
+            { Key = "ModMenu_ESPVeh_UAZ", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Jeep (UAZ)", "   Show UAZ"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_UAZ end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_UAZ = v return true end },
+            { Key = "ModMenu_ESPVeh_Buggy", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Buggy", "   Show Buggy"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_Buggy end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_Buggy = v return true end },
+            { Key = "ModMenu_ESPVeh_Coupe", UI = AliasMap.Switcher, Text = T("   Tampilkan kendaraan bentuk Thao (Coupe RB)", "   Show Coupe RB"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_Coupe end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_Coupe = v return true end },
+            { Key = "ModMenu_ESPVeh_Mirado", UI = AliasMap.Switcher, Text = T("   Tampilkan Xe Mirado", "   Show Mirado"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_Mirado end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_Mirado = v return true end },
+            { Key = "ModMenu_ESPVeh_Motor", UI = AliasMap.Switcher, Text = T("   Tampilkan sepeda motor (Motor/Scooter)", "   Show Motorcycles"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_Motor end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_Motor = v return true end },
+            { Key = "ModMenu_ESPVeh_Other", UI = AliasMap.Switcher, Text = T("   Tampilkan kendaraan lain (perahu/BRDM...)", "   Show Others (Boat/BRDM)"), ExpandHandle = "ModMenu_ESPVehicle_Ex", GetFunc = function() return _G.LynceModConfig.EspVeh_Other end, SetFunc = function(c,v) _G.LynceModConfig.EspVeh_Other = v return true end },
             
-            { Key = "ModMenu_ESPAntenna", UI = AliasMap.Switcher, Text = T("ESP Antenna (Cột)", "Antenna ESP"), GetFunc = function() return _G.LynceConfig.EspAntenna end, SetFunc = function(c,v) _G.LynceConfig.EspAntenna = v return true end },
-            { Key = "ModMenu_ESPOutline_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP garis tepi Musuh (Aktifkan HDR sẽ terang)", "▶ Outline ESP (HDR supported)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.EspOutline end, SetFunc = function(c,v) _G.LynceConfig.EspOutline = v return true end },
-            { Key = "ModMenu_ESPOutline_Color", UI = AliasMap.Slider, Text = T("   Warna garis tepi (1:merah 2:hijau 3:biru 4:emas 5:ungu 6:putih)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceState.CustomTextData.OutlineColor or 4 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OutlineColor = v return true end },
-            { Key = "ModMenu_ESPOutline_Thickness", UI = AliasMap.Slider, Text = T("   Ketebalan Garis Tepi", "   Outline Thickness"), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 20, min = 1, max = 20, GetFunc = function() return _G.LynceConfig.OutlineThickness end, SetFunc = function(c,v) _G.LynceConfig.OutlineThickness = v return true end }
+            { Key = "ModMenu_ESPAntenna", UI = AliasMap.Switcher, Text = T("ESP Antenna (Cột)", "Antenna ESP"), GetFunc = function() return _G.LynceModConfig.EspAntenna end, SetFunc = function(c,v) _G.LynceModConfig.EspAntenna = v return true end },
+            { Key = "ModMenu_ESPOutline_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ ESP garis tepi Musuh (Aktifkan HDR sẽ terang)", "▶ Outline ESP (HDR supported)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.EspOutline end, SetFunc = function(c,v) _G.LynceModConfig.EspOutline = v return true end },
+            { Key = "ModMenu_ESPOutline_Color", UI = AliasMap.Slider, Text = T("   Warna garis tepi (1:merah 2:hijau 3:biru 4:emas 5:ungu 6:putih)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceModState.CustomTextData.OutlineColor or 4 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.OutlineColor = v return true end },
+            { Key = "ModMenu_ESPOutline_Thickness", UI = AliasMap.Slider, Text = T("   Ketebalan Garis Tepi", "   Outline Thickness"), ExpandHandle = "ModMenu_ESPOutline_Ex", MinValue = 1, MaxValue = 20, min = 1, max = 20, GetFunc = function() return _G.LynceModConfig.OutlineThickness end, SetFunc = function(c,v) _G.LynceModConfig.OutlineThickness = v return true end }
         }
 
         local StackAimbot = {
-            { Key = "ModMenu_Aimbot_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot Scope", "▶ Custom Long Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomAimbot end, SetFunc = function(c,v) _G.LynceConfig.CustomAimbot = v return true end },
-            { Key = "ModMenu_Aimbot_Speed", UI = AliasMap.Slider, Text = T("   Kecepatan Aimbot Xa", "   Long Range Speed"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.OuterSpeed end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OuterSpeed = v return true end },
-            { Key = "ModMenu_Aimbot_Recoil", UI = AliasMap.Slider, Text = T("   kompensasi rekoil Ghìm titik bidik", "   Recoil Compensation"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.LynceState.CustomTextData.OuterRecoil or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.OuterRecoil = v return true end },
+            { Key = "ModMenu_Aimbot_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot Scope", "▶ Custom Long Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomAimbot end, SetFunc = function(c,v) _G.LynceModConfig.CustomAimbot = v return true end },
+            { Key = "ModMenu_Aimbot_Speed", UI = AliasMap.Slider, Text = T("   Kecepatan Aimbot Xa", "   Long Range Speed"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.OuterSpeed end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.OuterSpeed = v return true end },
+            { Key = "ModMenu_Aimbot_Recoil", UI = AliasMap.Slider, Text = T("   kompensasi rekoil Ghìm titik bidik", "   Recoil Compensation"), ExpandHandle = "ModMenu_Aimbot_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.LynceModState.CustomTextData.OuterRecoil or 0 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.OuterRecoil = v return true end },
 
-            { Key = "ModMenu_AimbotClose_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot CLOSE COMBAT", "▶ Custom Close Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomAimbotClose end, SetFunc = function(c,v) _G.LynceConfig.CustomAimbotClose = v return true end },
-            { Key = "ModMenu_AimbotClose_Speed", UI = AliasMap.Slider, Text = T("   Kecepatan Aimbot dekat", "   Close Range Speed"), ExpandHandle = "ModMenu_AimbotClose_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.InnerSpeed end, SetFunc = function(c,v) _G.LynceState.CustomTextData.InnerSpeed = v return true end },
+            { Key = "ModMenu_AimbotClose_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Aimbot CLOSE COMBAT", "▶ Custom Close Range Aimbot"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomAimbotClose end, SetFunc = function(c,v) _G.LynceModConfig.CustomAimbotClose = v return true end },
+            { Key = "ModMenu_AimbotClose_Speed", UI = AliasMap.Slider, Text = T("   Kecepatan Aimbot dekat", "   Close Range Speed"), ExpandHandle = "ModMenu_AimbotClose_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.InnerSpeed end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.InnerSpeed = v return true end },
 
-            { Key = "ModMenu_Magic_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶[BAN] Magic Bullet kustom atur", "▶ (RISK BAN) Custom Magic Bullet"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomMagicBullet end, SetFunc = function(c,v) _G.LynceConfig.CustomMagicBullet = v return true end },
-            { Key = "ModMenu_Magic_Head", UI = AliasMap.Slider, Text = T("   Damage Kepala (0.0 - 5.0)", "   Head Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceState.CustomTextData.MagicHead or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.MagicHead = (v / 100.0) * 5.0 return true end },
-            { Key = "ModMenu_Magic_Body", UI = AliasMap.Slider, Text = T("   Damage Tubuh (0.0 - 5.0)", "   Body Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceState.CustomTextData.MagicBody or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.MagicBody = (v / 100.0) * 5.0 return true end },
-            { Key = "ModMenu_Magic_Legs", UI = AliasMap.Slider, Text = T("   Damage Kaki (0.0 - 5.0)", "   Legs Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceState.CustomTextData.MagicLegs or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.MagicLegs = (v / 100.0) * 5.0 return true end },
+            { Key = "ModMenu_Magic_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶[BAN] Magic Bullet kustom atur", "▶ (RISK BAN) Custom Magic Bullet"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomMagicBullet end, SetFunc = function(c,v) _G.LynceModConfig.CustomMagicBullet = v return true end },
+            { Key = "ModMenu_Magic_Head", UI = AliasMap.Slider, Text = T("   Damage Kepala (0.0 - 5.0)", "   Head Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceModState.CustomTextData.MagicHead or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.MagicHead = (v / 100.0) * 5.0 return true end },
+            { Key = "ModMenu_Magic_Body", UI = AliasMap.Slider, Text = T("   Damage Tubuh (0.0 - 5.0)", "   Body Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceModState.CustomTextData.MagicBody or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.MagicBody = (v / 100.0) * 5.0 return true end },
+            { Key = "ModMenu_Magic_Legs", UI = AliasMap.Slider, Text = T("   Damage Kaki (0.0 - 5.0)", "   Legs Damage (0.0 - 5.0)"), ExpandHandle = "ModMenu_Magic_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor(((_G.LynceModState.CustomTextData.MagicLegs or 1.0) / 5.0) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.MagicLegs = (v / 100.0) * 5.0 return true end },
 
-            --{ Key = "ModMenu_HRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Horizontal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Horizontal Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomHRecoil end, SetFunc = function(c,v) _G.LynceConfig.CustomHRecoil = v return true end },
-            --{ Key = "ModMenu_HRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Horizontal", "   Horizontal Recoil Value"), ExpandHandle = "ModMenu_HRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceState.CustomTextData.HRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.HRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
+            --{ Key = "ModMenu_HRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Horizontal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Horizontal Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomHRecoil end, SetFunc = function(c,v) _G.LynceModConfig.CustomHRecoil = v return true end },
+            --{ Key = "ModMenu_HRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Horizontal", "   Horizontal Recoil Value"), ExpandHandle = "ModMenu_HRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceModState.CustomTextData.HRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.HRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
 
-         --   { Key = "ModMenu_VRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Vertikal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Vertical Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.CustomVRecoil end, SetFunc = function(c,v) _G.LynceConfig.CustomVRecoil = v return true end },
-        --    { Key = "ModMenu_VRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Vertikal", "   Vertical Recoil Value"), ExpandHandle = "ModMenu_VRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceState.CustomTextData.VRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.VRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
+         --   { Key = "ModMenu_VRecoil_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Kurangi Recoil Vertikal (Jatuhkan lalu ambil senjata untuk memuat ulang)", "▶ Less Vertical Recoil (Drop/Pick weapon)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.CustomVRecoil end, SetFunc = function(c,v) _G.LynceModConfig.CustomVRecoil = v return true end },
+        --    { Key = "ModMenu_VRecoil_Val", UI = AliasMap.Slider, Text = T("   Nilai rekoil Vertikal", "   Vertical Recoil Value"), ExpandHandle = "ModMenu_VRecoil_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return math.floor((((_G.LynceModState.CustomTextData.VRecoil or 0.3) - 0.3) / 4.7) * 100 + 0.5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.VRecoil = 0.3 + (v / 100.0) * 4.7 return true end },
  { 
     Key = "ModMenu_Less_Slider", 
     UI = AliasMap.Slider, 
@@ -1672,10 +1672,10 @@ function _G.InitModMenuTab()
     ExpandIndex = 3, 
     MinValue = 0, MaxValue = 100, min = 0, max = 100,
     GetFunc = function() 
-        return _G.LynceState.CustomTextData.RecoilSlider or 0 
+        return _G.LynceModState.CustomTextData.RecoilSlider or 0 
     end, 
     SetFunc = function(c, v) 
-        _G.LynceState.CustomTextData.RecoilSlider = v 
+        _G.LynceModState.CustomTextData.RecoilSlider = v 
         if _G.SaveModSettings then _G.SaveModSettings() end -- Panggil save bawaan kamu
         return true 
     end 
@@ -1687,96 +1687,96 @@ function _G.InitModMenuTab()
     ExpandIndex = 3, 
     MinValue = 0, MaxValue = 100, min = 0, max = 100,
     GetFunc = function() 
-        return _G.LynceState.CustomTextData.ShakeSlider or 0 
+        return _G.LynceModState.CustomTextData.ShakeSlider or 0 
     end, 
     SetFunc = function(c, v) 
-        _G.LynceState.CustomTextData.ShakeSlider = v 
+        _G.LynceModState.CustomTextData.ShakeSlider = v 
         if _G.SaveModSettings then _G.SaveModSettings() end -- Panggil save bawaan kamu
         return true 
     end 
 },
        
-            { Key = "ModMenu_LessShake", UI = AliasMap.Switcher, Text = T("LESS SHAKE", "Less Scope Shake"), GetFunc = function() return _G.LynceConfig.LessShake end, SetFunc = function(c,v) _G.LynceConfig.LessShake = v return true end },
-            { Key = "ModMenu_Accuracy", UI = AliasMap.Switcher, Text = T("ACCURACY"), GetFunc = function() return _G.LynceConfig.Accuracy end, SetFunc = function(c,v) _G.LynceConfig.Accuracy = v return true end },
-            { Key = "ModMenu_Crosshair", UI = AliasMap.Switcher, Text = T("Small CRosshair", "Small Crosshair"), GetFunc = function() return _G.LynceConfig.Crosshair end, SetFunc = function(c,v) _G.LynceConfig.Crosshair = v return true end },
-            { Key = "ModMenu_AutoHead", UI = AliasMap.Switcher, Text = T("Aimbot Head", "Aimbot Head"), GetFunc = function() return _G.LynceConfig.AutoHead end, SetFunc = function(c,v) _G.LynceConfig.AutoHead = v return true end },
-          --  { Key = "ModMenu_GodMode", UI = AliasMap.Switcher, Text = T("hancurkan hancurkan (menembak sangat cepat)", "God Mode (Fast Shoot)"), GetFunc = function() return _G.LynceConfig.GodMode end, SetFunc = function(c,v) _G.LynceConfig.GodMode = v return true end }
+            { Key = "ModMenu_LessShake", UI = AliasMap.Switcher, Text = T("LESS SHAKE", "Less Scope Shake"), GetFunc = function() return _G.LynceModConfig.LessShake end, SetFunc = function(c,v) _G.LynceModConfig.LessShake = v return true end },
+            { Key = "ModMenu_Accuracy", UI = AliasMap.Switcher, Text = T("ACCURACY"), GetFunc = function() return _G.LynceModConfig.Accuracy end, SetFunc = function(c,v) _G.LynceModConfig.Accuracy = v return true end },
+            { Key = "ModMenu_Crosshair", UI = AliasMap.Switcher, Text = T("Small CRosshair", "Small Crosshair"), GetFunc = function() return _G.LynceModConfig.Crosshair end, SetFunc = function(c,v) _G.LynceModConfig.Crosshair = v return true end },
+            { Key = "ModMenu_AutoHead", UI = AliasMap.Switcher, Text = T("Aimbot Head", "Aimbot Head"), GetFunc = function() return _G.LynceModConfig.AutoHead end, SetFunc = function(c,v) _G.LynceModConfig.AutoHead = v return true end },
+          --  { Key = "ModMenu_GodMode", UI = AliasMap.Switcher, Text = T("hancurkan hancurkan (menembak sangat cepat)", "God Mode (Fast Shoot)"), GetFunc = function() return _G.LynceModConfig.GodMode end, SetFunc = function(c,v) _G.LynceModConfig.GodMode = v return true end }
         }
 
         local StackAimbotV2 = {
-            { Key = "ModMenu_AT_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶Aktifkan aimtouch", "▶ Enable Custom Aimbot V2"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AimTouchEnable end, SetFunc = function(c,v) _G.LynceConfig.AimTouchEnable = v return true end },
+            { Key = "ModMenu_AT_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶Aktifkan aimtouch", "▶ Enable Custom Aimbot V2"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.AimTouchEnable end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchEnable = v return true end },
             
             -- HIPFIRE (titik bidik putih)
-            { Key = "ModMenu_AT_Hip_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot close combat", "   ▶ Hipfire Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AimTouchHipfire end, SetFunc = function(c,v) _G.LynceConfig.AimTouchHipfire = v return true end },
-            { Key = "ModMenu_AT_Hip_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_Hip_Ex", GetFunc = function() return _G.LynceConfig.AimTouchHipIgKnock end, SetFunc = function(c,v) _G.LynceConfig.AimTouchHipIgKnock = v return true end },
-            { Key = "ModMenu_AT_Hip_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_Hip_Ex", GetFunc = function() return _G.LynceConfig.AimTouchHipIgBot end, SetFunc = function(c,v) _G.LynceConfig.AimTouchHipIgBot = v return true end },
-            { Key = "ModMenu_AT_Hip_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_Hip_Ex", GetFunc = function() return _G.LynceConfig.AimTouchHipVisCheck end, SetFunc = function(c,v) _G.LynceConfig.AimTouchHipVisCheck = v return true end },
-            { Key = "ModMenu_AT_Hip_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchHipPrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchHipPrio = val return true end },
-            { Key = "ModMenu_AT_Hip_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchHipBone or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchHipBone = val return true end },
-            { Key = "ModMenu_AT_Hip_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchHipCond or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceState.CustomTextData.AimTouchHipCond = val return true end },
-            { Key = "ModMenu_AT_Hip_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchHipSpeed or 50 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchHipSpeed = v return true end },
-            { Key = "ModMenu_AT_Hip_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchHipFOV or 30 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchHipFOV = v return true end },
-            { Key = "ModMenu_AT_Hip_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-500m)", "      Distance Limit (1-500m)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return math.floor((_G.LynceState.CustomTextData.AimTouchHipDist or 250) / 5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchHipDist = v * 5 return true end },
+            { Key = "ModMenu_AT_Hip_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot close combat", "   ▶ Hipfire Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.AimTouchHipfire end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchHipfire = v return true end },
+            { Key = "ModMenu_AT_Hip_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_Hip_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchHipIgKnock end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchHipIgKnock = v return true end },
+            { Key = "ModMenu_AT_Hip_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_Hip_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchHipIgBot end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchHipIgBot = v return true end },
+            { Key = "ModMenu_AT_Hip_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_Hip_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchHipVisCheck end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchHipVisCheck = v return true end },
+            { Key = "ModMenu_AT_Hip_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchHipPrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchHipPrio = val return true end },
+            { Key = "ModMenu_AT_Hip_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchHipBone or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchHipBone = val return true end },
+            { Key = "ModMenu_AT_Hip_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchHipCond or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceModState.CustomTextData.AimTouchHipCond = val return true end },
+            { Key = "ModMenu_AT_Hip_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchHipSpeed or 50 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchHipSpeed = v return true end },
+            { Key = "ModMenu_AT_Hip_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchHipFOV or 30 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchHipFOV = v return true end },
+            { Key = "ModMenu_AT_Hip_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-500m)", "      Distance Limit (1-500m)"), ExpandHandle = "ModMenu_AT_Hip_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return math.floor((_G.LynceModState.CustomTextData.AimTouchHipDist or 250) / 5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchHipDist = v * 5 return true end },
 
             -- AIMBOT SHOTGUN
-            { Key = "ModMenu_AT_SG_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Shotgun", "   ▶ Shotgun Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AimTouchSG end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSG = v return true end },
-            { Key = "ModMenu_AT_SG_AutoFire", UI = AliasMap.Switcher, Text = T("      otomatis menembak", "      Auto Fire"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSGAutoFire end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSGAutoFire = v return true end },
-            { Key = "ModMenu_AT_SG_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSGIgKnock end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSGIgKnock = v return true end },
-            { Key = "ModMenu_AT_SG_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSGIgBot end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSGIgBot = v return true end },
-            { Key = "ModMenu_AT_SG_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSGVisCheck end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSGVisCheck = v return true end },
-            { Key = "ModMenu_AT_SG_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSGPrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchSGPrio = val return true end },
-            { Key = "ModMenu_AT_SG_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSGBone or 2 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchSGBone = val return true end },
-            { Key = "ModMenu_AT_SG_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSGCond or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceState.CustomTextData.AimTouchSGCond = val return true end },
-            { Key = "ModMenu_AT_SG_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSGSpeed or 80 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSGSpeed = v return true end },
-            { Key = "ModMenu_AT_SG_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSGFOV or 40 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSGFOV = v return true end },
-            { Key = "ModMenu_AT_SG_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-100m)", "      Distance Limit (1-100m)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSGDist or 30 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSGDist = v return true end },
+            { Key = "ModMenu_AT_SG_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Shotgun", "   ▶ Shotgun Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.AimTouchSG end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSG = v return true end },
+            { Key = "ModMenu_AT_SG_AutoFire", UI = AliasMap.Switcher, Text = T("      otomatis menembak", "      Auto Fire"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSGAutoFire end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSGAutoFire = v return true end },
+            { Key = "ModMenu_AT_SG_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSGIgKnock end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSGIgKnock = v return true end },
+            { Key = "ModMenu_AT_SG_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSGIgBot end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSGIgBot = v return true end },
+            { Key = "ModMenu_AT_SG_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_SG_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSGVisCheck end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSGVisCheck = v return true end },
+            { Key = "ModMenu_AT_SG_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSGPrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchSGPrio = val return true end },
+            { Key = "ModMenu_AT_SG_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSGBone or 2 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchSGBone = val return true end },
+            { Key = "ModMenu_AT_SG_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSGCond or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceModState.CustomTextData.AimTouchSGCond = val return true end },
+            { Key = "ModMenu_AT_SG_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSGSpeed or 80 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSGSpeed = v return true end },
+            { Key = "ModMenu_AT_SG_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSGFOV or 40 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSGFOV = v return true end },
+            { Key = "ModMenu_AT_SG_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-100m)", "      Distance Limit (1-100m)"), ExpandHandle = "ModMenu_AT_SG_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSGDist or 30 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSGDist = v return true end },
             
             -- SCOPE ALL (senjata biasa saat buka SCOPE)
-            { Key = "ModMenu_AT_ScopeAll_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Buka Scope", "   ▶ Scope Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AimTouchScopeAll end, SetFunc = function(c,v) _G.LynceConfig.AimTouchScopeAll = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", GetFunc = function() return _G.LynceConfig.AimTouchScopeIgKnock end, SetFunc = function(c,v) _G.LynceConfig.AimTouchScopeIgKnock = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", GetFunc = function() return _G.LynceConfig.AimTouchScopeIgBot end, SetFunc = function(c,v) _G.LynceConfig.AimTouchScopeIgBot = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", GetFunc = function() return _G.LynceConfig.AimTouchScopeVisCheck end, SetFunc = function(c,v) _G.LynceConfig.AimTouchScopeVisCheck = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopePrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchScopePrio = val return true end },
-            { Key = "ModMenu_AT_ScopeAll_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopeBone or 2 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchScopeBone = val return true end },
-            { Key = "ModMenu_AT_ScopeAll_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopeCond or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceState.CustomTextData.AimTouchScopeCond = val return true end },
-            { Key = "ModMenu_AT_ScopeAll_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopeSpeed or 40 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchScopeSpeed = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopeFOV or 20 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchScopeFOV = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-500m)", "      Distance Limit (1-500m)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return math.floor((_G.LynceState.CustomTextData.AimTouchScopeDist or 300) / 5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchScopeDist = v * 5 return true end },
-            { Key = "ModMenu_AT_ScopeAll_Pred", UI = AliasMap.Slider, Text = T("      Prediksi Arah Gerak", "      Prediction Value"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopePred or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchScopePred = v return true end },
-            { Key = "ModMenu_AT_ScopeAll_Recoil", UI = AliasMap.Slider, Text = T("      Kompensasi Recoil Otomatis", "      Auto Recoil Comp."), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchScopeRecoil or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchScopeRecoil = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Buka Scope", "   ▶ Scope Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.AimTouchScopeAll end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchScopeAll = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchScopeIgKnock end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchScopeIgKnock = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchScopeIgBot end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchScopeIgBot = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchScopeVisCheck end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchScopeVisCheck = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopePrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchScopePrio = val return true end },
+            { Key = "ModMenu_AT_ScopeAll_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopeBone or 2 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchScopeBone = val return true end },
+            { Key = "ModMenu_AT_ScopeAll_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopeCond or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceModState.CustomTextData.AimTouchScopeCond = val return true end },
+            { Key = "ModMenu_AT_ScopeAll_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopeSpeed or 40 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchScopeSpeed = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopeFOV or 20 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchScopeFOV = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-500m)", "      Distance Limit (1-500m)"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return math.floor((_G.LynceModState.CustomTextData.AimTouchScopeDist or 300) / 5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchScopeDist = v * 5 return true end },
+            { Key = "ModMenu_AT_ScopeAll_Pred", UI = AliasMap.Slider, Text = T("      Prediksi Arah Gerak", "      Prediction Value"), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopePred or 0 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchScopePred = v return true end },
+            { Key = "ModMenu_AT_ScopeAll_Recoil", UI = AliasMap.Slider, Text = T("      Kompensasi Recoil Otomatis", "      Auto Recoil Comp."), ExpandHandle = "ModMenu_AT_ScopeAll_Ex", MinValue = 0, MaxValue = 50, min = 0, max = 50, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchScopeRecoil or 0 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchScopeRecoil = v return true end },
 
             -- SCOPE SNIPER (SÚNG NGẮM/TỈA)
-            { Key = "ModMenu_AT_Sniper_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Buka Scope (Senapan Sniper)", "   ▶ Sniper Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AimTouchScopeSniper end, SetFunc = function(c,v) _G.LynceConfig.AimTouchScopeSniper = v return true end },
-            { Key = "ModMenu_AT_Sniper_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_Sniper_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSniperIgKnock end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSniperIgKnock = v return true end },
-            { Key = "ModMenu_AT_Sniper_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_Sniper_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSniperIgBot end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSniperIgBot = v return true end },
-            { Key = "ModMenu_AT_Sniper_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_Sniper_Ex", GetFunc = function() return _G.LynceConfig.AimTouchSniperVisCheck end, SetFunc = function(c,v) _G.LynceConfig.AimTouchSniperVisCheck = v return true end },
-            { Key = "ModMenu_AT_Sniper_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSniperPrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchSniperPrio = val return true end },
-            { Key = "ModMenu_AT_Sniper_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSniperBone or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceState.CustomTextData.AimTouchSniperBone = val return true end },
-            { Key = "ModMenu_AT_Sniper_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSniperCond or 2 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceState.CustomTextData.AimTouchSniperCond = val return true end },
-            { Key = "ModMenu_AT_Sniper_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSniperSpeed or 30 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSniperSpeed = v return true end },
-            { Key = "ModMenu_AT_Sniper_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSniperFOV or 20 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSniperFOV = v return true end },
-            { Key = "ModMenu_AT_Sniper_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-500m)", "      Distance Limit (1-500m)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return math.floor((_G.LynceState.CustomTextData.AimTouchSniperDist or 400) / 5) end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSniperDist = v * 5 return true end },
-            { Key = "ModMenu_AT_Sniper_Pred", UI = AliasMap.Slider, Text = T("      Prediksi Arah Gerak (0-100)", "      Prediction Value (0-100)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchSniperPred or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchSniperPred = v return true end },
+            { Key = "ModMenu_AT_Sniper_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Buka Scope (Senapan Sniper)", "   ▶ Sniper Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.AimTouchScopeSniper end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchScopeSniper = v return true end },
+            { Key = "ModMenu_AT_Sniper_IgKnock", UI = AliasMap.Switcher, Text = T("      Abaikan Musuh Knock", "      Ignore Knocked"), ExpandHandle = "ModMenu_AT_Sniper_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSniperIgKnock end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSniperIgKnock = v return true end },
+            { Key = "ModMenu_AT_Sniper_IgBot", UI = AliasMap.Switcher, Text = T("      Abaikan Bot", "      Ignore Bots"), ExpandHandle = "ModMenu_AT_Sniper_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSniperIgBot end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSniperIgBot = v return true end },
+            { Key = "ModMenu_AT_Sniper_Vis", UI = AliasMap.Switcher, Text = T("      Periksa Visibilitas (VisCheck)", "      Visibility Check"), ExpandHandle = "ModMenu_AT_Sniper_Ex", GetFunc = function() return _G.LynceModConfig.AimTouchSniperVisCheck end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchSniperVisCheck = v return true end },
+            { Key = "ModMenu_AT_Sniper_Prio", UI = AliasMap.Slider, Text = T("      prioritas prioritas (1:titik bidik 2:dekat 3:HP)", "      Priority (1:Crosshair 2:Distance 3:HP)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSniperPrio or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchSniperPrio = val return true end },
+            { Key = "ModMenu_AT_Sniper_Bone", UI = AliasMap.Slider, Text = T("      Posisi (1:Kepala 2:Dada 3:Perut 4:Pinggul)", "      Bone (1:Head 2:Chest 3:Stomach 4:Pelvis)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 4, min = 1, max = 4, Min = 1, Max = 4, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSniperBone or 1 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 4 then val = 4 end; _G.LynceModState.CustomTextData.AimTouchSniperBone = val return true end },
+            { Key = "ModMenu_AT_Sniper_Cond", UI = AliasMap.Slider, Text = T("      Kondisi (1:Bidik saat menembak, 2:Selalu membidik)", "      Trigger (1:On Fire, 2:Always)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 2, min = 1, max = 2, Min = 1, Max = 2, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSniperCond or 2 end, SetFunc = function(c,v) local val = math.floor(v+0.5); if val < 1 then val = 1 end; if val > 2 then val = 2 end; _G.LynceModState.CustomTextData.AimTouchSniperCond = val return true end },
+            { Key = "ModMenu_AT_Sniper_Spd", UI = AliasMap.Slider, Text = T("      Kelancaran / Kecepatan (1-100)", "      Smoothness / Speed (1-100)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSniperSpeed or 30 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSniperSpeed = v return true end },
+            { Key = "ModMenu_AT_Sniper_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-100)", "      FOV Radius (1-100)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSniperFOV or 20 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSniperFOV = v return true end },
+            { Key = "ModMenu_AT_Sniper_Dist", UI = AliasMap.Slider, Text = T("      Jarak (1-500m)", "      Distance Limit (1-500m)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return math.floor((_G.LynceModState.CustomTextData.AimTouchSniperDist or 400) / 5) end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSniperDist = v * 5 return true end },
+            { Key = "ModMenu_AT_Sniper_Pred", UI = AliasMap.Slider, Text = T("      Prediksi Arah Gerak (0-100)", "      Prediction Value (0-100)"), ExpandHandle = "ModMenu_AT_Sniper_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchSniperPred or 0 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchSniperPred = v return true end },
 
             -- AIMBOT SÚNG CỐI (MORTAR)
-            { Key = "ModMenu_AT_Mortar_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Mortir (Mortar)", "   ▶ Mortar Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.AimTouchMortar end, SetFunc = function(c,v) _G.LynceConfig.AimTouchMortar = v return true end },
-            { Key = "ModMenu_AT_Mortar_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-360)", "      FOV Radius (1-360)"), ExpandHandle = "ModMenu_AT_Mortar_Ex", MinValue = 1, MaxValue = 360, min = 1, max = 360, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchMortarFOV or 360 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchMortarFOV = v return true end },
-            { Key = "ModMenu_AT_Mortar_Pred", UI = AliasMap.Slider, Text = T("      Prediksi Arah Gerak (0-100)", "      Prediction Value (0-100)"), ExpandHandle = "ModMenu_AT_Mortar_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return _G.LynceState.CustomTextData.AimTouchMortarPred or 0 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.AimTouchMortarPred = v return true end }
+            { Key = "ModMenu_AT_Mortar_Ex", UI = AliasMap.TitleSwitcher, Text = T("   ▶ Aimbot Mortir (Mortar)", "   ▶ Mortar Aimbot"), ExpandHandle = "ModMenu_AT_Ex", ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.AimTouchMortar end, SetFunc = function(c,v) _G.LynceModConfig.AimTouchMortar = v return true end },
+            { Key = "ModMenu_AT_Mortar_FOV", UI = AliasMap.Slider, Text = T("      Radius FOV (1-360)", "      FOV Radius (1-360)"), ExpandHandle = "ModMenu_AT_Mortar_Ex", MinValue = 1, MaxValue = 360, min = 1, max = 360, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchMortarFOV or 360 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchMortarFOV = v return true end },
+            { Key = "ModMenu_AT_Mortar_Pred", UI = AliasMap.Slider, Text = T("      Prediksi Arah Gerak (0-100)", "      Prediction Value (0-100)"), ExpandHandle = "ModMenu_AT_Mortar_Ex", MinValue = 0, MaxValue = 100, min = 0, max = 100, GetFunc = function() return _G.LynceModState.CustomTextData.AimTouchMortarPred or 0 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.AimTouchMortarPred = v return true end }
         }
 
         local StackSkin = {
-            { Key = "Lobby Super Car", UI = AliasMap.Switcher, Text = T("Lobi Supercar VIP (Nonaktifkan untuk kembali ke default)", "VIP Super Car Lobby (Disable to revert)"), GetFunc = function() return _G.LynceConfig.SanhSieuXeVip end, SetFunc = function(c,v) _G.LynceConfig.SanhSieuXeVip = v; if _G.LobbyThemeSystem and _G.LobbyThemeSystem.UpdateTheme then _G.LobbyThemeSystem.UpdateTheme() end return true end },
-            { Key = "ModMenu_ModEmote", UI = AliasMap.Switcher, Text = T("Buka Semua Emote VIP (Emotes)", "Unlock All VIP Emotes"), GetFunc = function() return _G.LynceConfig.ModEmote end, SetFunc = function(c,v) _G.LynceConfig.ModEmote = v return true end },
-            { Key = "ModMenu_ModSkin", UI = AliasMap.Switcher, Text = T("Sistem Mod Skin VIP (Buka inventaris untuk memilih)", "VIP Mod Skin System (Open inventory)"), GetFunc = function() return _G.LynceConfig.ModSkin end, SetFunc = function(c,v) _G.LynceConfig.ModSkin = v return true end },
-            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("Skin Kotak Loot (Mengikuti skin Senjata/Kendaraan)", "Deadbox Skin (Sync with Weapon)"), GetFunc = function() return _G.LynceConfig.SkinDeadBox end, SetFunc = function(c,v) _G.LynceConfig.SkinDeadBox = v return true end },
-            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Nòng, tangan cầm...)", "Weapon Attachment Skin"), GetFunc = function() return _G.LynceConfig.SkinAttachment end, SetFunc = function(c,v) _G.LynceConfig.SkinAttachment = v return true end },
-            { Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("Kill Messenger VIP", "VIP Kill Messenger"), GetFunc = function() return _G.LynceConfig.KillMessage end, SetFunc = function(c,v) _G.LynceConfig.KillMessage = v return true end },
-            { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Menampilkan jumlah kill senjata)", "Kill Counter UI"), GetFunc = function() return _G.LynceConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceConfig.KillCountUI = v return true end },
-            { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end end) end return true end },
+            { Key = "Lobby Super Car", UI = AliasMap.Switcher, Text = T("Lobi Supercar VIP (Nonaktifkan untuk kembali ke default)", "VIP Super Car Lobby (Disable to revert)"), GetFunc = function() return _G.LynceModConfig.SanhSieuXeVip end, SetFunc = function(c,v) _G.LynceModConfig.SanhSieuXeVip = v; if _G.LobbyThemeSystem and _G.LobbyThemeSystem.UpdateTheme then _G.LobbyThemeSystem.UpdateTheme() end return true end },
+            { Key = "ModMenu_ModEmote", UI = AliasMap.Switcher, Text = T("Buka Semua Emote VIP (Emotes)", "Unlock All VIP Emotes"), GetFunc = function() return _G.LynceModConfig.ModEmote end, SetFunc = function(c,v) _G.LynceModConfig.ModEmote = v return true end },
+            { Key = "ModMenu_ModSkin", UI = AliasMap.Switcher, Text = T("Sistem Mod Skin VIP (Buka inventaris untuk memilih)", "VIP Mod Skin System (Open inventory)"), GetFunc = function() return _G.LynceModConfig.ModSkin end, SetFunc = function(c,v) _G.LynceModConfig.ModSkin = v return true end },
+            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("Skin Kotak Loot (Mengikuti skin Senjata/Kendaraan)", "Deadbox Skin (Sync with Weapon)"), GetFunc = function() return _G.LynceModConfig.SkinDeadBox end, SetFunc = function(c,v) _G.LynceModConfig.SkinDeadBox = v return true end },
+            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Nòng, tangan cầm...)", "Weapon Attachment Skin"), GetFunc = function() return _G.LynceModConfig.SkinAttachment end, SetFunc = function(c,v) _G.LynceModConfig.SkinAttachment = v return true end },
+            { Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("Kill Messenger VIP", "VIP Kill Messenger"), GetFunc = function() return _G.LynceModConfig.KillMessage end, SetFunc = function(c,v) _G.LynceModConfig.KillMessage = v return true end },
+            { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Menampilkan jumlah kill senjata)", "Kill Counter UI"), GetFunc = function() return _G.LynceModConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceModConfig.KillCountUI = v return true end },
+            { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceModConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceModConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end end) end return true end },
         }
 
 -- ==================== GODMOD GRAPHICS / PERFORMANCE ====================
-_G.LynceGraphicsConfig = _G.LynceGraphicsConfig or {
+_G.LynceModGraphicsConfig = _G.LynceModGraphicsConfig or {
     Enabled = false,
     Resolution = 3,
     Shadow = true,
@@ -1789,21 +1789,21 @@ _G.LynceGraphicsConfig = _G.LynceGraphicsConfig or {
     ViewDistance = false,
 }
 
-local LynceGraphicsResolutionMap = {
+local LynceModGraphicsResolutionMap = {
     [1] = "30",
     [2] = "45",
     [3] = "67",
     [4] = "100",
 }
 
-local LynceGraphicsResolutionName = {
+local LynceModGraphicsResolutionName = {
     [1] = "360p",
     [2] = "480p",
     [3] = "720p",
     [4] = "Default",
 }
 
-local function ApplyLynceGraphicsSettings()
+local function ApplyLynceModGraphicsSettings()
     pcall(function()
         local GameplayData = require("GameLua.GameCore.Data.GameplayData")
         local pc = GameplayData and GameplayData.GetPlayerController and GameplayData.GetPlayerController()
@@ -1812,8 +1812,8 @@ local function ApplyLynceGraphicsSettings()
         local KSL = import("KismetSystemLibrary")
         if not KSL or not KSL.ExecuteConsoleCommand then return end
 
-        local cfg = _G.LynceGraphicsConfig
-        local res = LynceGraphicsResolutionMap[cfg.Resolution] or "100"
+        local cfg = _G.LynceModGraphicsConfig
+        local res = LynceModGraphicsResolutionMap[cfg.Resolution] or "100"
 
         KSL.ExecuteConsoleCommand(pc, "r.ScreenPercentage " .. res)
         KSL.ExecuteConsoleCommand(pc, "r.MobileContentScaleFactor 0")
@@ -1922,10 +1922,10 @@ end
 local StackGraphics = {
     { Key = "ModMenu_Graphics_Ex", UI = AliasMap.TitleSwitcher,
       Text = "▶ GRAFIK & PERFORMA", ExpandIndex = 0,
-      GetFunc = function() return _G.LynceGraphicsConfig.Enabled end,
+      GetFunc = function() return _G.LynceModGraphicsConfig.Enabled end,
       SetFunc = function(c,v)
-          _G.LynceGraphicsConfig.Enabled = v
-          ApplyLynceGraphicsSettings()
+          _G.LynceModGraphicsConfig.Enabled = v
+          ApplyLynceModGraphicsSettings()
           return true
       end },
 
@@ -1933,85 +1933,85 @@ local StackGraphics = {
       Text = "   Resolusi", ExpandHandle = "ModMenu_Graphics_Ex",
       SwitcherText = {"360p","480p","720p","Default"},
       SwitcherValue = {1,2,3,4},
-      GetFunc = function() return _G.LynceGraphicsConfig.Resolution or 3 end,
+      GetFunc = function() return _G.LynceModGraphicsConfig.Resolution or 3 end,
       SetFunc = function(c,v)
-          _G.LynceGraphicsConfig.Resolution = v
-          ApplyLynceGraphicsSettings()
+          _G.LynceModGraphicsConfig.Resolution = v
+          ApplyLynceModGraphicsSettings()
           return true
       end },
 
     { Key = "ModMenu_GP_Shadow", UI = AliasMap.Switcher,
       Text = "   Shadow LOW", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.Shadow end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.Shadow = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.Shadow end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Shadow = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_Texture", UI = AliasMap.Switcher,
       Text = "   Texture LOW", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.Texture end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.Texture = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.Texture end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Texture = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_Material", UI = AliasMap.Switcher,
       Text = "   Material LOW", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.Material end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.Material = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.Material end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Material = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_AA", UI = AliasMap.Switcher,
       Text = "   Anti-Aliasing OFF", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.AA end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.AA = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.AA end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.AA = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_Bloom", UI = AliasMap.Switcher,
       Text = "   Bloom OFF", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.Bloom end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.Bloom = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.Bloom end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.Bloom = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_MotionBlur", UI = AliasMap.Switcher,
       Text = "   Motion Blur OFF", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.MotionBlur end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.MotionBlur = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.MotionBlur end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.MotionBlur = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_DOF", UI = AliasMap.Switcher,
       Text = "   Depth Of Field OFF", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.DOF end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.DOF = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.DOF end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.DOF = v ApplyLynceModGraphicsSettings() return true end },
 
     { Key = "ModMenu_GP_ViewDist", UI = AliasMap.Switcher,
       Text = "   View Distance LOW", ExpandHandle = "ModMenu_Graphics_Ex",
-      GetFunc = function() return _G.LynceGraphicsConfig.ViewDistance end,
-      SetFunc = function(c,v) _G.LynceGraphicsConfig.ViewDistance = v ApplyLynceGraphicsSettings() return true end },
+      GetFunc = function() return _G.LynceModGraphicsConfig.ViewDistance end,
+      SetFunc = function(c,v) _G.LynceModGraphicsConfig.ViewDistance = v ApplyLynceModGraphicsSettings() return true end },
 }
 
         local StackCombat = {
-            { Key = "ModMenu_FakeHWID", UI = AliasMap.Switcher, Text = T("Ubah HWID Virtual (Mencegah ID Perangkat Terkunci)", "Fake HWID (Anti-Ban)"), GetFunc = function() return _G.LynceConfig.FakeHWID end, SetFunc = function(c,v) _G.LynceConfig.FakeHWID = v return true end },
-            { Key = "ModMenu_Ipad_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Ipad View", "▶ Ipad View"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.IpadView end, SetFunc = function(c,v) _G.LynceConfig.IpadView = v return true end },
-            { Key = "ModMenu_Ipad_FOV", UI = AliasMap.Slider, Text = T("   Sudut Pandang FOV", "   FOV Value"), ExpandHandle = "ModMenu_Ipad_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return (_G.LynceState.CustomTextData.IpadViewFOV or 120) - 90 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.IpadViewFOV = 90 + v return true end },
+            { Key = "ModMenu_FakeHWID", UI = AliasMap.Switcher, Text = T("Ubah HWID Virtual (Mencegah ID Perangkat Terkunci)", "Fake HWID (Anti-Ban)"), GetFunc = function() return _G.LynceModConfig.FakeHWID end, SetFunc = function(c,v) _G.LynceModConfig.FakeHWID = v return true end },
+            { Key = "ModMenu_Ipad_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Ipad View", "▶ Ipad View"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.IpadView end, SetFunc = function(c,v) _G.LynceModConfig.IpadView = v return true end },
+            { Key = "ModMenu_Ipad_FOV", UI = AliasMap.Slider, Text = T("   Sudut Pandang FOV", "   FOV Value"), ExpandHandle = "ModMenu_Ipad_Ex", MinValue = 1, MaxValue = 100, min = 1, max = 100, GetFunc = function() return (_G.LynceModState.CustomTextData.IpadViewFOV or 120) - 90 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.IpadViewFOV = 90 + v return true end },
 
-            { Key = "ModMenu_BugMan_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Peregangan Layar (Karakter Gemuk)", "▶ Screen Stretch (Fat Body)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.BugManEnable end, SetFunc = function(c,v) _G.LynceConfig.BugManEnable = v return true end },
-            { Key = "ModMenu_BugMan_Ratio", UI = AliasMap.Slider, Text = T("   Rasio Peregangan", "   Stretch Ratio"), ExpandHandle = "ModMenu_BugMan_Ex", MinValue = 110, MaxValue = 200, min = 110, max = 200, GetFunc = function() return _G.LynceState.CustomTextData.BugManRatio or 133 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.BugManRatio = v return true end },
+            { Key = "ModMenu_BugMan_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Peregangan Layar (Karakter Gemuk)", "▶ Screen Stretch (Fat Body)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.BugManEnable end, SetFunc = function(c,v) _G.LynceModConfig.BugManEnable = v return true end },
+            { Key = "ModMenu_BugMan_Ratio", UI = AliasMap.Slider, Text = T("   Rasio Peregangan", "   Stretch Ratio"), ExpandHandle = "ModMenu_BugMan_Ex", MinValue = 110, MaxValue = 200, min = 110, max = 200, GetFunc = function() return _G.LynceModState.CustomTextData.BugManRatio or 133 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.BugManRatio = v return true end },
 
-            { Key = "ModMenu_165FPS", UI = AliasMap.Switcher, Text = T("Buka Kunci 165 FPS", "Unlock 165 FPS"), GetFunc = function() return _G.LynceConfig.UnlockFPS end, SetFunc = function(c,v) _G.LynceConfig.UnlockFPS = v; if v then _G.LynceState.GraphicsUnlocked = false end return true end },
+            { Key = "ModMenu_165FPS", UI = AliasMap.Switcher, Text = T("Buka Kunci 165 FPS", "Unlock 165 FPS"), GetFunc = function() return _G.LynceModConfig.UnlockFPS end, SetFunc = function(c,v) _G.LynceModConfig.UnlockFPS = v; if v then _G.LynceModState.GraphicsUnlocked = false end return true end },
             
-            { Key = "ModMenu_WallXuyenTuong", UI = AliasMap.Switcher, Text = T("Wall Tembus Dinding V1 (Hanya melihat menembus)", "Wallhack V1 (See through)"), GetFunc = function() return _G.LynceConfig.WallXuyenTuong end, SetFunc = function(c,v) _G.LynceConfig.WallXuyenTuong = v return true end },
-            { Key = "ModMenu_ColorBodyV2", UI = AliasMap.Switcher, Text = T("Warnai Musuh V2 (Chams Dasar)", "Chams V2 (Basic Color)"), GetFunc = function() return _G.LynceConfig.ColorBodyV2 end, SetFunc = function(c,v) _G.LynceConfig.ColorBodyV2 = v return true end },
-            { Key = "ModMenu_ColorBodyNew", UI = AliasMap.Switcher, Text = T("WALL warna NEW (hijau/merah terang Engine)", "NEW ENGINE CHAMS (Red/Green)"), GetFunc = function() return _G.LynceConfig.ColorBodyNew end, SetFunc = function(c,v) _G.LynceConfig.ColorBodyNew = v return true end },
-            { Key = "ModMenu_ColorBodyV3_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ WALL V2 + MÀU V3 (Warna Kustom)", "▶ WALL V2 + CHAMS V3 (Custom)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.ColorBodyV3 end, SetFunc = function(c,v) _G.LynceConfig.ColorBodyV3 = v return true end },
-            { Key = "ModMenu_V3_Hidden", UI = AliasMap.Slider, Text = T("   Warna di Balik Dinding (1:merah 2:hijau 3:biru 4:emas 5:ungu 6:putih)", "   Hidden Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"), ExpandHandle = "ModMenu_ColorBodyV3_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceState.CustomTextData.ColorV3Hidden or 1 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.ColorV3Hidden = v return true end },
-            { Key = "ModMenu_V3_Vis", UI = AliasMap.Slider, Text = T("   Warna Terlihat (1:merah 2:hijau 3:biru 4:emas 5:ungu 6:putih)", "   Visible Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"), ExpandHandle = "ModMenu_ColorBodyV3_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceState.CustomTextData.ColorV3Visible or 2 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.ColorV3Visible = v return true end },
-            { Key = "ModMenu_V3_Thick", UI = AliasMap.Slider, Text = T("   Ketebalan Garis Tepi HDR terlihat terlihat", "   HDR Outline Thickness"), ExpandHandle = "ModMenu_ColorBodyV3_Ex", MinValue = 1, MaxValue = 20, GetFunc = function() return _G.LynceState.CustomTextData.ColorV3Thickness or 4 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.ColorV3Thickness = v return true end },
+            { Key = "ModMenu_WallXuyenTuong", UI = AliasMap.Switcher, Text = T("Wall Tembus Dinding V1 (Hanya melihat menembus)", "Wallhack V1 (See through)"), GetFunc = function() return _G.LynceModConfig.WallXuyenTuong end, SetFunc = function(c,v) _G.LynceModConfig.WallXuyenTuong = v return true end },
+            { Key = "ModMenu_ColorBodyV2", UI = AliasMap.Switcher, Text = T("Warnai Musuh V2 (Chams Dasar)", "Chams V2 (Basic Color)"), GetFunc = function() return _G.LynceModConfig.ColorBodyV2 end, SetFunc = function(c,v) _G.LynceModConfig.ColorBodyV2 = v return true end },
+            { Key = "ModMenu_ColorBodyNew", UI = AliasMap.Switcher, Text = T("WALL warna NEW (hijau/merah terang Engine)", "NEW ENGINE CHAMS (Red/Green)"), GetFunc = function() return _G.LynceModConfig.ColorBodyNew end, SetFunc = function(c,v) _G.LynceModConfig.ColorBodyNew = v return true end },
+            { Key = "ModMenu_ColorBodyV3_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ WALL V2 + MÀU V3 (Warna Kustom)", "▶ WALL V2 + CHAMS V3 (Custom)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.ColorBodyV3 end, SetFunc = function(c,v) _G.LynceModConfig.ColorBodyV3 = v return true end },
+            { Key = "ModMenu_V3_Hidden", UI = AliasMap.Slider, Text = T("   Warna di Balik Dinding (1:merah 2:hijau 3:biru 4:emas 5:ungu 6:putih)", "   Hidden Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"), ExpandHandle = "ModMenu_ColorBodyV3_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceModState.CustomTextData.ColorV3Hidden or 1 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.ColorV3Hidden = v return true end },
+            { Key = "ModMenu_V3_Vis", UI = AliasMap.Slider, Text = T("   Warna Terlihat (1:merah 2:hijau 3:biru 4:emas 5:ungu 6:putih)", "   Visible Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Pur 6:Wht)"), ExpandHandle = "ModMenu_ColorBodyV3_Ex", MinValue = 1, MaxValue = 6, GetFunc = function() return _G.LynceModState.CustomTextData.ColorV3Visible or 2 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.ColorV3Visible = v return true end },
+            { Key = "ModMenu_V3_Thick", UI = AliasMap.Slider, Text = T("   Ketebalan Garis Tepi HDR terlihat terlihat", "   HDR Outline Thickness"), ExpandHandle = "ModMenu_ColorBodyV3_Ex", MinValue = 1, MaxValue = 20, GetFunc = function() return _G.LynceModState.CustomTextData.ColorV3Thickness or 4 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.ColorV3Thickness = v return true end },
             
-            { Key = "ModMenu_WallVehicle", UI = AliasMap.Switcher, Text = T("Wall Kendaraan", "Vehicle Wallhack"), GetFunc = function() return _G.LynceConfig.WallVehicle end, SetFunc = function(c,v) _G.LynceConfig.WallVehicle = v return true end },
+            { Key = "ModMenu_WallVehicle", UI = AliasMap.Switcher, Text = T("Wall Kendaraan", "Vehicle Wallhack"), GetFunc = function() return _G.LynceModConfig.WallVehicle end, SetFunc = function(c,v) _G.LynceModConfig.WallVehicle = v return true end },
 
-            { Key = "ModMenu_WhiteBody", UI = AliasMap.Switcher, Text = T("Karakter Putih", "White Body"), GetFunc = function() return _G.LynceConfig.WhiteBody end, SetFunc = function(c,v) _G.LynceConfig.WhiteBody = v return true end },
-            { Key = "ModMenu_BlackSky", UI = AliasMap.Switcher, Text = T("Langit Gelap (Black Sky)", "Black Sky"), GetFunc = function() return _G.LynceConfig.BlackSky end, SetFunc = function(c,v) _G.LynceConfig.BlackSky = v return true end },
-            { Key = "ModMenu_RemoveFog", UI = AliasMap.Switcher, Text = T("Hapus Kabut", "Remove Fog"), GetFunc = function() return _G.LynceConfig.RemoveFog end, SetFunc = function(c,v) _G.LynceConfig.RemoveFog = v return true end },
-            { Key = "ModMenu_RemoveGrass", UI = AliasMap.Switcher, Text = T("Hapus Rumput", "Remove Grass"), GetFunc = function() return _G.LynceConfig.RemoveGrass end, SetFunc = function(c,v) _G.LynceConfig.RemoveGrass = v return true end },
-            { Key = "ModMenu_RemoveTrees", UI = AliasMap.Switcher, Text = T("Hapus Pohon", "Remove Trees"), GetFunc = function() return _G.LynceConfig.RemoveTrees end, SetFunc = function(c,v) _G.LynceConfig.RemoveTrees = v return true end },
-            { Key = "ModMenu_WallClimb", UI = AliasMap.Switcher, Text = T("Leo Dinding", "Wall Climb"), GetFunc = function() return _G.LynceConfig.WallClimb end, SetFunc = function(c,v) _G.LynceConfig.WallClimb = v return true end },
-            { Key = "ModMenu_FastCar", UI = AliasMap.Switcher, Text = T("Fast Flying Car", "Fast Car / Flying Car"), GetFunc = function() return _G.LynceConfig.FastCar end, SetFunc = function(c,v) _G.LynceConfig.FastCar = v return true end },
+            { Key = "ModMenu_WhiteBody", UI = AliasMap.Switcher, Text = T("Karakter Putih", "White Body"), GetFunc = function() return _G.LynceModConfig.WhiteBody end, SetFunc = function(c,v) _G.LynceModConfig.WhiteBody = v return true end },
+            { Key = "ModMenu_BlackSky", UI = AliasMap.Switcher, Text = T("Langit Gelap (Black Sky)", "Black Sky"), GetFunc = function() return _G.LynceModConfig.BlackSky end, SetFunc = function(c,v) _G.LynceModConfig.BlackSky = v return true end },
+            { Key = "ModMenu_RemoveFog", UI = AliasMap.Switcher, Text = T("Hapus Kabut", "Remove Fog"), GetFunc = function() return _G.LynceModConfig.RemoveFog end, SetFunc = function(c,v) _G.LynceModConfig.RemoveFog = v return true end },
+            { Key = "ModMenu_RemoveGrass", UI = AliasMap.Switcher, Text = T("Hapus Rumput", "Remove Grass"), GetFunc = function() return _G.LynceModConfig.RemoveGrass end, SetFunc = function(c,v) _G.LynceModConfig.RemoveGrass = v return true end },
+            { Key = "ModMenu_RemoveTrees", UI = AliasMap.Switcher, Text = T("Hapus Pohon", "Remove Trees"), GetFunc = function() return _G.LynceModConfig.RemoveTrees end, SetFunc = function(c,v) _G.LynceModConfig.RemoveTrees = v return true end },
+            { Key = "ModMenu_WallClimb", UI = AliasMap.Switcher, Text = T("Leo Dinding", "Wall Climb"), GetFunc = function() return _G.LynceModConfig.WallClimb end, SetFunc = function(c,v) _G.LynceModConfig.WallClimb = v return true end },
+            { Key = "ModMenu_FastCar", UI = AliasMap.Switcher, Text = T("Fast Flying Car", "Fast Car / Flying Car"), GetFunc = function() return _G.LynceModConfig.FastCar end, SetFunc = function(c,v) _G.LynceModConfig.FastCar = v return true end },
 
-            { Key = "ModMenu_WeaponGlow_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Glow garis tepi senjata (bercahaya HDR)", "▶ Weapon Glow (HDR)"), ExpandIndex = 0, GetFunc = function() return _G.LynceConfig.WeaponGlow end, SetFunc = function(c,v) _G.LynceConfig.WeaponGlow = v return true end },
-            { Key = "ModMenu_WeaponGlowColor", UI = AliasMap.Slider, Text = T("   Warna senjata (1:merah 2:hijau 3:biru 4:emas 5:Rainbow)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Rnb)"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 5, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowColor or 5 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowColor = v return true end },
-            { Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T("   Ketebalan Garis Tepi senjata", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.LynceState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.LynceState.CustomTextData.WeaponGlowThickness = v return true end }
+            { Key = "ModMenu_WeaponGlow_Ex", UI = AliasMap.TitleSwitcher, Text = T("▶ Glow garis tepi senjata (bercahaya HDR)", "▶ Weapon Glow (HDR)"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.WeaponGlow end, SetFunc = function(c,v) _G.LynceModConfig.WeaponGlow = v return true end },
+            { Key = "ModMenu_WeaponGlowColor", UI = AliasMap.Slider, Text = T("   Warna senjata (1:merah 2:hijau 3:biru 4:emas 5:Rainbow)", "   Color (1:Red 2:Grn 3:Blu 4:Ylw 5:Rnb)"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 5, GetFunc = function() return _G.LynceModState.CustomTextData.WeaponGlowColor or 5 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.WeaponGlowColor = v return true end },
+            { Key = "ModMenu_WeaponGlowThick", UI = AliasMap.Slider, Text = T("   Ketebalan Garis Tepi senjata", "   Glow Thickness"), ExpandHandle = "ModMenu_WeaponGlow_Ex", MinValue = 1, MaxValue = 15, GetFunc = function() return _G.LynceModState.CustomTextData.WeaponGlowThickness or 3 end, SetFunc = function(c,v) _G.LynceModState.CustomTextData.WeaponGlowThickness = v return true end }
         }
         
     for _, _graphicsItem in ipairs(StackGraphics) do
@@ -2071,9 +2071,9 @@ local StackGraphics = {
     end
 end
 
-local function ShowLynceVIPMenu() 
-    if _G.LynceMenuAlreadyShown then return end
-    if _G.LynceState.MenuStep ~= 0 then return end
+local function ShowLynceModVIPMenu() 
+    if _G.LynceModMenuAlreadyShown then return end
+    if _G.LynceModState.MenuStep ~= 0 then return end
 
     pcall(function()
         local Msg = require("client.slua.logic.common.logic_common_msg_box")
@@ -2092,26 +2092,26 @@ local function ShowLynceVIPMenu()
         end
 
         local function Step_ScamAlert()
-            local title = _G.LynceLang == "EN" and "SCAM ALERT" or "SCAM MOD WARNING"
-            local content = _G.LynceLang == "EN" 
-                and "Join my Telegram to avoid scammers selling mods TELE @GODMODINGX" 
+            local title = _G.LynceModLang == "EN" and "SCAM ALERT" or "SCAM MOD WARNING"
+            local content = _G.LynceModLang == "EN" 
+                and "Join my Telegram to avoid scammers selling mods TELE @GODMODX" 
                 or "REAL OWNER GODMOD HANYA @zexygodx SELAIN ITU SCAM \nBANYAK SCAM BERKELIARAN YANG BIJAK KALO PILIH VIP"
-            local btn1 = _G.LynceLang == "EN" and "JOIN" or "MASUK"
-            local btn2 = _G.LynceLang == "EN" and "CLOSE" or "tutup"
+            local btn1 = _G.LynceModLang == "EN" and "JOIN" or "MASUK"
+            local btn2 = _G.LynceModLang == "EN" and "CLOSE" or "tutup"
 
             Msg.Show(1, title, content, function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end end, function() end, btn1, btn2)
-            _G.LynceState.MenuStep = 99
-            _G.LynceMenuAlreadyShown = true
+            _G.LynceModState.MenuStep = 99
+            _G.LynceModMenuAlreadyShown = true
         end
 
         local Step_Welcome
         local function Step_AskModSkin()
-            local title = _G.LynceLang == "EN" and "LOAD MOD SKIN SYSTEM?" or "MUAT SISTEM MOD SKIN?"
-            local content = _G.LynceLang == "EN"
+            local title = _G.LynceModLang == "EN" and "LOAD MOD SKIN SYSTEM?" or "MUAT SISTEM MOD SKIN?"
+            local content = _G.LynceModLang == "EN"
                 and "The Skin System (Weapons, Vehicles, Clothes) may use extra memory.\nDo you want to load the Skin menu and enable its logic?\n(If your phone is weak, select NO.)"
                 or "Sistem Skin (Senjata, Kendaraan, Pakaian) dapat memakai RAM tambahan.\nMau memuat menu Skin dan mengaktifkan logic-nya?\n(Jika HP lemah, pilih TIDAK.)"
-            local btn1 = _G.LynceLang == "EN" and "YES (LOAD)" or "YA (MUAT SKIN)"
-            local btn2 = _G.LynceLang == "EN" and "NO (SKIP)" or "TIDAK (LEWATI)"
+            local btn1 = _G.LynceModLang == "EN" and "YES (LOAD)" or "YA (MUAT SKIN)"
+            local btn2 = _G.LynceModLang == "EN" and "NO (SKIP)" or "TIDAK (LEWATI)"
 
             Msg.Show(2, title, content,
                 function()
@@ -2120,25 +2120,25 @@ local function ShowLynceVIPMenu()
                 end,
                 function()
                     _G.EnableLogicModSkin = false
-                    _G.LynceConfig.ModSkin = false
-                    _G.LynceConfig.SkinDeadBox = false
-                    _G.LynceConfig.SkinAttachment = false
+                    _G.LynceModConfig.ModSkin = false
+                    _G.LynceModConfig.SkinDeadBox = false
+                    _G.LynceModConfig.SkinAttachment = false
                     DeferStep(Step_Welcome)
                 end, btn1, btn2)
         end
 
         Step_Welcome = function()
-            local title = _G.LynceLang == "EN" and "WELCOME TO VIP MOD" or "WELCOME BROK"
-            local content = _G.LynceLang == "EN" 
-                and "Hi, GODMODINGX here. The VIP MENU is now inside Game Settings!\nIMPORTANT: Enable fewer features to avoid lag. Play safe!" 
+            local title = _G.LynceModLang == "EN" and "WELCOME TO VIP MOD" or "WELCOME BROK"
+            local content = _G.LynceModLang == "EN" 
+                and "Hi, GODMODX here. The VIP MENU is now inside Game Settings!\nIMPORTANT: Enable fewer features to avoid lag. Play safe!" 
                 or "MAIN SELAYAKNYA PRO PELER GAUSAH SANGEAN JAN LUPA JOIN @GODMODX\n don't forget to give feedback"
-            local btn1 = _G.LynceLang == "EN" and "OPEN GAME MENU" or "BUKA MENU "
-            local btn2 = _G.LynceLang == "EN" and "CLOSE" or "GODMODINGX"
+            local btn1 = _G.LynceModLang == "EN" and "OPEN GAME MENU" or "BUKA MENU "
+            local btn2 = _G.LynceModLang == "EN" and "CLOSE" or "GODMODX"
 
             Msg.Show(1, title, content, 
             function() 
                 _G.InitModMenuTab()
-                if _G.LynceLang == "EN" then
+                if _G.LynceModLang == "EN" then
                     Notify("VIP MOD MENU ADDED!\nOpen Settings (Gear icon) -> VIP MOD MENU to toggle features.")
                 else
                     Notify("sudah TAMBAH 'VIP MOD menu' ke PHẦN pengaturan dari GAME!\nHãy buka pengaturan (Răng Cưa) -> VIP MOD menu untuk aktifkan/nonaktifkan.")
@@ -2149,18 +2149,18 @@ local function ShowLynceVIPMenu()
         end
 
         local function Step_SelectLanguage()
-            Msg.Show(2, "SELECT LANGUAGE / pilih bahasa bahasa", "PILIH SENDIRI\nVui silakan pilih bahasa bahasa kamu ingin gunakan gunakan.",
+            Msg.Show(2, "SELECT LANGUAGE / pilih bahasa bahasa", "PLER IWAK\n silakan pilih bahasa bahasa kamu ingin gunakan gunakan.",
             function()
-                _G.LynceLang = "INDO"
+                _G.LynceModLang = "INDO"
                 DeferStep(Step_AskModSkin)
             end,
             function()
-                _G.LynceLang = "EN"
+                _G.LynceModLang = "EN"
                 DeferStep(Step_AskModSkin)
             end, "INDONESIA", "ENGLISH")
         end
 
-        _G.LynceState.MenuStep = 1
+        _G.LynceModState.MenuStep = 1
         Step_SelectLanguage() 
     end)
 end
@@ -2170,7 +2170,7 @@ end
 -- ========================================== 
 local function InitializeGraphicsUnlock() 
     if isExpired then return end
-    if _G.LynceState.GraphicsUnlocked or currentTime > limitTime then return end
+    if _G.LynceModState.GraphicsUnlocked or currentTime > limitTime then return end
 
     pcall(function()
         local SettingCfg = require("client.logic.setting.setting_config")
@@ -2316,7 +2316,7 @@ local function InitializeGraphicsUnlock()
             ft_impl.OnFPSFTSliderValueChange2 = ft_impl.OnFPSFTSliderValueChange3
         end
     end)
-    _G.LynceState.GraphicsUnlocked = true
+    _G.LynceModState.GraphicsUnlocked = true
     Notify("Graphics & FPS 165Hz Unlocked (Upgraded Version)")
 end
 
@@ -2324,7 +2324,7 @@ end
 -- INISIALISASI SISTEM ESP (GỐC)
 -- ========================================== 
 local function InitializeNativeESP() 
-    if _G.LynceState.NativeESPReady then return end
+    if _G.LynceModState.NativeESPReady then return end
     pcall(function() 
         local GamePlayTools = require("GameLua.Mod.BaseMod.Common.GamePlayTools") 
         local currentMarkCfg = GamePlayTools.GetCurrentConfig("ScreenMarkConfig") 
@@ -2375,7 +2375,7 @@ local function InitializeNativeESP()
             end 
         end 
     end)
-    _G.LynceState.NativeESPReady = true 
+    _G.LynceModState.NativeESPReady = true 
     Notify("Native ESP System Initialized") 
 end
 
@@ -2490,7 +2490,7 @@ local function ApplyColorBodyV2(enemy, pc, markData)
         local hidden = markData.CachedHiddenState
         if hidden == nil then hidden = true end
         
-        local cData = _G.LynceState.CustomTextData or {}
+        local cData = _G.LynceModState.CustomTextData or {}
         local hiddenColor = {R = cData.HiddenR or 150, G = cData.HiddenG or 0, B = cData.HiddenB or 0, A = cData.HiddenA or 25}
         local visibleColor = {R = cData.VisibleR or 0, G = cData.VisibleG or 150, B = cData.VisibleB or 0, A = cData.VisibleA or 25}
         
@@ -2611,7 +2611,7 @@ local function ApplyColorBodyV3(enemy, markData)
         local meshes = GetAllSkeletalMeshes(enemy, markData)
         if #meshes == 0 then return end
         
-        local cData = _G.LynceState.CustomTextData or {}
+        local cData = _G.LynceModState.CustomTextData or {}
         local hidChoice = cData.ColorV3Hidden or 1
         local visChoice = cData.ColorV3Visible or 2
         local v3Thick = cData.ColorV3Thickness or 4
@@ -2922,7 +2922,7 @@ end
 
 _G.AimTouch = function()
     pcall(function()
-        if not _G.LynceConfig.AimTouchEnable then return end
+        if not _G.LynceModConfig.AimTouchEnable then return end
         
         local player = GameplayData.GetPlayerCharacter()
         if not slua.isValid(player) then return end
@@ -2970,7 +2970,7 @@ _G.AimTouch = function()
         end
 
         -- LOGIC NHẢ CÒ senjata jika MẤT target / musuh mati atau SHOTGUN HẾT peluru
-        if _G.LynceState.IsAutoFiring then
+        if _G.LynceModState.IsAutoFiring then
             pcall(function()
                 player.bIsWeaponFiring = false
                 if type(player.SetIsWeaponFiring) == "function" then player:SetIsWeaponFiring(false) end
@@ -2978,7 +2978,7 @@ _G.AimTouch = function()
                 local wepMgr = player.WeaponManagerComponent
                 if slua.isValid(wepMgr) then wepMgr.bIsWeaponFiring = false end
             end)
-            _G.LynceState.IsAutoFiring = false
+            _G.LynceModState.IsAutoFiring = false
         end
 
         -- SHOTGUN HẾT peluru NGƯNG AIM untuk GAME NẠP peluru
@@ -3001,7 +3001,7 @@ _G.AimTouch = function()
         local recoilCompVal = 0 
 
         -- PHÂN LOẠI KONFIGURASI THEO status status tampilkan ada
-        if isMortar and _G.LynceConfig.AimTouchMortar then
+        if isMortar and _G.LynceModConfig.AimTouchMortar then
             local isPlaced = false
             pcall(function()
                 if weapon and weapon.MortarState == 2 then isPlaced = true end
@@ -3012,67 +3012,67 @@ _G.AimTouch = function()
             prioMode = 1  
             boneIdx = 4 
             speedVal = 100 
-            fovVal = _G.LynceState.CustomTextData.AimTouchMortarFOV or 360 
+            fovVal = _G.LynceModState.CustomTextData.AimTouchMortarFOV or 360 
             maxDistMeters = 2000 
             useVisCheck = false 
             igKnock = false
             igBot = false
-            predVal = _G.LynceState.CustomTextData.AimTouchMortarPred or 0 
+            predVal = _G.LynceModState.CustomTextData.AimTouchMortarPred or 0 
             
-        elseif isShotgun and _G.LynceConfig.AimTouchSG then
-            cond = _G.LynceState.CustomTextData.AimTouchSGCond or 1
-            if _G.LynceConfig.AimTouchSGAutoFire then cond = 2 end
+        elseif isShotgun and _G.LynceModConfig.AimTouchSG then
+            cond = _G.LynceModState.CustomTextData.AimTouchSGCond or 1
+            if _G.LynceModConfig.AimTouchSGAutoFire then cond = 2 end
             if cond == 1 and not isFiring then return end
-            prioMode = _G.LynceState.CustomTextData.AimTouchSGPrio or 1
-            boneIdx = _G.LynceState.CustomTextData.AimTouchSGBone or 2
-            speedVal = _G.LynceState.CustomTextData.AimTouchSGSpeed or 80
-            fovVal = _G.LynceState.CustomTextData.AimTouchSGFOV or 40
-            maxDistMeters = _G.LynceState.CustomTextData.AimTouchSGDist or 30
-            useVisCheck = _G.LynceConfig.AimTouchSGVisCheck
-            igKnock = _G.LynceConfig.AimTouchSGIgKnock
-            igBot = _G.LynceConfig.AimTouchSGIgBot
+            prioMode = _G.LynceModState.CustomTextData.AimTouchSGPrio or 1
+            boneIdx = _G.LynceModState.CustomTextData.AimTouchSGBone or 2
+            speedVal = _G.LynceModState.CustomTextData.AimTouchSGSpeed or 80
+            fovVal = _G.LynceModState.CustomTextData.AimTouchSGFOV or 40
+            maxDistMeters = _G.LynceModState.CustomTextData.AimTouchSGDist or 30
+            useVisCheck = _G.LynceModConfig.AimTouchSGVisCheck
+            igKnock = _G.LynceModConfig.AimTouchSGIgKnock
+            igBot = _G.LynceModConfig.AimTouchSGIgBot
             
         elseif isADS then
-            if isSniper and _G.LynceConfig.AimTouchScopeSniper then
-                cond = _G.LynceState.CustomTextData.AimTouchSniperCond or 2
+            if isSniper and _G.LynceModConfig.AimTouchScopeSniper then
+                cond = _G.LynceModState.CustomTextData.AimTouchSniperCond or 2
                 if cond == 1 and not isFiring then return end
-                prioMode = _G.LynceState.CustomTextData.AimTouchSniperPrio or 1
-                boneIdx = _G.LynceState.CustomTextData.AimTouchSniperBone or 1
-                speedVal = _G.LynceState.CustomTextData.AimTouchSniperSpeed or 30
-                fovVal = _G.LynceState.CustomTextData.AimTouchSniperFOV or 20
-                maxDistMeters = _G.LynceState.CustomTextData.AimTouchSniperDist or 400
-                useVisCheck = _G.LynceConfig.AimTouchSniperVisCheck
-                igKnock = _G.LynceConfig.AimTouchSniperIgKnock
-                igBot = _G.LynceConfig.AimTouchSniperIgBot
-                predVal = _G.LynceState.CustomTextData.AimTouchSniperPred or 0 -- ambil nilai nilai dự đoán Sniper
-            elseif _G.LynceConfig.AimTouchScopeAll then
-                cond = _G.LynceState.CustomTextData.AimTouchScopeCond or 1
+                prioMode = _G.LynceModState.CustomTextData.AimTouchSniperPrio or 1
+                boneIdx = _G.LynceModState.CustomTextData.AimTouchSniperBone or 1
+                speedVal = _G.LynceModState.CustomTextData.AimTouchSniperSpeed or 30
+                fovVal = _G.LynceModState.CustomTextData.AimTouchSniperFOV or 20
+                maxDistMeters = _G.LynceModState.CustomTextData.AimTouchSniperDist or 400
+                useVisCheck = _G.LynceModConfig.AimTouchSniperVisCheck
+                igKnock = _G.LynceModConfig.AimTouchSniperIgKnock
+                igBot = _G.LynceModConfig.AimTouchSniperIgBot
+                predVal = _G.LynceModState.CustomTextData.AimTouchSniperPred or 0 -- ambil nilai nilai dự đoán Sniper
+            elseif _G.LynceModConfig.AimTouchScopeAll then
+                cond = _G.LynceModState.CustomTextData.AimTouchScopeCond or 1
                 if cond == 1 and not isFiring then return end
-                prioMode = _G.LynceState.CustomTextData.AimTouchScopePrio or 1
-                boneIdx = _G.LynceState.CustomTextData.AimTouchScopeBone or 2
-                speedVal = _G.LynceState.CustomTextData.AimTouchScopeSpeed or 40
-                fovVal = _G.LynceState.CustomTextData.AimTouchScopeFOV or 20
-                maxDistMeters = _G.LynceState.CustomTextData.AimTouchScopeDist or 300
-                useVisCheck = _G.LynceConfig.AimTouchScopeVisCheck
-                igKnock = _G.LynceConfig.AimTouchScopeIgKnock
-                igBot = _G.LynceConfig.AimTouchScopeIgBot
-                predVal = _G.LynceState.CustomTextData.AimTouchScopePred or 0 -- ambil nilai nilai dự đoán senjata biasa
-                recoilCompVal = _G.LynceState.CustomTextData.AimTouchScopeRecoil or 0 -- ambil nilai nilai kompensasi rekoil
+                prioMode = _G.LynceModState.CustomTextData.AimTouchScopePrio or 1
+                boneIdx = _G.LynceModState.CustomTextData.AimTouchScopeBone or 2
+                speedVal = _G.LynceModState.CustomTextData.AimTouchScopeSpeed or 40
+                fovVal = _G.LynceModState.CustomTextData.AimTouchScopeFOV or 20
+                maxDistMeters = _G.LynceModState.CustomTextData.AimTouchScopeDist or 300
+                useVisCheck = _G.LynceModConfig.AimTouchScopeVisCheck
+                igKnock = _G.LynceModConfig.AimTouchScopeIgKnock
+                igBot = _G.LynceModConfig.AimTouchScopeIgBot
+                predVal = _G.LynceModState.CustomTextData.AimTouchScopePred or 0 -- ambil nilai nilai dự đoán senjata biasa
+                recoilCompVal = _G.LynceModState.CustomTextData.AimTouchScopeRecoil or 0 -- ambil nilai nilai kompensasi rekoil
             else
                 return
             end
         else
-            if not _G.LynceConfig.AimTouchHipfire then return end
-            cond = _G.LynceState.CustomTextData.AimTouchHipCond or 1
+            if not _G.LynceModConfig.AimTouchHipfire then return end
+            cond = _G.LynceModState.CustomTextData.AimTouchHipCond or 1
             if cond == 1 and not isFiring then return end 
-            prioMode = _G.LynceState.CustomTextData.AimTouchHipPrio or 1
-            boneIdx = _G.LynceState.CustomTextData.AimTouchHipBone or 1
-            speedVal = _G.LynceState.CustomTextData.AimTouchHipSpeed or 50
-            fovVal = _G.LynceState.CustomTextData.AimTouchHipFOV or 30
-            maxDistMeters = _G.LynceState.CustomTextData.AimTouchHipDist or 250
-            useVisCheck = _G.LynceConfig.AimTouchHipVisCheck
-            igKnock = _G.LynceConfig.AimTouchHipIgKnock
-            igBot = _G.LynceConfig.AimTouchHipIgBot
+            prioMode = _G.LynceModState.CustomTextData.AimTouchHipPrio or 1
+            boneIdx = _G.LynceModState.CustomTextData.AimTouchHipBone or 1
+            speedVal = _G.LynceModState.CustomTextData.AimTouchHipSpeed or 50
+            fovVal = _G.LynceModState.CustomTextData.AimTouchHipFOV or 30
+            maxDistMeters = _G.LynceModState.CustomTextData.AimTouchHipDist or 250
+            useVisCheck = _G.LynceModConfig.AimTouchHipVisCheck
+            igKnock = _G.LynceModConfig.AimTouchHipIgKnock
+            igBot = _G.LynceModConfig.AimTouchHipIgBot
         end
 
         local currentMaxDist = maxDistMeters * 100 
@@ -3216,7 +3216,7 @@ _G.AimTouch = function()
         end)
 
         -- LOGIC ĐOÁN HƯỚNG senjata mortir
-        if isMortar and _G.LynceConfig.AimTouchMortar and predVal > 0 then
+        if isMortar and _G.LynceModConfig.AimTouchMortar and predVal > 0 then
             pcall(function()
                 if tVelocity and (tVelocity.X ~= 0 or tVelocity.Y ~= 0) then
                     local approxDist = player:GetDistanceTo(bestTarget) / 100.0
@@ -3291,7 +3291,7 @@ _G.AimTouch = function()
         end
         
         -- LOGIC TÍNH TOÁN GÓC BẮN THẬT SỰ CHO SÚNG CỐI
-        if isMortar and _G.LynceConfig.AimTouchMortar then
+        if isMortar and _G.LynceModConfig.AimTouchMortar then
             local targetPos = { X = finalBonePos.X, Y = finalBonePos.Y, Z = finalBonePos.Z }
             local launchPos = camLoc
             pcall(function()
@@ -3364,7 +3364,7 @@ _G.AimTouch = function()
         local finalRot = { Pitch = finalPitch, Yaw = finalYaw, Roll = 0 }
         pc:SetControlRotation(finalRot, "AimTouch")
         
-        if isShotgun and _G.LynceConfig.AimTouchSGAutoFire then
+        if isShotgun and _G.LynceModConfig.AimTouchSGAutoFire then
             pcall(function()
                 local distToTarget = player:GetDistanceTo(bestTarget) / 100
                 if distToTarget <= maxDistMeters then
@@ -3378,7 +3378,7 @@ _G.AimTouch = function()
                     if slua.isValid(currentWep) and type(currentWep.StartFire) == "function" then 
                         currentWep:StartFire() 
                     end
-                    _G.LynceState.IsAutoFiring = true
+                    _G.LynceModState.IsAutoFiring = true
                 end
             end)
         end
@@ -3530,7 +3530,7 @@ _G.RunOptimizedItemAndVehicleESP = function(pc)
         if not slua.isValid(player) then return end
 
         -- XỬ kelola WALL PHƯƠNG TIỆN (Giữ asli jarak jarak nhìn jauh 200m)
-        if _G.LynceConfig.WallVehicle then
+        if _G.LynceModConfig.WallVehicle then
             local ASTExtraVehicleBase = import("STExtraVehicleBase")
             if ASTExtraVehicleBase then
                 local Actors = Game:GetActorsByClass(ASTExtraVehicleBase)
@@ -3564,7 +3564,7 @@ _G.RunOptimizedItemAndVehicleESP = function(pc)
         else _G.AppliedVehicleWall = {} end
 
         -- XỬ kelola ESP dan CHAMS item (pelacakan chữ & Glow di bawah 70m)
-        if _G.LynceConfig.EspItem_Master then
+        if _G.LynceModConfig.EspItem_Master then
             local APickUpWrapperActor = import("PickUpWrapperActor") or import("STPickupWrapperActor")
             if APickUpWrapperActor then
                 local Actors = Game:GetActorsByClass(APickUpWrapperActor)
@@ -3583,16 +3583,16 @@ _G.RunOptimizedItemAndVehicleESP = function(pc)
                                 if itemData then
                                     -- Check xem berhasil aturan phân loại ada sedang aktifkan tidak?
                                     local isShow = false
-                                    if itemData.cat == "AR" and _G.LynceConfig.EspItem_AR then isShow = true
-                                    elseif itemData.cat == "Sniper" and _G.LynceConfig.EspItem_Sniper then isShow = true
-                                    elseif itemData.cat == "SMG" and _G.LynceConfig.EspItem_SMG then isShow = true
-                                    elseif itemData.cat == "Shotgun" and _G.LynceConfig.EspItem_Shotgun then isShow = true
-                                    elseif itemData.cat == "LMG" and _G.LynceConfig.EspItem_LMG then isShow = true
-                                    elseif itemData.cat == "Pistol" and _G.LynceConfig.EspItem_Pistol then isShow = true
-                                    elseif itemData.cat == "Melee" and _G.LynceConfig.EspItem_Melee then isShow = true
-                                    elseif itemData.cat == "Special" and _G.LynceConfig.EspItem_Special then isShow = true
-                                    elseif itemData.cat == "Grenade" and _G.LynceConfig.EspItem_Grenade then isShow = true
-                                    elseif itemData.cat == "Scope" and _G.LynceConfig.EspItem_Scope then isShow = true
+                                    if itemData.cat == "AR" and _G.LynceModConfig.EspItem_AR then isShow = true
+                                    elseif itemData.cat == "Sniper" and _G.LynceModConfig.EspItem_Sniper then isShow = true
+                                    elseif itemData.cat == "SMG" and _G.LynceModConfig.EspItem_SMG then isShow = true
+                                    elseif itemData.cat == "Shotgun" and _G.LynceModConfig.EspItem_Shotgun then isShow = true
+                                    elseif itemData.cat == "LMG" and _G.LynceModConfig.EspItem_LMG then isShow = true
+                                    elseif itemData.cat == "Pistol" and _G.LynceModConfig.EspItem_Pistol then isShow = true
+                                    elseif itemData.cat == "Melee" and _G.LynceModConfig.EspItem_Melee then isShow = true
+                                    elseif itemData.cat == "Special" and _G.LynceModConfig.EspItem_Special then isShow = true
+                                    elseif itemData.cat == "Grenade" and _G.LynceModConfig.EspItem_Grenade then isShow = true
+                                    elseif itemData.cat == "Scope" and _G.LynceModConfig.EspItem_Scope then isShow = true
                                     end
 
                                     -- hanya xử kelola mảng dan gambar Glow jika sedang aktifkan
@@ -3644,7 +3644,7 @@ _G.RunOptimizedItemAndVehicleESP = function(pc)
     end
 
     -- 2. gambar TÊN item terus menerus ke KHUNG konfigurasi (Rất nhẹ, jalankan setiap frame)
-    if _G.LynceConfig.EspItem_Master and slua.isValid(pc) and pc.MyHUD then
+    if _G.LynceModConfig.EspItem_Master and slua.isValid(pc) and pc.MyHUD then
         local hud = pc.MyHUD
         local player = GameplayData.GetPlayerCharacter()
         for _, item in ipairs(_G.CachedItems) do
@@ -3816,7 +3816,7 @@ local function _M_DrawCounter()
                             -- ========================================================
                             -- LOGIC CHECK musuh bidik (hanya fitur saat jarak jarak < 400m)
                             -- ========================================================
-                            if _G.LynceConfig.EspAimWarning and not isBeingTargeted and d < 400 then
+                            if _G.LynceModConfig.EspAimWarning and not isBeingTargeted and d < 400 then
                                 local eLoc = type(tPawn.K2_GetActorLocation) == "function" and tPawn:K2_GetActorLocation()
                                 local pLoc = type(player.K2_GetActorLocation) == "function" and player:K2_GetActorLocation()
                                 
@@ -3840,7 +3840,7 @@ local function _M_DrawCounter()
                                         -- Musuh hướng nòng senjata salah lệch < 15 tingkat
                                         if dYaw < 15 and dPitch < 20 then
                                             -- Áp gunakan logic Periksa Visibilitas (VisCheck)
-                                            if _G.LynceConfig.EspAimWarningVisCheck then
+                                            if _G.LynceModConfig.EspAimWarningVisCheck then
                                                 if slua.isValid(pc) and type(pc.LineOfSightTo) == "function" then
                                                     if pc:LineOfSightTo(tPawn) then
                                                         isBeingTargeted = true
@@ -3867,7 +3867,7 @@ local function _M_DrawCounter()
 
             -- sembunyikan/Tampilkan UI Peringatan unik buat (Khung 2)
             if widgetWarning and slua.isValid(widgetWarning) then
-                if _G.LynceConfig.EspAimWarning and isBeingTargeted then
+                if _G.LynceModConfig.EspAimWarning and isBeingTargeted then
                     widgetWarning:SetWidgetVisibility(UEnums.ESlateVisibility.SelfHitTestInvisible)
                 else
                     widgetWarning:SetWidgetVisibility(UEnums.ESlateVisibility.Collapsed)
@@ -3894,7 +3894,7 @@ local function MainLoop()
 
             -- tulis đè fungsi dari game
             SystemLib.GetDeviceId = function(...)
-                if _G.LynceConfig.FakeHWID then
+                if _G.LynceModConfig.FakeHWID then
                     if not _G.FakeHWID_String then
                         -- buat ngẫu nhiên satu HWID ilusi 32 ký otomatis
                         local chars = "0123456789abcdef"
@@ -3929,8 +3929,8 @@ local function MainLoop()
     end
     -- =====================================================================
 
-    if _G.LynceState.CustomTextData == nil then 
-        _G.LynceState.CustomTextData = {OuterSpeed = 10, InnerSpeed = 10, HRecoil = 0.3, VRecoil = 0.3, MagicHead = 1.0, MagicBody = 1.0, MagicLegs = 1.0, IpadViewFOV = 120, AimTouchHipPrio = 1, AimTouchHipBone = 1, AimTouchHipCond = 1, AimTouchHipSpeed = 50, AimTouchHipFOV = 30, AimTouchHipDist = 250, AimTouchSGPrio = 1, AimTouchSGBone = 2, AimTouchSGCond = 1, AimTouchSGSpeed = 80, AimTouchSGFOV = 40, AimTouchSGDist = 30, AimTouchScopePrio = 1, AimTouchScopeBone = 2, AimTouchScopeCond = 1, AimTouchScopeSpeed = 40, AimTouchScopeFOV = 20, AimTouchScopeDist = 300, AimTouchSniperPrio = 1, AimTouchSniperBone = 1, AimTouchSniperCond = 2, AimTouchSniperSpeed = 30, AimTouchSniperFOV = 20, AimTouchSniperDist = 400}
+    if _G.LynceModState.CustomTextData == nil then 
+        _G.LynceModState.CustomTextData = {OuterSpeed = 10, InnerSpeed = 10, HRecoil = 0.3, VRecoil = 0.3, MagicHead = 1.0, MagicBody = 1.0, MagicLegs = 1.0, IpadViewFOV = 120, AimTouchHipPrio = 1, AimTouchHipBone = 1, AimTouchHipCond = 1, AimTouchHipSpeed = 50, AimTouchHipFOV = 30, AimTouchHipDist = 250, AimTouchSGPrio = 1, AimTouchSGBone = 2, AimTouchSGCond = 1, AimTouchSGSpeed = 80, AimTouchSGFOV = 40, AimTouchSGDist = 30, AimTouchScopePrio = 1, AimTouchScopeBone = 2, AimTouchScopeCond = 1, AimTouchScopeSpeed = 40, AimTouchScopeFOV = 20, AimTouchScopeDist = 300, AimTouchSniperPrio = 1, AimTouchSniperBone = 1, AimTouchSniperCond = 2, AimTouchSniperSpeed = 30, AimTouchSniperFOV = 20, AimTouchSniperDist = 400}
     end
 
     local okData, GameplayData = pcall(require, "GameLua.GameCore.Data.GameplayData") 
@@ -3941,15 +3941,15 @@ local function MainLoop()
 
     -- hapus bersih SÀNH SANH sampah KHỎI RAM saat BẠN mati, ubah MAP, ke SẢNH
     if not Valid(localPlayer) then 
-        if _G.LynceState.TrackedMarks then
-            for markId, _ in pairs(_G.LynceState.TrackedMarks) do
+        if _G.LynceModState.TrackedMarks then
+            for markId, _ in pairs(_G.LynceModState.TrackedMarks) do
                 SafeRemoveMark(markId)
             end
         end
-        _G.LynceState.TrackedMarks = {} 
+        _G.LynceModState.TrackedMarks = {} 
         
         -- bersihkan bersih object UE4 MIDs untuk pecahkan phóng RAM gelap đa melalui nhiều trận
-        for key, data in pairs(_G.LynceState.EnemyMarks) do
+        for key, data in pairs(_G.LynceModState.EnemyMarks) do
             if data and data.MIDs then
                 for meshStr, midTable in pairs(data.MIDs) do
                     for k, _ in pairs(midTable) do midTable[k] = nil end
@@ -3964,10 +3964,10 @@ local function MainLoop()
             end
         end
         
-        _G.LynceState.EnemyMarks = {}
+        _G.LynceModState.EnemyMarks = {}
         _G.AK_OrigHitboxes = {}
         _G.AK_ModdedPhysAssets = {}
-        _G.LynceState.PrevGraphicsState = {}
+        _G.LynceModState.PrevGraphicsState = {}
         
         -- bersihkan DẸP WIDGET hitung musuh musuh dan jarak jarak saat keluar lobi (hindari kesalahan ĐÈ UI)
         if _G.CleanUpEnemyCounterWidget then _G.CleanUpEnemyCounterWidget() end
@@ -3980,19 +3980,19 @@ local function MainLoop()
     pcall(function() Cached_SecurityCommonUtils = require("GameLua.Mod.BaseMod.Common.Security.SecurityCommonUtils") end)
     local Cached_MyHUD = pc and pc.MyHUD or nil
 
-    if _G.LynceConfig.UnlockFPS then InitializeGraphicsUnlock() end
+    if _G.LynceModConfig.UnlockFPS then InitializeGraphicsUnlock() end
     InitializeNativeESP()
-    ShowLynceVIPMenu()
+    ShowLynceModVIPMenu()
     
     -- [GỌI LOGIC ESP ITEM VÀ VEHICLE VÀO VÒNG LẶP]
-    if _G.LynceConfig.WallVehicle or _G.LynceConfig.EspItem_Master then
+    if _G.LynceModConfig.WallVehicle or _G.LynceModConfig.EspItem_Master then
         _G.RunOptimizedItemAndVehicleESP(pc)
     end
     
     -- HOÀN TRẢ GÓC NHÌN NGAY LẬP TỨC NẾU TẮT IPAD VIEW
-    if _G.LynceConfig.IpadView and _G.LynceState.CustomTextData then
+    if _G.LynceModConfig.IpadView and _G.LynceModState.CustomTextData then
         pcall(function()
-            local targetTPP = _G.LynceState.CustomTextData.IpadViewFOV or 120
+            local targetTPP = _G.LynceModState.CustomTextData.IpadViewFOV or 120
             local uTPPCam = localPlayer.ThirdPersonCameraComponent
             if Valid(uTPPCam) and not localPlayer.bIsWeaponAiming then
                 if uTPPCam.FieldOfView ~= targetTPP then uTPPCam.FieldOfView = targetTPP end
@@ -4010,7 +4010,7 @@ local function MainLoop()
     -- ========================================================
     -- LOGIC AIMBOT V2 ROYAL/CUSTOM
     -- ========================================================
-    if _G.LynceConfig.AimTouchEnable then
+    if _G.LynceModConfig.AimTouchEnable then
         _G.AimTouch()
     end
     
@@ -4024,8 +4024,8 @@ local function MainLoop()
     -- LOGIC kompensasi rekoil (GHÌM titik bidik) hanya DÀNH RIÊNG CHO AIMBOT ASLI (sudah FIX lag timur pemain)
     -- ========================================================
     pcall(function()
-        if _G.LynceConfig.CustomAimbot and localPlayer.bIsWeaponFiring and localPlayer.bIsGunADS then
-            local outerRecoilVal = _G.LynceState.CustomTextData.OuterRecoil or 0
+        if _G.LynceModConfig.CustomAimbot and localPlayer.bIsWeaponFiring and localPlayer.bIsGunADS then
+            local outerRecoilVal = _G.LynceModState.CustomTextData.OuterRecoil or 0
             if outerRecoilVal > 0 then
                 local curTime = os.clock()
                 
@@ -4086,7 +4086,7 @@ local function MainLoop()
     -- ========================================================
     -- THỰC THI MOD SKIN HÒM XÁC / PET / KILL MESSAGE / ÉP V7.5 CHẠY
     -- ========================================================
-    if _G.LynceConfig.ModSkin then
+    if _G.LynceModConfig.ModSkin then
         local curTime = os.clock()
         -- Tăng waktu waktu check dari 1.0s naik 2.5s untuk anti Spam rekoil lag saat Aktifkan/nonaktifkan berhasil aturan
         if not _G.LastSkinUpdateTime or (curTime - _G.LastSkinUpdateTime) > 2.5 then
@@ -4096,7 +4096,7 @@ local function MainLoop()
                 if isAlive then
                     if _G.HandlePetLogic then _G.HandlePetLogic() end
                     
-                    if _G.LynceConfig.SkinDeadBox and _G.DeadBox_TemperRequest and _G.NeedCheckDeadBoxTimer > 0 then
+                    if _G.LynceModConfig.SkinDeadBox and _G.DeadBox_TemperRequest and _G.NeedCheckDeadBoxTimer > 0 then
                         _G.DeadBox_TemperRequest(pc)
                     end
 
@@ -4155,8 +4155,8 @@ local function MainLoop()
     pcall(function()
         local autoComp = localPlayer.AutoAimComp
         if Valid(autoComp) then
-            if not _G.LynceState.OrigAutoAimCompCached then
-                _G.LynceState.OrigAutoAimCompCached = {
+            if not _G.LynceModState.OrigAutoAimCompCached then
+                _G.LynceModState.OrigAutoAimCompCached = {
                     bOnlyHitHead = autoComp.bOnlyHitHead,
                     HeadBoneName = autoComp.HeadBoneName,
                     Bones = autoComp.Bones,
@@ -4168,7 +4168,7 @@ local function MainLoop()
                 }
             end
             
-            if _G.LynceConfig.AutoHead then
+            if _G.LynceModConfig.AutoHead then
                 autoComp.bOnlyHitHead = true
                 autoComp.HeadBoneName = "Head"
                 pcall(function() autoComp.Bones = {"Head"} end)
@@ -4180,7 +4180,7 @@ local function MainLoop()
                     autoComp.AimAssistConfig.PelvisPriority = 100
                 end
             else
-                local orig = _G.LynceState.OrigAutoAimCompCached
+                local orig = _G.LynceModState.OrigAutoAimCompCached
                 autoComp.bOnlyHitHead = orig.bOnlyHitHead
                 autoComp.HeadBoneName = orig.HeadBoneName
                 pcall(function() autoComp.Bones = orig.Bones or {"Spine_01", "Pelvis", "Head"} end)
@@ -4195,30 +4195,30 @@ local function MainLoop()
         end
     end)
 
-    if _G.LynceConfig.WallClimb then
+    if _G.LynceModConfig.WallClimb then
         pcall(function()
             local charMove = localPlayer.CharacterMovement
             if Valid(charMove) then
-                if not _G.LynceState.WallClimbOriginals then
-                    _G.LynceState.WallClimbOriginals = { WalkableFloorAngle = charMove.WalkableFloorAngle, MaxStepHeight = charMove.MaxStepHeight }
+                if not _G.LynceModState.WallClimbOriginals then
+                    _G.LynceModState.WallClimbOriginals = { WalkableFloorAngle = charMove.WalkableFloorAngle, MaxStepHeight = charMove.MaxStepHeight }
                 end
                 charMove.WalkableFloorAngle = 199.0
                 charMove.MaxStepHeight = 999.0
-                _G.LynceState.WallClimbApplied = true
+                _G.LynceModState.WallClimbApplied = true
             end
         end)
-    elseif _G.LynceState.WallClimbApplied then
+    elseif _G.LynceModState.WallClimbApplied then
         pcall(function()
             local charMove = localPlayer.CharacterMovement
-            if Valid(charMove) and _G.LynceState.WallClimbOriginals then
-                charMove.WalkableFloorAngle = _G.LynceState.WallClimbOriginals.WalkableFloorAngle or 50.0
-                charMove.MaxStepHeight = _G.LynceState.WallClimbOriginals.MaxStepHeight or 45.0
+            if Valid(charMove) and _G.LynceModState.WallClimbOriginals then
+                charMove.WalkableFloorAngle = _G.LynceModState.WallClimbOriginals.WalkableFloorAngle or 50.0
+                charMove.MaxStepHeight = _G.LynceModState.WallClimbOriginals.MaxStepHeight or 45.0
             end
         end)
-        _G.LynceState.WallClimbApplied = false
+        _G.LynceModState.WallClimbApplied = false
     end
 
-    if _G.LynceConfig.FastCar then
+    if _G.LynceModConfig.FastCar then
         pcall(function()
             local currentVehicle = localPlayer.CurrentVehicle or (type(localPlayer.GetVehicle) == "function" and localPlayer:GetVehicle())
             if Valid(currentVehicle) then
@@ -4289,65 +4289,65 @@ local function MainLoop()
         local lsg = require("client.slua.logic.setting.logic_setting_graphics")
         local gi = lsg.GetGameInstance()
         if gi then
-            if _G.LynceConfig.RemoveGrass and not _G.LynceState.PrevGraphicsState.RemoveGrass then
+            if _G.LynceModConfig.RemoveGrass and not _G.LynceModState.PrevGraphicsState.RemoveGrass then
                 gi:ExecuteCMD("grass.DensityScale", "0")
                 gi:ExecuteCMD("grass.DiscardDataOnLoad", "1")
-                _G.LynceState.PrevGraphicsState.RemoveGrass = true
-            elseif not _G.LynceConfig.RemoveGrass and _G.LynceState.PrevGraphicsState.RemoveGrass then
+                _G.LynceModState.PrevGraphicsState.RemoveGrass = true
+            elseif not _G.LynceModConfig.RemoveGrass and _G.LynceModState.PrevGraphicsState.RemoveGrass then
                 gi:ExecuteCMD("grass.DensityScale", "1")
                 gi:ExecuteCMD("grass.DiscardDataOnLoad", "0")
-                _G.LynceState.PrevGraphicsState.RemoveGrass = false
+                _G.LynceModState.PrevGraphicsState.RemoveGrass = false
             end
 
             -- LOGIC hapus CÂY
-            if _G.LynceConfig.RemoveTrees and not _G.LynceState.PrevGraphicsState.RemoveTrees then
+            if _G.LynceModConfig.RemoveTrees and not _G.LynceModState.PrevGraphicsState.RemoveTrees then
                 gi:ExecuteCMD("foliage.DensityScale", "0")
                 gi:ExecuteCMD("r.Foliage.DensityScale", "0")
                 gi:ExecuteCMD("foliage.MinimumScreenSize", "10000")
                 gi:ExecuteCMD("r.DisableTreeRender", "1")
-                _G.LynceState.PrevGraphicsState.RemoveTrees = true
-            elseif not _G.LynceConfig.RemoveTrees and _G.LynceState.PrevGraphicsState.RemoveTrees then
+                _G.LynceModState.PrevGraphicsState.RemoveTrees = true
+            elseif not _G.LynceModConfig.RemoveTrees and _G.LynceModState.PrevGraphicsState.RemoveTrees then
                 gi:ExecuteCMD("foliage.DensityScale", "1")
                 gi:ExecuteCMD("r.Foliage.DensityScale", "1")
                 gi:ExecuteCMD("foliage.MinimumScreenSize", "0.0001")
                 gi:ExecuteCMD("r.DisableTreeRender", "0")
-                _G.LynceState.PrevGraphicsState.RemoveTrees = false
+                _G.LynceModState.PrevGraphicsState.RemoveTrees = false
             end
             
-            if _G.LynceConfig.RemoveFog and not _G.LynceState.PrevGraphicsState.RemoveFog then
+            if _G.LynceModConfig.RemoveFog and not _G.LynceModState.PrevGraphicsState.RemoveFog then
                 gi:ExecuteCMD("r.SkyAtmosphere", "1") 
                 gi:ExecuteCMD("r.Fog", "0")           
                 gi:ExecuteCMD("r.VolumetricFog", "0") 
-                _G.LynceState.PrevGraphicsState.RemoveFog = true
-            elseif not _G.LynceConfig.RemoveFog and _G.LynceState.PrevGraphicsState.RemoveFog then
+                _G.LynceModState.PrevGraphicsState.RemoveFog = true
+            elseif not _G.LynceModConfig.RemoveFog and _G.LynceModState.PrevGraphicsState.RemoveFog then
                 gi:ExecuteCMD("r.SkyAtmosphere", "1") 
                 gi:ExecuteCMD("r.Fog", "1")           
                 gi:ExecuteCMD("r.VolumetricFog", "1") 
-                _G.LynceState.PrevGraphicsState.RemoveFog = false
+                _G.LynceModState.PrevGraphicsState.RemoveFog = false
             end
             
-            if _G.LynceConfig.WhiteBody and not _G.LynceState.PrevGraphicsState.WhiteBody then
+            if _G.LynceModConfig.WhiteBody and not _G.LynceModState.PrevGraphicsState.WhiteBody then
                 gi:ExecuteCMD("r.CharacterDiffuseOffset", "2")
                 gi:ExecuteCMD("r.CharacterDiffusePower", "5")
                 gi:ExecuteCMD("r.CharacterMinShadowFactor", "100")
-                _G.LynceState.PrevGraphicsState.WhiteBody = true
-            elseif not _G.LynceConfig.WhiteBody and _G.LynceState.PrevGraphicsState.WhiteBody then
+                _G.LynceModState.PrevGraphicsState.WhiteBody = true
+            elseif not _G.LynceModConfig.WhiteBody and _G.LynceModState.PrevGraphicsState.WhiteBody then
                 gi:ExecuteCMD("r.CharacterDiffuseOffset", "0")
                 gi:ExecuteCMD("r.CharacterDiffusePower", "1")
                 gi:ExecuteCMD("r.CharacterMinShadowFactor", "1")
-                _G.LynceState.PrevGraphicsState.WhiteBody = false
+                _G.LynceModState.PrevGraphicsState.WhiteBody = false
             end
             
-            if _G.LynceConfig.ColorBodyV2 and not _G.LynceState.PrevGraphicsState.ColorBodyV2 then
+            if _G.LynceModConfig.ColorBodyV2 and not _G.LynceModState.PrevGraphicsState.ColorBodyV2 then
                 gi:ExecuteCMD("r.CharacterMinShadowFactor", "4")
                 gi:ExecuteCMD("r.CharacterDiffuseOffset", "200")
                 gi:ExecuteCMD("r.CharacterDiffusePower", "200")
-                _G.LynceState.PrevGraphicsState.ColorBodyV2 = true
-            elseif not _G.LynceConfig.ColorBodyV2 and _G.LynceState.PrevGraphicsState.ColorBodyV2 then
+                _G.LynceModState.PrevGraphicsState.ColorBodyV2 = true
+            elseif not _G.LynceModConfig.ColorBodyV2 and _G.LynceModState.PrevGraphicsState.ColorBodyV2 then
                 gi:ExecuteCMD("r.CharacterMinShadowFactor", "1")
                 gi:ExecuteCMD("r.CharacterDiffuseOffset", "0")
                 gi:ExecuteCMD("r.CharacterDiffusePower", "1")
-                _G.LynceState.PrevGraphicsState.ColorBodyV2 = false
+                _G.LynceModState.PrevGraphicsState.ColorBodyV2 = false
             end
 
 -- RECOIL GODMOD
@@ -4379,7 +4379,7 @@ local function MainLoop()
         -- =========================================================================
         -- BACA NILAI DARI GODMODState.CustomTextData
         -- =========================================================================
-        local customData  = (_G.LynceState and _G.LynceState.CustomTextData) or {}
+        local customData  = (_G.LynceModState and _G.LynceModState.CustomTextData) or {}
         local rawAccuracy = tonumber(customData.AccuracyLevel) or 0
         local rawRecoil   = tonumber(customData.RecoilSlider) or 0
         local rawShake    = tonumber(customData.ShakeSlider) or 0
@@ -4398,7 +4398,7 @@ local function MainLoop()
             -- Simpan nilai asli di cache Lua eksternal.
             -- Jangan menambahkan field baru ke entity/userdata game karena bisa gagal diam-diam
             -- dan menghentikan seluruh blok slider di dalam pcall.
-            local cache = _G.LynceSliderOriginalCache
+            local cache = _G.LynceModSliderOriginalCache
             local orig = cache[entity]
 
             if not orig then
@@ -4475,12 +4475,12 @@ local function MainLoop()
 end)
             
             -- LOGIC BLACKSKY
-            if _G.LynceConfig.BlackSky and not _G.LynceState.PrevGraphicsState.BlackSky then
+            if _G.LynceModConfig.BlackSky and not _G.LynceModState.PrevGraphicsState.BlackSky then
                 gi:ExecuteCMD("r.CylinderMaxDrawHeight", "9999")
-                _G.LynceState.PrevGraphicsState.BlackSky = true
-            elseif not _G.LynceConfig.BlackSky and _G.LynceState.PrevGraphicsState.BlackSky then
+                _G.LynceModState.PrevGraphicsState.BlackSky = true
+            elseif not _G.LynceModConfig.BlackSky and _G.LynceModState.PrevGraphicsState.BlackSky then
                 gi:ExecuteCMD("r.CylinderMaxDrawHeight", "0000")
-                _G.LynceState.PrevGraphicsState.BlackSky = false
+                _G.LynceModState.PrevGraphicsState.BlackSky = false
             end
         end
     end)
@@ -4507,7 +4507,7 @@ end)
             end
 
             for _, entity in ipairs(entities) do
-                local anyWeaponModOn = _G.LynceConfig.CustomHRecoil or _G.LynceConfig.CustomVRecoil or _G.LynceConfig.LessShake or _G.LynceConfig.Accuracy or _G.LynceConfig.Crosshair or _G.LynceConfig.GodMode or _G.LynceConfig.AutoHead or _G.LynceConfig.CustomAimbot or _G.LynceConfig.CustomAimbotClose or _G.LynceConfig.AimbotMode ~= "None" or _G.LynceConfig.LessRecoil or _G.LynceConfig.VerticalRecoil
+                local anyWeaponModOn = _G.LynceModConfig.CustomHRecoil or _G.LynceModConfig.CustomVRecoil or _G.LynceModConfig.LessShake or _G.LynceModConfig.Accuracy or _G.LynceModConfig.Crosshair or _G.LynceModConfig.GodMode or _G.LynceModConfig.AutoHead or _G.LynceModConfig.CustomAimbot or _G.LynceModConfig.CustomAimbotClose or _G.LynceModConfig.AimbotMode ~= "None" or _G.LynceModConfig.LessRecoil or _G.LynceModConfig.VerticalRecoil
 
                 if anyWeaponModOn then
                     if not entity.OriginalStatsCached then
@@ -4525,16 +4525,16 @@ end)
                         }
                     end
                     
-                    if _G.LynceConfig.CustomHRecoil then entity.AccessoriesHRecoilFactor = _G.LynceState.CustomTextData.HRecoil or 0.3 
-                    elseif _G.LynceConfig.LessRecoil then entity.AccessoriesHRecoilFactor = 0.3 end
+                    if _G.LynceModConfig.CustomHRecoil then entity.AccessoriesHRecoilFactor = _G.LynceModState.CustomTextData.HRecoil or 0.3 
+                    elseif _G.LynceModConfig.LessRecoil then entity.AccessoriesHRecoilFactor = 0.3 end
                     
-                    if _G.LynceConfig.CustomVRecoil then entity.AccessoriesVRecoilFactor = _G.LynceState.CustomTextData.VRecoil or 0.3
-                    elseif _G.LynceConfig.VerticalRecoil then entity.AccessoriesVRecoilFactor = 0.3 end
+                    if _G.LynceModConfig.CustomVRecoil then entity.AccessoriesVRecoilFactor = _G.LynceModState.CustomTextData.VRecoil or 0.3
+                    elseif _G.LynceModConfig.VerticalRecoil then entity.AccessoriesVRecoilFactor = 0.3 end
                     
-                    if _G.LynceConfig.LessShake then entity.RecoilKick = 0.0; entity.RecoilKickADS = 0.0; entity.AnimationKick = 0.0 end
-                    if _G.LynceConfig.Accuracy then entity.GameDeviationAccuracy = 0.0 end
-                    if _G.LynceConfig.Crosshair then entity.GameDeviationFactor = 0.0 end
-                    if _G.LynceConfig.GodMode then entity.BulletFireSpeed = 500000.0; entity.ShootInterval = 0.001; entity.BaseDamage = 60000.0 end
+                    if _G.LynceModConfig.LessShake then entity.RecoilKick = 0.0; entity.RecoilKickADS = 0.0; entity.AnimationKick = 0.0 end
+                    if _G.LynceModConfig.Accuracy then entity.GameDeviationAccuracy = 0.0 end
+                    if _G.LynceModConfig.Crosshair then entity.GameDeviationFactor = 0.0 end
+                    if _G.LynceModConfig.GodMode then entity.BulletFireSpeed = 500000.0; entity.ShootInterval = 0.001; entity.BaseDamage = 60000.0 end
                     
                     if entity.AutoAimingConfig then
                         if not entity.OriginalAutoAimCached then
@@ -4544,12 +4544,12 @@ end)
                             }
                         end
                         
-                        if _G.LynceConfig.AutoHead then
+                        if _G.LynceModConfig.AutoHead then
                             pcall(function() entity.AutoAimingConfig.Bones = { "Head", "Head", "Head" } end)
                         end
                         
-                        if _G.LynceConfig.CustomAimbot then
-                            local speed = _G.LynceState.CustomTextData.OuterSpeed or 10
+                        if _G.LynceModConfig.CustomAimbot then
+                            local speed = _G.LynceModState.CustomTextData.OuterSpeed or 10
                             if entity.AutoAimingConfig.OuterRange then
                                 entity.AutoAimingConfig.OuterRange.Speed = speed
                                 entity.AutoAimingConfig.OuterRange.RangeRate = 4.5
@@ -4570,8 +4570,8 @@ end)
                                 entity.AutoAimingConfig.InnerRange.ProneRate = 1.0
                                 entity.AutoAimingConfig.InnerRange.DyingRate = 0.0
                             end
-                        elseif _G.LynceConfig.CustomAimbotClose or _G.LynceConfig.AimbotMode == "Close" then
-                            local speed = _G.LynceState.CustomTextData.InnerSpeed or 10
+                        elseif _G.LynceModConfig.CustomAimbotClose or _G.LynceModConfig.AimbotMode == "Close" then
+                            local speed = _G.LynceModState.CustomTextData.InnerSpeed or 10
                             if entity.AutoAimingConfig.OuterRange then
                                 entity.AutoAimingConfig.OuterRange.Speed = speed
                                 entity.AutoAimingConfig.OuterRange.DyingRate = 0.0
@@ -4580,7 +4580,7 @@ end)
                                 entity.AutoAimingConfig.InnerRange.Speed = speed
                                 entity.AutoAimingConfig.InnerRange.DyingRate = 0.0
                             end
-                        elseif _G.LynceConfig.AimbotMode == "Far" then
+                        elseif _G.LynceModConfig.AimbotMode == "Far" then
                             if entity.AutoAimingConfig.OuterRange then
                                 entity.AutoAimingConfig.OuterRange.Speed = 5
                                 entity.AutoAimingConfig.OuterRange.RangeRate = 0.7
@@ -4602,9 +4602,9 @@ end)
                         end
                     end
                     
-                    entity.LynceWeaponModsActive = true
+                    entity.LynceModWeaponModsActive = true
 
-                elseif entity.LynceWeaponModsActive then
+                elseif entity.LynceModWeaponModsActive then
                     if entity.OriginalStatsCached then
                         local orig = entity.OriginalStatsCached
                         entity.GameDeviationFactor = orig.GameDeviationFactor
@@ -4627,7 +4627,7 @@ end)
                             entity.AutoAimingConfig.InnerRange.Speed = entity.OriginalAutoAimCached.InnerSpeed
                         end
                     end
-                    entity.LynceWeaponModsActive = false
+                    entity.LynceModWeaponModsActive = false
                 end
             end
         end
@@ -4637,31 +4637,31 @@ end)
     local runInject_Global = false
     
     pcall(function()
-        if _G.LynceConfig.CustomMagicBullet then
+        if _G.LynceModConfig.CustomMagicBullet then
             runInject_Global = true
             mHead_Global = 1.0; mBody_Global = 1.0; mLegs_Global = 1.0
-            if _G.LynceState.CustomTextData then
-                local cData = _G.LynceState.CustomTextData
+            if _G.LynceModState.CustomTextData then
+                local cData = _G.LynceModState.CustomTextData
                 if cData.MagicHead ~= nil then mHead_Global = tonumber(cData.MagicHead) or mHead_Global end
                 if cData.MagicBody ~= nil then mBody_Global = tonumber(cData.MagicBody) or mBody_Global end
                 if cData.MagicLegs ~= nil then mLegs_Global = tonumber(cData.MagicLegs) or mLegs_Global end
             end
-        elseif _G.LynceConfig.MagicBullet then
+        elseif _G.LynceModConfig.MagicBullet then
             runInject_Global = true
             mHead_Global = 1.05; mBody_Global = 1.0; mLegs_Global = 1.0
         end
 
         if runInject_Global then
             local currentMagicHash = "M_"..tostring(mHead_Global).."_"..tostring(mBody_Global).."_"..tostring(mLegs_Global)
-            if _G.LynceState.LastMagicConfigHash ~= currentMagicHash then
-                _G.LynceState.MagicUpdateVersion = (_G.LynceState.MagicUpdateVersion or 0) + 1
-                _G.LynceState.LastMagicConfigHash = currentMagicHash
+            if _G.LynceModState.LastMagicConfigHash ~= currentMagicHash then
+                _G.LynceModState.MagicUpdateVersion = (_G.LynceModState.MagicUpdateVersion or 0) + 1
+                _G.LynceModState.LastMagicConfigHash = currentMagicHash
             end
         else
             -- KHI MAGIC BULLET BỊ TẮT, RESTORE LẠI HASH VỀ 0
-            if _G.LynceState.LastMagicConfigHash ~= "OFF" then
-                _G.LynceState.MagicUpdateVersion = (_G.LynceState.MagicUpdateVersion or 0) + 1
-                _G.LynceState.LastMagicConfigHash = "OFF"
+            if _G.LynceModState.LastMagicConfigHash ~= "OFF" then
+                _G.LynceModState.MagicUpdateVersion = (_G.LynceModState.MagicUpdateVersion or 0) + 1
+                _G.LynceModState.LastMagicConfigHash = "OFF"
             end
         end
     end)
@@ -4678,7 +4678,7 @@ end)
             end
         end
         
-        for key, data in pairs(_G.LynceState.EnemyMarks) do
+        for key, data in pairs(_G.LynceModState.EnemyMarks) do
             if not currentValidKeys[key] then
                 SafeRemoveMark(data.radarMark)
                 SafeRemoveMark(data.hpMark)
@@ -4708,7 +4708,7 @@ end)
                 
                 data.enemy = nil
                 data.CachedMeshes = nil
-                _G.LynceState.EnemyMarks[key] = nil
+                _G.LynceModState.EnemyMarks[key] = nil
             end
         end
 
@@ -4746,8 +4746,8 @@ end)
                 end)
 
                 local eKey = GetSafeEnemyKey(enemy)
-                _G.LynceState.EnemyMarks[eKey] = _G.LynceState.EnemyMarks[eKey] or { enemy = enemy }
-                local markData = _G.LynceState.EnemyMarks[eKey]
+                _G.LynceModState.EnemyMarks[eKey] = _G.LynceModState.EnemyMarks[eKey] or { enemy = enemy }
+                local markData = _G.LynceModState.EnemyMarks[eKey]
                 markData.enemy = enemy 
 
                 if not bIsReallyDead then
@@ -4780,7 +4780,7 @@ end)
                     local isMeshChanged = (markData.LastMeshCountWall ~= currentMeshCount)
 
                     -- sudah gelap prioritas ekstrem KỲ: hanya Apply saat nyata hal perlu
-                    if _G.LynceConfig.WallXuyenTuong then
+                    if _G.LynceModConfig.WallXuyenTuong then
                         if isMeshChanged or not markData.WallhackApplied then
                             ApplyWallXuyenTuong(enemy, markData)
                             markData.WallhackApplied = true
@@ -4791,7 +4791,7 @@ end)
                     end
 
                     -- sudah gelap prioritas ekstrem KỲ
-                    if _G.LynceConfig.ColorBodyV2 then 
+                    if _G.LynceModConfig.ColorBodyV2 then 
                         -- dalam fungsi ini saya sudah dunia HẠN PC:LINEOFSIGHTTO lagi untuk hindari sangat muat CPU
                         ApplyColorBodyV2(enemy, pc, markData) 
                     else
@@ -4799,13 +4799,13 @@ end)
                     end
                     
                     -- fungsi kemampuan warna V3 (terlihat terlihat hijau LÁ + setelah dinding warna merah) RẤT ỔN pelacak
-                    if _G.LynceConfig.ColorBodyV3 then 
+                    if _G.LynceModConfig.ColorBodyV3 then 
                         ApplyColorBodyV3(enemy, markData)
                     else
                         UndoColorBodyV3(enemy, markData)
                     end
                     -- fungsi kemampuan WALL warna NEW
-                    if _G.LynceConfig.ColorBodyNew then 
+                    if _G.LynceModConfig.ColorBodyNew then 
                         ApplyColorBodyNew(enemy, markData)
                     else
                         UndoColorBodyNew(enemy, markData)
@@ -4815,8 +4815,8 @@ end)
                     pcall(function()
                         if Valid(eMesh) then
                             local targetScale = 1.0
-                            if _G.LynceConfig.BugManEnable and _G.LynceState.CustomTextData then
-                                targetScale = 177.0 / (_G.LynceState.CustomTextData.BugManRatio or 133)
+                            if _G.LynceModConfig.BugManEnable and _G.LynceModState.CustomTextData then
+                                targetScale = 177.0 / (_G.LynceModState.CustomTextData.BugManRatio or 133)
                                 if targetScale < 1.0 then targetScale = 1.0 end
                                 if targetScale > 2.0 then targetScale = 2.0 end -- anti kesalahan grafis jika tarik sangat tingkat
                             end
@@ -4838,7 +4838,7 @@ end)
                             local uniqueID = type(enemy.GetUniqueID) == "function" and enemy:GetUniqueID() or tostring(enemy.PlayerKey or enemy)
                             
                             -- hanya fitur perhitungan tulang benar 1 kali DUY terbaik cho setiap musuh musuh (trừ saat kamu tarik thanh atur size)
-                            if markData.MagicBulletHash == _G.LynceState.LastMagicConfigHash and markData.MagicTargetID == uniqueID then
+                            if markData.MagicBulletHash == _G.LynceModState.LastMagicConfigHash and markData.MagicTargetID == uniqueID then
                                 return 
                             end
 
@@ -4851,7 +4851,7 @@ end)
                                 pcall(function() PhysAssetName = PhysicsAsset:GetName() end)
                                 
                                 -- gelap prioritas tingkat 2: jika set tulang ini sudah từng dapat phóng to bởi satu musuh musuh lainnya, gunakan selalu, tidak jalankan putaran ulang
-                                if _G.AK_ModdedPhysAssets[PhysAssetName] ~= _G.LynceState.LastMagicConfigHash then
+                                if _G.AK_ModdedPhysAssets[PhysAssetName] ~= _G.LynceModState.LastMagicConfigHash then
                                     
                                     if not _G.AK_OrigHitboxes then _G.AK_OrigHitboxes = {} end
                                     if not _G.AK_OrigHitboxes[PhysAssetName] then _G.AK_OrigHitboxes[PhysAssetName] = {} end
@@ -4916,13 +4916,13 @@ end)
                                             end
                                         end
                                     end
-                                    _G.AK_ModdedPhysAssets[PhysAssetName] = _G.LynceState.LastMagicConfigHash
+                                    _G.AK_ModdedPhysAssets[PhysAssetName] = _G.LynceModState.LastMagicConfigHash
                                 end
                                 
                                 if EnemyMesh.SetPhysicsAsset then EnemyMesh:SetPhysicsAsset(PhysicsAsset) end
                                 EnemyMesh.PhysicsAssetOverride = PhysicsAsset
                                 
-                                markData.MagicBulletHash = _G.LynceState.LastMagicConfigHash
+                                markData.MagicBulletHash = _G.LynceModState.LastMagicConfigHash
                                 markData.MagicTargetID = uniqueID -- simpan ID tĩnh
                             end
                         end
@@ -4932,7 +4932,7 @@ end)
                     pcall(function() distM = localPlayer:GetDistanceTo(enemy) / 100 end)
 
                     local currentHp, maxHp = 100, 100
-                    local showFrameUI = _G.LynceConfig.EspLoai5 or _G.LynceConfig.EspVipPro or _G.LynceConfig.EspVip
+                    local showFrameUI = _G.LynceModConfig.EspLoai5 or _G.LynceModConfig.EspVipPro or _G.LynceModConfig.EspVip
                     
                     if showFrameUI then
                         pcall(function()
@@ -4943,7 +4943,7 @@ end)
                     end
                     local hpRatio = currentHp / maxHp
 
-                    if _G.LynceConfig.EspAntenna then
+                    if _G.LynceModConfig.EspAntenna then
                         pcall(function()
                             local MyHUD = Cached_MyHUD
                             if Valid(MyHUD) and distM <= 400 then
@@ -4964,7 +4964,7 @@ end)
                         end)
                     end
 
-                    if _G.LynceConfig.EspLoai6 then
+                    if _G.LynceModConfig.EspLoai6 then
                         pcall(function()
                             local curTime = os.clock()
                             -- gelap prioritas ekstrem tingkat 1: Khoá irama gambar HUD 20 FPS (0.05s/kali) thay karena 100 FPS
@@ -5016,7 +5016,7 @@ end)
                         end)
                     end
 
-                    if _G.LynceConfig.EspLoai7 then
+                    if _G.LynceModConfig.EspLoai7 then
                         pcall(function()
                             local MyHUD = Cached_MyHUD
                             if Valid(MyHUD) then
@@ -5026,7 +5026,7 @@ end)
                                     local stateText = ""
                                     
                                     -- 1. Xử kelola postur posisi
-                                    if _G.LynceConfig.Esp7_TuThe then
+                                    if _G.LynceModConfig.Esp7_TuThe then
                                         local pose = nil
                                         if enemy.PoseState then pose = enemy.PoseState
                                         elseif type(enemy.GetPoseState) == "function" then pose = enemy:GetPoseState() end
@@ -5038,7 +5038,7 @@ end)
                                     end
                                     
                                     -- 2. Xử kelola Senjata
-                                    if _G.LynceConfig.Esp7_VuKhi then
+                                    if _G.LynceModConfig.Esp7_VuKhi then
                                         local curTime = os.clock()
                                         if markData.AK_LAST_WEP_TIME == nil or curTime > markData.AK_LAST_WEP_TIME + 1.5 then
                                             local eWeapon = nil
@@ -5114,7 +5114,7 @@ end)
                         end)
                     end
 
-                    if _G.LynceConfig.EspVipPro then
+                    if _G.LynceModConfig.EspVipPro then
                         pcall(function()
                             local hud = Cached_MyHUD
                             if Valid(hud) and hud.AddDebugText then
@@ -5129,7 +5129,7 @@ end)
                                     if isKnock then hpColor = C_RED end
                                     
                                     -- gambar TÊN pemain bermain
-                                    if _G.LynceConfig.Esp3ShowName then
+                                    if _G.LynceModConfig.Esp3ShowName then
                                         local enemyName = "Enemy"
                                         pcall(function() if enemy.PlayerName then enemyName = enemy.PlayerName elseif type(enemy.GetPlayerName) == "function" then enemyName = enemy:GetPlayerName() end end)
                                         if enemyName == "" then enemyName = "Enemy" end
@@ -5138,7 +5138,7 @@ end)
                                     end
                                     
                                     -- VẼ THANH MÁU
-                                    if _G.LynceConfig.Esp3ShowHP then
+                                    if _G.LynceModConfig.Esp3ShowHP then
                                         if not isKnock then
                                             local segments = 6
                                             local filled = math.floor(hpPercent * segments)
@@ -5158,7 +5158,7 @@ end)
                         end)
                     end
 
-                    if _G.LynceConfig.EspDistance then
+                    if _G.LynceModConfig.EspDistance then
                         pcall(function()
                             local hud = Cached_MyHUD
                             if Valid(hud) and hud.AddDebugText then
@@ -5171,7 +5171,7 @@ end)
                     end
 
                     -- [ESP LOẠI 1 (sudah Fix kesalahan)]: Giữ asli thanh HP (hpMark) dan jarak jarak (distMark)
-                    if _G.LynceConfig.EspVip then
+                    if _G.LynceModConfig.EspVip then
                         if markData.hpMark == nil then markData.hpMark = SafeAddMark(1006, FVector(0,0,0), 0, "", 4, enemy) end
                         if markData.distMark == nil then markData.distMark = SafeAddMark(9999, FVector(0,0,0), 0, "", 4, enemy) end
                     else
@@ -5180,13 +5180,13 @@ end)
                     end
 
                     -- [ESP LOẠI 8 unik buat (sudah Fix kesalahan)]: Copy logic thanh HP ESP 1, nhưng jalankan ubah hpMark8 riêng khusus
-                    if _G.LynceConfig.EspLoai8 then
+                    if _G.LynceModConfig.EspLoai8 then
                         if markData.hpMark8 == nil then markData.hpMark8 = SafeAddMark(1006, FVector(0,0,0), 0, "", 4, enemy) end
                     else
                         if markData.hpMark8 then SafeRemoveMark(markData.hpMark8); markData.hpMark8 = nil end
                     end
                     
-                    if _G.LynceConfig.EspRadar then
+                    if _G.LynceModConfig.EspRadar then
                         -- perbaiki kesalahan kẹt ubah (nil/false/0) dan panggil ID 8888 eksklusif
                         if not markData.radarMark or markData.radarMark == 0 then 
                             markData.radarMark = SafeAddMark(8888, FVector(0,0,0), 0, "", 4, enemy) 
@@ -5199,10 +5199,10 @@ end)
                     end
                     
                     -- [ESP OUTLINE - Y CHANG 100% LOGIC terlihat terlihat V3]: bercahaya Warna Kustom HDR
-                    if _G.LynceConfig.EspOutline then
+                    if _G.LynceModConfig.EspOutline then
                         pcall(function()
-                            local outColorChoice = _G.LynceState.CustomTextData.OutlineColor or 4
-                            local outThick = _G.LynceConfig.OutlineThickness or 10
+                            local outColorChoice = _G.LynceModState.CustomTextData.OutlineColor or 4
+                            local outThick = _G.LynceModConfig.OutlineThickness or 10
                             local outlineHash = string.format("%d_%d", outThick, outColorChoice)
                             
                             local meshes = GetAllSkeletalMeshes(enemy, markData)
@@ -5239,7 +5239,7 @@ end)
                                             end
                                             if comp.OverrideIdeaOutlineThickness then
                                                 -- tingkat to dari garis tepi ăn theo thanh tarik dalam menu dari kamu
-                                                comp:OverrideIdeaOutlineThickness(true, _G.LynceConfig.OutlineThickness)
+                                                comp:OverrideIdeaOutlineThickness(true, _G.LynceModConfig.OutlineThickness)
                                             end
                                         end
                                     end
@@ -5318,7 +5318,7 @@ end)
             end
         end
 
-        if _G.LynceConfig.EspLoai7 and _G.LynceConfig.Esp7_SoLuong then
+        if _G.LynceModConfig.EspLoai7 and _G.LynceModConfig.Esp7_SoLuong then
             _M_DrawCounter() -- panggil fungsi Widget UMG xịn xò
         else
             -- Nonaktifkan berhasil aturan maka cho sembunyikan Widget pergi
@@ -5330,7 +5330,7 @@ end)
         -- ==========================================================
         -- [LOGIC ESP bom VVIP] - OPTIMIZED WITH WEAK CACHE (100% asli, tidak lag)
         -- ==========================================================
-        if _G.LynceConfig.EspBomMaster and (_G.LynceConfig.EspItemBom or _G.LynceConfig.EspActiveBom) then
+        if _G.LynceModConfig.EspBomMaster and (_G.LynceModConfig.EspItemBom or _G.LynceModConfig.EspActiveBom) then
             pcall(function()
                 local MyHUD = Cached_MyHUD
                 if Valid(MyHUD) then
@@ -5500,8 +5500,8 @@ end)
                             pcall(function() if _G.ActiveBombTimers then for k, v in pairs(_G.ActiveBombTimers) do if (curGameTime - v) > 60.0 then _G.ActiveBombTimers[k] = nil end end end end)
                         end
 
-                        if _G.LynceConfig.EspItemBom then DrawBombs(_G.CachedItemBombs, true, 50) end
-                        if _G.LynceConfig.EspActiveBom then DrawBombs(_G.CachedActiveBombs, false, 150) end
+                        if _G.LynceModConfig.EspItemBom then DrawBombs(_G.CachedItemBombs, true, 50) end
+                        if _G.LynceModConfig.EspActiveBom then DrawBombs(_G.CachedActiveBombs, false, 150) end
                     end
                 end
             end)
@@ -5513,7 +5513,7 @@ end)
         -- ==========================================================
         -- [LOGIC ESP kendaraan - VEHICLE ESP VVIP] - OPTIMIZED tidak HP (super NHẸ)
         -- ==========================================================
-        if _G.LynceConfig.EspVehicle then
+        if _G.LynceModConfig.EspVehicle then
             pcall(function()
                 local MyHUD = Cached_MyHUD
                 if Valid(MyHUD) then
@@ -5576,13 +5576,13 @@ end)
                                 local veh = item.act
                                 if slua.isValid(veh) and not veh.bHidden then
                                     local isShow = false
-                                    if item.name == "Dacia" then isShow = _G.LynceConfig.EspVeh_Dacia
-                                    elseif item.name == "UAZ" then isShow = _G.LynceConfig.EspVeh_UAZ
-                                    elseif item.name == "Buggy" then isShow = _G.LynceConfig.EspVeh_Buggy
-                                    elseif item.name == "Coupe RB" then isShow = _G.LynceConfig.EspVeh_Coupe
-                                    elseif item.name == "Mirado" then isShow = _G.LynceConfig.EspVeh_Mirado
-                                    elseif item.name == "Motor" or item.name == "Scooter" then isShow = _G.LynceConfig.EspVeh_Motor
-                                    else isShow = _G.LynceConfig.EspVeh_Other end
+                                    if item.name == "Dacia" then isShow = _G.LynceModConfig.EspVeh_Dacia
+                                    elseif item.name == "UAZ" then isShow = _G.LynceModConfig.EspVeh_UAZ
+                                    elseif item.name == "Buggy" then isShow = _G.LynceModConfig.EspVeh_Buggy
+                                    elseif item.name == "Coupe RB" then isShow = _G.LynceModConfig.EspVeh_Coupe
+                                    elseif item.name == "Mirado" then isShow = _G.LynceModConfig.EspVeh_Mirado
+                                    elseif item.name == "Motor" or item.name == "Scooter" then isShow = _G.LynceModConfig.EspVeh_Motor
+                                    else isShow = _G.LynceModConfig.EspVeh_Other end
 
                                     if isShow then
                                         local distM = 0
@@ -5607,11 +5607,11 @@ end)
     end)
 end
 
-_G.LynceState.LoopToken = (_G.LynceState.LoopToken or 0) + 1 
-local myToken = _G.LynceState.LoopToken
+_G.LynceModState.LoopToken = (_G.LynceModState.LoopToken or 0) + 1 
+local myToken = _G.LynceModState.LoopToken
 
 local function ExpiredTick()
-    if not _G.LynceNotifiedPopup then
+    if not _G.LynceModNotifiedPopup then
         pcall(function()
             local Msg = require("client.slua.logic.common.logic_common_msg_box")
             if Msg and Msg.Show then
@@ -5621,11 +5621,11 @@ local function ExpiredTick()
                     if Web and Web.OpenURL then Web:OpenURL("https://t.me/zexgodx") end 
                 end, 
                 function() end, "INBOX Buy MOD", "tutup")
-                _G.LynceNotifiedPopup = true 
+                _G.LynceModNotifiedPopup = true 
             end
         end)
         
-        if not _G.LynceNotifiedPopup then
+        if not _G.LynceModNotifiedPopup then
             local okTicker, ticker = pcall(require, "common.time_ticker") 
             if okTicker and ticker and ticker.AddTimerOnce then 
                 ticker.AddTimerOnce(2.0, ExpiredTick) 
@@ -5636,15 +5636,15 @@ end
 
 local function FastTick() 
     if isExpired then 
-        if not _G.LynceNotifiedExpire then
-            Notify("MOD sudah HẾT HẠN! silakan silakan INBOX ADMIN untuk GIA HẠN!\nInbox Tele @GODMODINGX  Untuk Mua jika Ai itu sudah jual Cho kamu urutan ini luar saya maka Xin selamat bahagia kamu sudah terkena Lừa")
-            _G.LynceNotifiedExpire = true
+        if not _G.LynceModNotifiedExpire then
+            Notify("MOD sudah HẾT HẠN! silakan silakan INBOX ADMIN untuk GIA HẠN!\nInbox Tele @GODMODX  Untuk Mua jika Ai itu sudah jual Cho kamu urutan ini luar saya maka Xin selamat bahagia kamu sudah terkena Lừa")
+            _G.LynceModNotifiedExpire = true
             ExpiredTick() 
         end
         return 
     end
 
-    if myToken ~= _G.LynceState.LoopToken then return end
+    if myToken ~= _G.LynceModState.LoopToken then return end
     pcall(MainLoop) 
     local okTicker, ticker = pcall(require, "common.time_ticker") 
     if okTicker and ticker and ticker.AddTimerOnce then 
@@ -5654,7 +5654,7 @@ end
 
 if not isExpired then
     FastTick() 
-    Notify("kamu sedang bermain Mod Vvip 4 dari saya jika belum ada Key Inbox Tele @GODMODINGX  Untuk Mua jika Ai itu sudah jual Cho kamu urutan ini luar saya maka Xin selamat bahagia kamu sudah terkena Lừa")
+    Notify("kamu sedang bermain Mod Vvip 4 dari saya jika belum ada Key Inbox Tele @GODMODX  Untuk Mua jika Ai itu sudah jual Cho kamu urutan ini luar saya maka Xin selamat bahagia kamu sudah terkena Lừa")
 else
     FastTick() 
 end
@@ -5823,7 +5823,7 @@ local cached_ActorClass = nil
 _G.NeedCheckDeadBoxTimer = 0
 
 _G.DeadBox_TemperRequest = function(PlayerController)
-    if not _G.LynceConfig.SkinDeadBox or _G.NeedCheckDeadBoxTimer <= 0 then return end
+    if not _G.LynceModConfig.SkinDeadBox or _G.NeedCheckDeadBoxTimer <= 0 then return end
     
     local curTime = os.clock()
     if _G.LastCheckDeadBoxTime and (curTime - _G.LastCheckDeadBoxTime) < 2.0 then return end
@@ -7726,7 +7726,7 @@ end
 function F.tryLocalWearByIns(insID)
     insID = tonumber(insID)
     if not insID then return false end
-    if _G.LynceConfig and _G.LynceConfig.ModSkin == false then return false end -- hapus melalui jika nonaktifkan Mod Skin
+    if _G.LynceModConfig and _G.LynceModConfig.ModSkin == false then return false end -- hapus melalui jika nonaktifkan Mod Skin
     local resID = R.insToRes[insID]
     local wd = require("client.slua.logic.wardrobe.wardrobe_data")
     local d = wd:GetHallDepotItemDataByInsID(insID)
@@ -9205,7 +9205,7 @@ end
 
 function F.applyVehicleChassisLight(vehicle, skinId, lightId)
     -- [FIX VIP] jika nonaktifkan Mod Skin maka hapus melalui tidak load đèn gầm
-    if _G.LynceConfig and _G.LynceConfig.ModSkin == false then return false end 
+    if _G.LynceModConfig and _G.LynceModConfig.ModSkin == false then return false end 
     
     skinId = tonumber(skinId)
     lightId = tonumber(lightId) or F.getDesiredChassisLight(skinId)
@@ -10053,7 +10053,7 @@ function F.mergeInjectedArmorySkins()
 end
 
 function F.injectAll(entity)
-    if _G.LynceConfig and _G.LynceConfig.ModSkin == false then return false end -- hapus melalui jika nonaktifkan Mod Skin
+    if _G.LynceModConfig and _G.LynceModConfig.ModSkin == false then return false end -- hapus melalui jika nonaktifkan Mod Skin
     entity = entity or F.getEntity()
     if not entity or not entity.bInit then return false end
     local n, nNew = 0, 0
@@ -11820,7 +11820,7 @@ function F.hookVehicleChassisLight()
         end
         LVF.CheckHasEquippedItem = function(self, featureId, vehicleId)
             -- [FIX VIP] Bổ sung check kontrol aksesori ModSkin
-            if _G.LynceConfig and _G.LynceConfig.ModSkin ~= false then
+            if _G.LynceModConfig and _G.LynceModConfig.ModSkin ~= false then
                 if F.isChassisLightId(featureId) then
                     return F.getDesiredChassisLight(vehicleId) == tonumber(featureId)
                 end
@@ -11833,7 +11833,7 @@ function F.hookVehicleChassisLight()
         end
         LVF.GetEquipedChassisLightData = function(self, vehicleId, source)
             -- [FIX VIP] Bổ sung check kontrol aksesori ModSkin
-            if _G.LynceConfig and _G.LynceConfig.ModSkin ~= false then
+            if _G.LynceModConfig and _G.LynceModConfig.ModSkin ~= false then
                 local our = F.getDesiredChassisLight(vehicleId)
                 if our then return our end
             end
@@ -11845,7 +11845,7 @@ function F.hookVehicleChassisLight()
         end
         LVF.GetVehicleChassisLightData = function(self, uid, vehicleId, position, source)
             -- [FIX VIP] Bổ sung check kontrol aksesori ModSkin
-            if _G.LynceConfig and _G.LynceConfig.ModSkin ~= false then
+            if _G.LynceModConfig and _G.LynceModConfig.ModSkin ~= false then
                 if uid and DataMgr and DataMgr.roleData and tonumber(uid) == tonumber(DataMgr.roleData.uid) then
                     local our = F.getDesiredChassisLight(vehicleId)
                     if our then return our end
@@ -13017,7 +13017,7 @@ function F.applySkinToWeaponRef(CurWeapon)
     end
 
     -- LOGIC 2: XỬ LÝ PHỤ KIỆN (ATTACHMENTS)
-    if _G.LynceConfig.SkinAttachment and tmp_id >= 1000000 and _G.VIP_Attachments and _G.VIP_Attachments[tmp_id] then
+    if _G.LynceModConfig.SkinAttachment and tmp_id >= 1000000 and _G.VIP_Attachments and _G.VIP_Attachments[tmp_id] then
         local attachSkinConfig = _G.VIP_Attachments[tmp_id]
         local baseAttachMap = _G.BaseAttachToIndex
         
@@ -13231,7 +13231,7 @@ function F.matchApplyWeaponSkin(char)
             local ticker = require("common.time_ticker")
             if ticker and ticker.AddTimerLoop then
                 ticker.AddTimerLoop(0, function()
-                    if not _G.LynceConfig.ModSkin then return end
+                    if not _G.LynceModConfig.ModSkin then return end
                     
                     -- [CỜ NGỦ timur IN-GAME]: jika sudah keluar lobi -> Ngủ selalu, tidak jalankan gì hết!
                     if _G.AddOutfit and not _G.AddOutfit.isInRealMatch() then return end
@@ -13260,7 +13260,7 @@ function F.matchApplyWeaponSkin(char)
                             
                             -- jika DATA belum PHẢI adalah VIP -> baru saja lụm thẳng ke Balo -> menembak perintah Load ngầm!
                             -- atau aktifkan Skin aksesori -> periksa periksa aksesori
-                            if synSkinID ~= tSkin or _G.LynceConfig.SkinAttachment then
+                            if synSkinID ~= tSkin or _G.LynceModConfig.SkinAttachment then
                                 if _G.AddOutfit and _G.AddOutfit.applySkinToWeapon then
                                     _G.AddOutfit.applySkinToWeapon(wep)
                                 end
@@ -13273,7 +13273,7 @@ function F.matchApplyWeaponSkin(char)
     end
 
     -- laporan sepenuhnya menjadi: jika senjata cầm di atas tangan sudah xong xuôi maka khóa luồng asli dari Engine
-    if isVisualMatched and not _G.LynceConfig.SkinAttachment then
+    if isVisualMatched and not _G.LynceModConfig.SkinAttachment then
         _weaponApplied = true
         return true
     end
@@ -13817,7 +13817,7 @@ local function downloadTeamAssets(skinID)
 end
 
 local function patchTeamKill(messageData)
-    if not _G.LynceConfig.KillMessage then return messageData end -- [CHẶN jika nonaktifkan berhasil TẮC]
+    if not _G.LynceModConfig.KillMessage then return messageData end -- [CHẶN jika nonaktifkan berhasil TẮC]
     if not messageData or not isMyKill(messageData) then return messageData end
     local currentSkinID = getCurrentWeaponSkinID()
     if not currentSkinID or currentSkinID == 0 or currentSkinID == 69 then return messageData end
@@ -13846,7 +13846,7 @@ local function installTeamBroadcastHooks()
             local copied = O_Copy(self, messageData)
             
             -- [gelap prioritas TUYỆT lawan] jika nonaktifkan Kill Message -> hapus melalui seluruh set logic sisi di bawah, kembalikan tentang asli dasar dari game selalu.
-            if not _G.LynceConfig.KillMessage then return copied end
+            if not _G.LynceModConfig.KillMessage then return copied end
             
             local ok2, result = pcall(function() return patchTeamKill(copied) end)
             if ok2 then return result end
@@ -13892,7 +13892,7 @@ pcall(function()
             if not self or not DamageRecordData then return end
 
             -- [gelap prioritas TUYỆT lawan] Nonaktifkan semua 3 fungsi kemampuan -> kembalikan tentang game asli ngay segera, super nhẹ
-            if not _G.LynceConfig.SkinDeadBox and not _G.LynceConfig.KillCountUI and not _G.LynceConfig.KillMessage then
+            if not _G.LynceModConfig.SkinDeadBox and not _G.LynceModConfig.KillCountUI and not _G.LynceModConfig.KillMessage then
                 return O_FileItem(self, DamageRecordData)
             end
 
@@ -13907,12 +13907,12 @@ pcall(function()
 
             if bIsCauser then
                 if DamageRecordData.DamageType == UEnums.DamageType.VehicleDamage then
-                    if _G.LynceConfig.SkinDeadBox or _G.LynceConfig.KillMessage then 
+                    if _G.LynceModConfig.SkinDeadBox or _G.LynceModConfig.KillMessage then 
                         local carSkinID = _G.CurrentEquipVehicleID or 0
                         if carSkinID ~= 0 then
                             local ExpandData = slua.LuaArchiverDecode(LuaStateWrapper, DamageRecordData.ExpandDataContent) or {}
                             ExpandData.CauserVehicleSkinID = carSkinID
-                            if _G.LynceConfig.KillMessage then -- hanya aktifkan baru ÉP SKIN naik KILL FEED
+                            if _G.LynceModConfig.KillMessage then -- hanya aktifkan baru ÉP SKIN naik KILL FEED
                                 self:ChangeInfoBgByWeaponAvatarIDLua(carSkinID)
                                 DamageRecordData.CauserWeaponAvatarID = carSkinID
                                 DamageRecordData.CauserClothAvatarID = _G.SuitSkin or 0
@@ -13936,22 +13936,22 @@ pcall(function()
                                 
                                 -- [gelap prioritas FPS] senjata Mod selalu ada ID lớn hơn 1.000.000 (Ví dụ M4 es: 1101004046)
                                 if SkinID > 1000000 then 
-                                    if _G.LynceConfig.KillCountUI then 
+                                    if _G.LynceModConfig.KillCountUI then 
                                         ExpandData.KillCounterItemId = DefineID
                                         ExpandData.KillCounterNum = (ExpandData.KillCounterNum or 0) + 1
                                         _G.addKill(DefineID, 1)
                                         hasChanged = true
                                     end
-                                    if _G.LynceConfig.SkinDeadBox then 
+                                    if _G.LynceModConfig.SkinDeadBox then 
                                         _G.NeedCheckDeadBoxTimer = 5 
                                         hasChanged = true
                                     end
                                 end
                             end
 
-                            if hasChanged or _G.LynceConfig.KillMessage then
+                            if hasChanged or _G.LynceModConfig.KillMessage then
                                 _G.UpdateMyKillCounter = true
-                                if _G.LynceConfig.KillMessage then -- hanya aktifkan baru THAY ubah GÓI informasi untuk tampilkan di atas TOP
+                                if _G.LynceModConfig.KillMessage then -- hanya aktifkan baru THAY ubah GÓI informasi untuk tampilkan di atas TOP
                                     local synData = currWeapon.synData
                                     if synData and slua.isValid(synData) then
                                         local weaponDefineID = slua.IndexReference(synData:Get(7), "defineID")
@@ -13988,7 +13988,7 @@ pcall(function()
         
         local o_OnRefreshUI = MyMainKillCounter.__inner_impl.OnRefreshUI
         MyMainKillCounter.__inner_impl.OnRefreshUI = function(self, _, _, UID)
-            if not _G.LynceConfig.KillCountUI then return end -- CHẶN KHI TẮT
+            if not _G.LynceModConfig.KillCountUI then return end -- CHẶN KHI TẮT
             local LogicKillCounter = ModuleManager.GetModule(ModuleManager.CommonModuleConfig.LogicKillCounter)
             local curEquipedKillCounter = LogicKillCounter:GetEquipedKillCounterId(6114302174, self.WeaponID)
             local uCharacter = slua_GameFrontendHUD:GetPlayerController():GetPlayerCharacterSafety()
@@ -14002,12 +14002,12 @@ pcall(function()
             end
         end
 
-        MyKillCountSubSystem.__inner_impl.CheckSupportKCUI = function(self) return _G.LynceConfig.KillCountUI end
+        MyKillCountSubSystem.__inner_impl.CheckSupportKCUI = function(self) return _G.LynceModConfig.KillCountUI end
 
         local o_UpdateMainKillCounterUI = MyKillCountSubSystem.__inner_impl.UpdateMainKillCounterUI
         MyKillCountSubSystem.__inner_impl.UpdateMainKillCounterUI = function(self, bShow, WeaponID, AvatarID)
             -- [gelap prioritas TUYỆT lawan] Bóp nghẹt ngay perintah panggil UI dari Game jika sedang nonaktifkan, anti CHỚP (FLASH)
-            if not _G.LynceConfig.KillCountUI then
+            if not _G.LynceModConfig.KillCountUI then
                 o_UpdateMainKillCounterUI(self, false, WeaponID, AvatarID) -- Ép parameter angka False
                 local MainKillCounter = UIManager.GetUI(UIManager.UI_Config_InGame.MainKillCounter)
                 if MainKillCounter then UIManager.CloseUI(UIManager.UI_Config_InGame.MainKillCounter) end
@@ -14055,7 +14055,7 @@ pcall(function()
 
         local o_CheckNeedMainKillCounterUI = MyKillCountSubSystem.__inner_impl.CheckNeedMainKillCounterUI
         MyKillCountSubSystem.__inner_impl.CheckNeedMainKillCounterUI = function(self, Weapon, PlayerID)
-            if not _G.LynceConfig.KillCountUI then return end -- CHẶN KHI TẮT
+            if not _G.LynceModConfig.KillCountUI then return end -- CHẶN KHI TẮT
             local uCharacter = slua_GameFrontendHUD:GetPlayerController():GetPlayerCharacterSafety()
             local currweapon = uCharacter:GetCurrentWeapon()
             if currweapon ~= nil then
@@ -14076,7 +14076,7 @@ local _lastKCSkinID = 0
 _G.GameAvatarHandlerkillcounter = function()
     local UIManager = require("client.slua_ui_framework.manager")
     
-    if not _G.LynceConfig.KillCountUI then
+    if not _G.LynceModConfig.KillCountUI then
         local MainKillCounter = UIManager.GetUI(UIManager.UI_Config_InGame.MainKillCounter)
         if MainKillCounter then UIManager.CloseUI(UIManager.UI_Config_InGame.MainKillCounter) end
         return 
@@ -14281,7 +14281,7 @@ pcall(function()
     -- Fungsi trộn Emote 1 kali duy terbaik
     local function GetOptimizedEmoteList(baseList)
         local baseCount = baseList and #baseList or 0
-        local isEmoteModEnabled = _G.LynceConfig.ModEmote == true
+        local isEmoteModEnabled = _G.LynceModConfig.ModEmote == true
 
         -- jika sudah trộn rồi, angka jumlah Emote asli tidak ubah, dan status status nút Aktifkan/nonaktifkan tidak ubah -> ambil selalu dari Cache keluar xài
         if CachedInGameEmotes and LastBaseCount == baseCount and LastEmoteSwitchState == isEmoteModEnabled then
@@ -14337,7 +14337,7 @@ pcall(function()
         EventSystem:registEvent(EVENTTYPE_INGAME, EVENTID_INGAME_QUICK_EXPRESSION_DECAL_CLICK, function()
             pcall(function()
                 -- jika sedang nonaktifkan MOD EMOTE -> kembalikan tentang giao terlihat default dari Game untuk khỏi kesalahan UI
-                if not _G.LynceConfig.ModEmote then return end 
+                if not _G.LynceModConfig.ModEmote then return end 
 
                 local UIManager = require("client.slua_ui_framework.manager")
                 if not UIManager or not UIManager.UI_Config_InGame then return end
@@ -14407,7 +14407,7 @@ _G.LobbyThemeSystem.MY_VEHICLES = MY_VEHICLES
 
 local function isCustomGarageTheme()
     -- jika berhasil aturan lobi super kendaraan terkena nonaktifkan -> segera kembalikan tentang False, vô hiệu transformasi Hook
-    if not _G.LynceConfig.SanhSieuXeVip then return false end
+    if not _G.LynceModConfig.SanhSieuXeVip then return false end
     return GARAGE_THEME_IDS[_G.HallThemeApplicationValue] == true
 end
 
@@ -14582,7 +14582,7 @@ local function tryInitHooks()
         end)
 
         -- [dasar FIX gelap prioritas] jika nonaktifkan berhasil aturan: pulihkan semua kendaraan dan lobi (Background) asli
-        if not _G.LynceConfig.SanhSieuXeVip then
+        if not _G.LynceModConfig.SanhSieuXeVip then
             -- gunakan ubah cờ untuk hanya load lagi lobi 1 kali duy terbaik lúc baru saja nonaktifkan (anti chớp lag CPU)
             if not _G.LobbyThemeSystem.IsRestoredToOriginal then
                 
@@ -14675,7 +14675,7 @@ local function startTimers()
 
     TXtime_ticker.AddTimerLoop(0, function()
         -- [dasar FIX] jika nonaktifkan berhasil aturan maka cho putaran ulang NGỦ timur sepenuhnya untuk tiết kiệm CPU
-        if not _G.LynceConfig.SanhSieuXeVip then return end
+        if not _G.LynceModConfig.SanhSieuXeVip then return end
 
         if not _G.LobbyThemeSystem.__inited then
             tryInitHooks()
