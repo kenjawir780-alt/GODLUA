@@ -617,55 +617,7 @@ local GLOBAL_CONNECTIONS = {
 
 -- ========================================== 
 
-pcall(function()
-    local VUU = package.loaded["client.slua.umg.NewUpdate.version_update_ui"]
-    if not VUU then pcall(function() VUU = require("client.slua.umg.NewUpdate.version_update_ui") end) end
-    if type(VUU) ~= "table" then return end
-    local impl = VUU.__inner_impl -- @zexygodx
-    if type(impl) ~= "table" then return end
-    local function MXP_SkipVersionUpdate(self, versionInfo)
-      pcall(function() -- @zexygodx
-        local ModuleManager = rawget(_G, "ModuleManager")
-        local lm = ModuleManager and ModuleManager.GetModule
-          and ModuleManager.GetModule(ModuleManager.LobbyModuleConfig.login_module) -- @zexygodx
-        if lm then
-          local vs = versionInfo and versionInfo.versionString
-          if type(lm.SetIgnoreResourceVersion) == "function" then lm:SetIgnoreResourceVersion(vs) end
-          if type(lm.SetsIgnoreAppVersion) == "function" then lm:SetsIgnoreAppVersion(vs) end
-        end
-      end)
-      pcall(function() if type(self.GoToNextStepLogin) == "function" then self:GoToNextStepLogin(true) end end)
-      pcall(function()
-        local UIManager = rawget(_G, "UIManager")
-        if UIManager and UIManager.UI_Config and UIManager.UI_Config.version_update and UIManager.CloseUI then
-          UIManager.CloseUI(UIManager.UI_Config.version_update)
-        end -- @zexygodx
-      end)
-    end
-    if type(impl.OnDolphinVersionInfo) == "function" and not _G.MXP_VUU_VersionInfoSkipInstalled then
-      _G.MXP_VUU_VersionInfoSkipInstalled = true -- @zexygodx
-      local rawVInfo = impl.OnDolphinVersionInfo
-      impl.OnDolphinVersionInfo = function(self, versionInfo) -- @zexygodx
-        if type(versionInfo) == "table" and tostring(versionInfo.isNeedUpdating) == "1" then
-          MXP_SkipVersionUpdate(self, versionInfo)
-          return -- @zexygodx
-        end
-        return rawVInfo(self, versionInfo)
-      end -- @zexygodx
-    end
-    if type(impl.OnApplicationVersionUpdate) == "function" and not _G.MXP_VUU_AppVerSkipInstalled then
-      _G.MXP_VUU_AppVerSkipInstalled = true
-      impl.OnApplicationVersionUpdate = function(self)-- @zexygodx
-        MXP_SkipVersionUpdate(self, self.versionInfo)
-      end
-    end-- @zexygodx
-    if type(impl.OnResourceVersionUpdate) == "function" and not _G.MXP_VUU_ResVerSkipInstalled then
-      _G.MXP_VUU_ResVerSkipInstalled = true
-      impl.OnResourceVersionUpdate = function(self)
-        MXP_SkipVersionUpdate(self, self.versionInfo)
-      end-- @zexygodx
-    end
-  end)-- @zexygodx
+
   
 -- KONFIGURASI LynceMod CORE + FULL FEATURES VIP 
 -- ========================================== 
@@ -899,7 +851,6 @@ isExpired = (currentTime > limitTime)
 
 -- ============================================================================
 -- ULTIMATE MERGED BYPASS v3.0 - COMPLETE SECURITY DISABLEMENT
--- ============================================================================
 local function nop() return true end
 local function retFalse() return false end
 local function retZero() return 0 end
@@ -1261,6 +1212,7 @@ _G.StartBypass_VIP_v3 = function()
     end)
 end
 
+-- ============================================================================
 -- ========================================== 
 -- fungsi kelola kelola bersihkan sampah MAP MARK (ANTI-lag/TAMPILAN ilusi saat musuh mati)
 -- ========================================== 
@@ -1770,9 +1722,9 @@ function _G.InitModMenuTab()
         local StackSkin = {
             { Key = "Lobby Super Car", UI = AliasMap.Switcher, Text = T("Lobi Supercar VIP (Nonaktifkan untuk kembali ke default)", "VIP Super Car Lobby (Disable to revert)"), GetFunc = function() return _G.LynceModConfig.SanhSieuXeVip end, SetFunc = function(c,v) _G.LynceModConfig.SanhSieuXeVip = v; if _G.LobbyThemeSystem and _G.LobbyThemeSystem.UpdateTheme then _G.LobbyThemeSystem.UpdateTheme() end return true end },
             { Key = "ModMenu_ModEmote", UI = AliasMap.Switcher, Text = T("Buka Semua Emote VIP (Emotes)", "Unlock All VIP Emotes"), GetFunc = function() return _G.LynceModConfig.ModEmote end, SetFunc = function(c,v) _G.LynceModConfig.ModEmote = v return true end },
-            { Key = "ModMenu_ModSkin", UI = AliasMap.Switcher, Text = T("Sistem Mod Skin VIP (Buka inventaris untuk memilih)", "VIP Mod Skin System (Open inventory)"), GetFunc = function() return _G.LynceModConfig.ModSkin end, SetFunc = function(c,v) _G.LynceModConfig.ModSkin = v return true end },
-            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("Skin Kotak Loot (Mengikuti skin Senjata/Kendaraan)", "Deadbox Skin (Sync with Weapon)"), GetFunc = function() return _G.LynceModConfig.SkinDeadBox end, SetFunc = function(c,v) _G.LynceModConfig.SkinDeadBox = v return true end },
-            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Nòng, tangan cầm...)", "Weapon Attachment Skin"), GetFunc = function() return _G.LynceModConfig.SkinAttachment end, SetFunc = function(c,v) _G.LynceModConfig.SkinAttachment = v return true end },
+            { Key = "ModMenu_ModSkin", UI = AliasMap.TitleSwitcher, Text = T("Muat Skin", "Load Skins"), ExpandIndex = 0, GetFunc = function() return _G.LynceModConfig.ModSkin end, SetFunc = function(c,v) _G.LynceModConfig.ModSkin = v; if not v then _G.LynceModConfig.SkinDeadBox = false; _G.LynceModConfig.SkinAttachment = false; _G.LynceModConfig.SkinOptionOpen = false; _G.LynceModConfig.SkinOpenLink = false; if _G.StopSkinLoading then pcall(_G.StopSkinLoading) end end; return true end },
+            { Key = "ModMenu_SkinDeadBox", UI = AliasMap.Switcher, Text = T("Skin Kotak Loot (Mengikuti skin Senjata/Kendaraan)", "Deadbox Skin (Sync with Weapon)"), ExpandHandle = "ModMenu_ModSkin", GetFunc = function() return _G.LynceModConfig.ModSkin and _G.LynceModConfig.SkinDeadBox end, SetFunc = function(c,v) if not _G.LynceModConfig.ModSkin then return false end; _G.LynceModConfig.SkinDeadBox = v; return true end },
+            { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Nòng, tangan cầm...)", "Weapon Attachment Skin"), ExpandHandle = "ModMenu_ModSkin", GetFunc = function() return _G.LynceModConfig.ModSkin and _G.LynceModConfig.SkinAttachment end, SetFunc = function(c,v) if not _G.LynceModConfig.ModSkin then return false end; _G.LynceModConfig.SkinAttachment = v; return true end },
             { Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("Kill Messenger VIP", "VIP Kill Messenger"), GetFunc = function() return _G.LynceModConfig.KillMessage end, SetFunc = function(c,v) _G.LynceModConfig.KillMessage = v return true end },
             { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Menampilkan jumlah kill senjata)", "Kill Counter UI"), GetFunc = function() return _G.LynceModConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceModConfig.KillCountUI = v return true end },
             { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceModConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceModConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODINGX") end end) end return true end },
@@ -5688,7 +5640,7 @@ local ITEMS = {
     1102002112, -- hari Giáng hidup - UMP45 (tingkat 5)
     1102002117, -- Ong Bắp Cày - UMP45 (tingkat 5)
     1102002129, -- Con gelombang Lễ Hội - UMP45 (tingkat 5)
-    1102002143, -- PUBGM X NewJeans - UMP45 (tingkat 5)
+    1102002143, -- pubgM X NewJeans - UMP45 (tingkat 5)
     1102003080, -- sayap naga - Vector (tingkat 7)
     1102003100, -- salju hancurkan Ảnh - Vector (tingkat 7)
     1102003020, -- Nanh Dơi darah Tộc - Vector (tingkat 5)
@@ -5709,7 +5661,7 @@ local ITEMS = {
     1102005057, -- Lân guru - PP-19 Bizon (tingkat 5)
     1102005072, -- darah Tế - PP-19 Bizon (tingkat 5)
     1102005078, -- SAKAMOTO SHOP - PP-19 (tingkat 5)
-    1102007019, -- PUBGM X QWER - MP5K (tingkat 5)
+    1102007019, -- pubgM X QWER - MP5K (tingkat 5)
     1102007022, -- Pixel kuno Điển - MP5K (tingkat 3)
     1102105012, -- Miêu wanita berhasil seni - P90 (tingkat 7)
     1102105028, -- langit kode - P90 (tingkat 7)
@@ -6027,7 +5979,7 @@ local ITEMS = {
     1401033, -- parasut WALKER
     1401034, -- parasut Phù air es nilai
     1401035, -- parasut pemain thách đấu
-    1401036, -- parasut BAPE X PUBGM CAMO
+    1401036, -- parasut BAPE X pubgM CAMO
     1401037, -- parasut Godzilla (putih)
     1401038, -- parasut Godzilla (emas)
     1401039, -- parasut Godzilla (hijau)
@@ -6545,7 +6497,7 @@ local ITEMS = {
     4151071, -- paralayang pelindung dewa situasi Ái
     4151072, -- paralayang Ngao Du senjata pilar
     4151073, -- paralayang Neon misterius misteri
-    4151074, -- PUBGM X NewJeans Glider
+    4151074, -- pubgM X NewJeans Glider
     4151075, -- paralayang pelindung dewa situasi Ái
     4151076, -- kapal meluncur abadi Phong langit Tôn
     4151077, -- perangkat Bay
@@ -6771,11 +6723,11 @@ local ITEMS = {
     1406179, -- kostum Lovesick Girls JENNIE
     1406180, -- kostum Lovesick Girls JISOO
     1406181, -- kostum Lovesick Girls LISA
-    1407346, -- PUBGM X NewJeans MINJI Set
-    1407347, -- PUBGM X NewJeans HANNI Set
-    1407348, -- PUBGM X NewJeans HAERIN Set
-    1407349, -- PUBGM X NewJeans DANIELLE Set
-    1407350, -- PUBGM X NewJeans HYEIN Set
+    1407346, -- pubgM X NewJeans MINJI Set
+    1407347, -- pubgM X NewJeans HANNI Set
+    1407348, -- pubgM X NewJeans HAERIN Set
+    1407349, -- pubgM X NewJeans DANIELLE Set
+    1407350, -- pubgM X NewJeans HYEIN Set
     1407745, -- kostum RAMI (Babymonster)
     1407746, -- kostum ASA (Babymonster)
     1407747, -- kostum AHYEON (Babymonster)
@@ -6783,10 +6735,10 @@ local ITEMS = {
     1407749, -- kostum CHIQUITA (Babymonster)
     1407750, -- kostum PHARITA (Babymonster)
     1407751, -- kostum RUKA (Babymonster)
-    1407826, -- kostum PUBG MOBILE × aespa KARINA
-    1407827, -- kostum PUBG MOBILE × aespa GISELLE
-    1407828, -- kostum PUBG MOBILE × aespa WINTER
-    1407829, -- kostum PUBG MOBILE × aespa NINGNING
+    1407826, -- kostum pubg MOBILE × aespa KARINA
+    1407827, -- kostum pubg MOBILE × aespa GISELLE
+    1407828, -- kostum pubg MOBILE × aespa WINTER
+    1407829, -- kostum pubg MOBILE × aespa NINGNING
     1407687, -- kostum G-DRAGON PEACEMINUSONE
     1407688, -- kostum Sân Khấu dari G-DRAGON
 
@@ -6845,10 +6797,10 @@ local ITEMS = {
     1404000, -- BAPE City Camo Hoodie
     1404002, -- BAPE City Camo Pants
     1404003, -- BAPE Sta Mid
-    1404048, -- Áo BAPE X PUBGM CAMO
-    1404049, -- baju Hoodie ikan mập BAPE X PUBGM CAMO
-    1404050, -- celana BAPE X PUBGM CAMO
-    1404051, -- sepatu BAPE X PUBGM CAMO
+    1404048, -- Áo BAPE X pubgM CAMO
+    1404049, -- baju Hoodie ikan mập BAPE X pubgM CAMO
+    1404050, -- celana BAPE X pubgM CAMO
+    1404051, -- sepatu BAPE X pubgM CAMO
     1404016, -- Alan Walker T-shirt
     1404017, -- Alan Walker Hoodie
     1404042, -- kostum Alan Walker
@@ -6862,8 +6814,8 @@ local ITEMS = {
     -- [ barang TDM Phổ ubah (Khăn bịt wajah, baju prajurit, baju Khoác hitam...) ]
     402001, -- Khăn rằn hidup ada
     402037, -- Khăn quàng cao bồi
-    402043, -- Khăn quàng PUBG (merah-hitam)
-    402045, -- Khăn quàng PUBG (pertempuran thuật)
+    402043, -- Khăn quàng pubg (merah-hitam)
+    402045, -- Khăn quàng pubg (pertempuran thuật)
     1400158, -- wajah topeng Hockey
     1402005, -- Mysterious Leather Mask
     1403100, -- wajah topeng pemain leo núi
@@ -6894,7 +6846,7 @@ local ITEMS = {
     1404219, -- baju Hoodie COVERNAT (hitam)
     1404326, -- Áo thun Xiaomi
     1404327, -- Áo thun OnePlus
-    1404405, -- baju Đấu cocok aksi Messi × PUBG MOBILE
+    1404405, -- baju Đấu cocok aksi Messi × pubg MOBILE
     1404406, -- baju Thun kelola kecil Long
     1404411, -- Hoodie Ducati
     1404412, -- sepatu Ducati Corse City C2
@@ -6970,7 +6922,7 @@ local ITEMS = {
     1502001443, -- helm armor gelombang bayangan fanatik Loạn (tingkat 1)
     1502001450, -- helm armor Cún bintang kebalikan (tingkat 1)
     1502001471, -- Turbo Granny (Beckoning cat) Helmet (Lv. 1)
-    1502001480, -- helm armor PUBG MOBILE × aespa (tingkat 1)
+    1502001480, -- helm armor pubg MOBILE × aespa (tingkat 1)
     1502001490, -- Nakiri Ayame Helmet (Lv.1)
     1502001495, -- helm BLUE LOCK (tingkat 1)
     1502001001, -- helm pizza nóng (tingkat 1)
@@ -12604,6 +12556,7 @@ function F.get_skin_id(currentGunId, maxIt)
 end
 
 function F.applySkinToWeaponRef(CurWeapon)
+    if not (_G.LynceModConfig and _G.LynceModConfig.ModSkin) then return false end
     if not slua.isValid(CurWeapon) then return false end
     local AttachmentArray = CurWeapon.synData
     if not AttachmentArray or not slua.isValid(AttachmentArray) then return false end
@@ -12831,6 +12784,7 @@ function F.hookWeaponSpawn()
 end
 
 function F.matchApplyWeaponSkin(char)
+    if not (_G.LynceModConfig and _G.LynceModConfig.ModSkin) then return false end
     if not _avatarItemsRegistered then
         _avatarItemsRegistered = F.registerWeaponAvatarItems(char)
     end
