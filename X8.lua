@@ -1,566 +1,509 @@
--- Decompiled by @trndravix | Join @code_leak
--- Contact for Private Tools - DM @trndravix
-local UKismetSystemLibrary = import("KismetSystemLibrary")
-local GameModeBase = {
-  LuaEventContainer = {
-    "DefaultLuaEventPlaceholder"
+local BRPlayerCharacterBase = {
+  ServerRPC = {},
+  ClientRPC = {},
+  MulticastRPC = {},
+  LuaEventContainer = {}
+}
+BRPlayerCharacterBase.ServerRPC.ServerRPC_NearDeathGiveupRescue = {
+  Reliable = true,
+  Params = {}
+}
+BRPlayerCharacterBase.ServerRPC.ServerRPC_CarryDeadBox = {
+  Reliable = true,
+  Params = {
+    UEnums.EPropertyClass.Object
   }
 }
+BRPlayerCharacterBase.ServerRPC.RPC_Server_GmPlayAction = {
+  Reliable = true,
+  Params = {
+    UEnums.EPropertyClass.Int
+  }
+}
+BRPlayerCharacterBase.MulticastRPC.MulticastRPC_GmPlayAction = {
+  Reliable = true,
+  Params = {
+    UEnums.EPropertyClass.Int
+  }
+}
+BRPlayerCharacterBase.ClientRPC.RPC_Client_SetShouldCheckPassWall = {
+  Reliable = true,
+  Params = {
+    UEnums.EPropertyClass.Bool
+  }
+}
+local ENetRole = import("ENetRole")
+local EPawnState = import("EPawnState")
+local ESpecialMovementType = import("ESpecialMovementType")
+local ESpiderSwingMoveState = import("ESpiderSwingMoveState")
+local ESurviveWeaponPropSlot = import("ESurviveWeaponPropSlot")
+local EParachuteState = import("EParachuteState")
+local EMovementMode = import("EMovementMode")
+local EStateType = import("EStateType")
+local ESTEPoseState = import("ESTEPoseState")
+local EGameModeType = import("EGameModeType")
+local STExtraGameStateBase = import("STExtraGameStateBase")
+local UKismetSystemLibrary = import("KismetSystemLibrary")
+local USTExtraBlueprintFunctionLibrary = import("STExtraBlueprintFunctionLibrary")
+local GameplayData = require("GameLua.GameCore.Data.GameplayData")
+local GamePlayTools = require("GameLua.Mod.BaseMod.Common.GamePlayTools")
+local MatchModeIds = require("GameLua.Mod.BaseMod.GamePlay.Config.MatchModeIdsConfig")
 
-function GameModeBase:ctor(selfType)
-  self.footEffectConsumeList = {}
-  self.AllTeammatesDied = {}
-  self.bHaveInitedRevivalCount = false
-  self.bAddKillerFlow = false
+function BRPlayerCharacterBase:ctor()
 end
 
-function GameModeBase:_PostConstruct()
-  GameModeBase.__super._PostConstruct(self)
+function BRPlayerCharacterBase:_PostConstruct()
+  BRPlayerCharacterBase.__super._PostConstruct(self)
+  self:InitAddSpecialMoveInfo()
+  self.bCanNearDeathGiveup = true
+  print(bWriteLog and "BRPlayerCharacterBase:_PostConstruct bCanNearDeathGiveup true")
 end
 
-function GameModeBase:InitGameplaySys()
-  local GameplaySysMgr = require("GameLua.Mod.BaseMod.GamePlay.Core.GameplaySysMgr")
-end
-
-function GameModeBase:ReceiveBeginPlay()
-  GameModeBase.__super.ReceiveBeginPlay(self)
-  self:InitGameplaySys()
-  self:PostInitGameplaySys()
-  self:AddCommonEvent(EVENTTYPE_INGAME_NORMAL, EVENTID_PAWN_DIED, self.HandleOnPawnDie, self)
-  self:AddCommonEvent(EVENTTYPE_INGAME_NORMAL, EVENTID_PAWN_RESCUE, self.OnHandleRescued, self)
-  self:AddCommonEvent(EVENTTYPE_PLAYEREVENT_ITEM, EVENTID_PLAYEREVENT_DROPITEM, self.OnDropItem, self)
-  self:AddCommonEventWithConditions(EVENTTYPE_INGAME_NORMAL, EVENTID_GAME_MODE_STATE_CHANGE, {
-    [1] = "FightingState"
-  }, self.OnHandleEnterBattle, self)
-  if slua.isValid(self.PlayerRespawnComponent) then
-    self:AddControlEvent(self.PlayerRespawnComponent, "OnGlobalRespawnedDelegate", self.RevivalRestoreDataFinish, self)
+function BRPlayerCharacterBase:ReceiveBeginPlay()
+  BRPlayerCharacterBase.__super.ReceiveBeginPlay(self)
+  self:AddControlEvent(self, "MovementModeChangedDelegate", self.HandleOnMovementModeChangedNew, self)
+  if self:HasAuthority() and self:CheckAddCheckFallingDistanceComponent() then
+    local CheckFallingDistanceComponent_C = import("CheckFallingDistanceComponent")
+    if slua.isValid(CheckFallingDistanceComponent_C) and not slua.isValid(self:GetComponentByClass(CheckFallingDistanceComponent_C)) then
+      print(bWriteLog and "BRPlayerCharacterBase:ReceiveBeginPlay Add CheckFallingDistanceComponent")
+      Game:AddComponent(CheckFallingDistanceComponent_C, self, "CheckFallingDistanceComponent")
+    end
   end
-  if Server and not Server.IsShipping() then
-    print(bWriteLog and "GameModeBase:ReceiveBeginPlay")
-    local MaxPlayerNum = CGame:GetCommandLineValue("ParallelWorld.Debug.MaxPlayerNum=")
-    if MaxPlayerNum and MaxPlayerNum ~= "" then
-      print(bWriteLog and "GameModeBase:ReceiveBeginPlay MaxPlayerNum = " .. MaxPlayerNum)
-      UKismetSystemLibrary.ExecuteConsoleCommand(self.Object, string.format("ParallelWorld.Debug.MaxPlayerNum %s", MaxPlayerNum))
+  if slua.isValid(self.STCharacterMovement) then
+    self.STCharacterMovement.bPositiveBlowUp = true
+  end
+  if self.Role == ENetRole.ROLE_AutonomousProxy then
+    self:AddControlEvent(self, "OnPawnStateDisabled", self.OnPawnStateChange, self)
+    self:AddControlEvent(self, "OnPawnStateEnabled", self.OnPawnStateChange, self)
+    self:AddControlEventConditionOnly(self, "OnAttrChangeEventDelegate", {
+      AttrName = {
+        "bCanSelfRescue"
+      }
+    }, self.CharacterAttrChangeEvent, self)
+  end
+  if Client then
+    printf(bWriteLog and "BRPlayerCharacterBase:ReceiveBeginPlay, PlayerKey:%u ", self.PlayerKey)
+    GameplayData.AddCharacter(self.Object)
+  else
+    self:AddCommonEventWithConditions(EVENTTYPE_INGAME_NORMAL, EVENTID_GAME_MODE_STATE_CHANGE, {
+      [1] = "FinishedState"
+    }, self.HandleFinishedState, self)
+  end
+end
+
+function BRPlayerCharacterBase:CharacterAttrChangeEvent(uPawn, AttrName, AttrVal)
+  BRPlayerCharacterBase.__super.CharacterAttrChangeEvent(self, uPawn, AttrName, AttrVal)
+  if self.Object ~= uPawn then
+    return
+  end
+  if self.Role == ENetRole.ROLE_AutonomousProxy and AttrName == "bCanSelfRescue" then
+    local uPlayerController = self:GetPlayerControllerSafety()
+    if slua.isValid(uPlayerController) then
+      uPlayerController:BroadcastUIMessage("UIMsg_CanSelfRescue", 0, "", "")
     end
-    local ReserveBotNum = CGame:GetCommandLineValue("ParallelWorld.Debug.ReserveBotNum=")
-    if ReserveBotNum and ReserveBotNum ~= "" then
-      print(bWriteLog and "GameModeBase:ReceiveBeginPlay ReserveBotNum = " .. ReserveBotNum)
-      UKismetSystemLibrary.ExecuteConsoleCommand(self.Object, string.format("ParallelWorld.Debug.ReserveBotNum %s", ReserveBotNum))
+  end
+end
+
+function BRPlayerCharacterBase:OnPawnStateChange(PawnState)
+  print("BRPlayerCharacterBase:OnPawnStateChange:", PawnState)
+  if PawnState == EPawnState.SwitchPP then
+    local uPlayerController = self:GetPlayerControllerSafety()
+    if slua.isValid(uPlayerController) then
+      uPlayerController:BroadcastUIMessage("UIMsg_FPPModeChange", 0, "", "")
     end
+  end
+end
+
+function BRPlayerCharacterBase:HandleFinishedState()
+  print(bWriteLog and "BRPlayerCharacterBase:HandleFinishedState", self.STCharacterMovement)
+  if slua.isValid(self.STCharacterMovement) and self.STCharacterMovement.SetDynamicSimpleQueryConfigDisable then
+    local EDynamicSimpleQueryConfigDisableMask = import("EDynamicSimpleQueryConfigDisableMask")
+    self.STCharacterMovement:SetDynamicSimpleQueryConfigDisable(EDynamicSimpleQueryConfigDisableMask.Bit0, true)
+  end
+end
+
+function BRPlayerCharacterBase:CheckAddCheckFallingDistanceComponent()
+  if CGameMode and CGameMode.GameModeType and CGameState and CGameState.GameModeID then
+    local GameModeType = CGameMode.GameModeType
+    local GameModeID = tonumber(CGameState.GameModeID)
+    local bModeTypeSatisfy = GameModeType == EGameModeType.ETypicalGameMode or GameModeType == EGameModeType.EFourInOneGameMode or GameModeType == EGameModeType.EHeavyWeaponGameMode
+    local bModeIDSatisfy = not MatchModeIds[GameModeID]
+    print(bWriteLog and bWriteLog and "BRPlayerCharacterBase:CheckAddCheckFallingDistanceComponent:", GameModeType, GameModeID, bModeTypeSatisfy, bModeIDSatisfy)
+    return bModeTypeSatisfy and bModeIDSatisfy
+  end
+  return false
+end
+
+function BRPlayerCharacterBase:LuaHandleParachuteStateChanged(LastParachuteState, NewParachuteState)
+  BRPlayerCharacterBase.__super.LuaHandleParachuteStateChanged(self, LastParachuteState, NewParachuteState)
+  if not Client then
+    local uCurrentPlayerControl = self:GetPlayerControllerSafety()
+    if slua.isValid(uCurrentPlayerControl) and uCurrentPlayerControl.CheckParachuteOpenFeature then
+      if NewParachuteState == EParachuteState.PS_Opening then
+        if uCurrentPlayerControl.CheckParachuteOpenFeature.SatrtCheckShowParachuteCloseUI then
+          uCurrentPlayerControl.CheckParachuteOpenFeature:SatrtCheckShowParachuteCloseUI()
+        end
+      elseif NewParachuteState == EParachuteState.PS_None then
+        if uCurrentPlayerControl.CheckParachuteOpenFeature.RecoverParachuteOpenParam then
+          uCurrentPlayerControl.CheckParachuteOpenFeature:RecoverParachuteOpenParam()
+        end
+        if uCurrentPlayerControl.CheckParachuteOpenFeature.ClearTimerAndState then
+          uCurrentPlayerControl.CheckParachuteOpenFeature:ClearTimerAndState()
+        end
+      end
+    end
+  end
+end
+
+function BRPlayerCharacterBase:OnLanded()
+  printf("BRPlayerCharacterBase:OnLanded PlayerKey:%d", self.PlayerKey)
+  if self.HandleOnLanded then
+    self:HandleOnLanded(-1)
   end
   if not Client then
-    self:AddCommonEvent(EVENTTYPE_PLAYEREVENT_ITEM, EVENTID_PLAYEREVENT_PICKUPITEM, self.OnHandlePickupItem, self)
-    print(bWriteLog and "GameModeBase:ReceiveBeginPlay ResetPropertySerializationStats")
-    UKismetSystemLibrary.ExecuteConsoleCommand(self.Object, string.format("net.ResetPropertySerializationStats"))
-  end
-  self:AddCommonEvent(EVENTTYPE_PLAYEREVENT_CHARACTER, EVENTID_PLAYEREVENT_CHAR_KILL, self.HandleOnCharacterKill, self)
-  self:AddCommonEvent(EVENTTYPE_INGAME_NORMAL, EVENTID_PAWN_NEAR_DEATH, self.HandleOnCharacterKnockOut, self)
-  local EGameModeType = import("/Script/ShadowTrackerExtra.EGameModeType")
-  if self.GameModeType == EGameModeType.ETypicalGameMode or self.GameModeType == EGameModeType.EFourInOneGameMode then
-    self.bAddKillerFlow = true
-    print(bWriteLog and "GameModeBase:ReceiveBeginPlay bAddKillerFlow true")
-  end
-  UKismetSystemLibrary.ExecuteConsoleCommand(self.Object, string.format("pc.SpectatorNotClearViewTarget 0"))
-end
-
-function GameModeBase:HandleOnPawnDie(_, __, Pawn, Killer, TypeID)
-  if Pawn and slua.isValid(Pawn) then
-    if Pawn.SetDiedTime then
-      Pawn:SetDiedTime()
-    end
-    if Pawn.SetDiedPosition then
-      Pawn:SetDiedPosition()
-    end
-    if Pawn.SetDiedPlayerCount then
-      Pawn:SetDiedPlayerCount()
-    end
-  end
-  if slua.isValid(Pawn) and Pawn.GetPlayerStateSafety then
-    local uPlayerState = Pawn:GetPlayerStateSafety()
-    if uPlayerState and slua.isValid(uPlayerState) and uPlayerState.HasAnyReviveChance and uPlayerState:HasAnyReviveChance() then
-      if not (not Server or Server.IsShipping()) or CGame:IsEditor() then
-        if uPlayerState.bReviveIndefinitely == true then
-          print(bWriteLog and "GameModeBase:HandleOnPawnDie, bReviveIndefinitely = true")
-          self:AddGameTimer(10, false, function()
-            if Pawn and slua.isValid(Pawn) and uPlayerState and slua.isValid(uPlayerState) then
-              uPlayerState:SetHaveSinglePlayerReviveItem(true)
-              local DSReviveSubsystem = SubsystemMgr:Get("DSReviveSubsystem")
-              DSReviveSubsystem:ItemReviveImplementation(uPlayerState, false)
-            end
-          end)
-        else
-          print(bWriteLog and "GameModeBase:HandleOnPawnDie, bReviveIndefinitely = " .. tostring(uPlayerState.bReviveIndefinitely))
-        end
-      else
-        print(bWriteLog and "GameModeBase:HandleOnPawnDie, Server.IsShipping()")
+    local uCurrentPlayerControl = self:GetPlayerControllerSafety()
+    if slua.isValid(uCurrentPlayerControl) and uCurrentPlayerControl.CheckParachuteOpenFeature then
+      if uCurrentPlayerControl.CheckParachuteOpenFeature.ClearTimerAndState then
+        uCurrentPlayerControl.CheckParachuteOpenFeature:ClearTimerAndState()
       end
-      if self:IsPlayerCanSelfRevival(uPlayerState) then
-        uPlayerState.IsInWaittingRevivalState = false
-        local DSReviveSubsystem = SubsystemMgr:Get("DSReviveSubsystem")
-        if DSReviveSubsystem then
-          local GamePlayTools = require("GameLua.Mod.BaseMod.Common.GamePlayTools")
-          local ReviveConfig = GamePlayTools.GetCurrentConfig("ReviveConfig")
-          local HelicopterConfig = DSReviveSubsystem:GetHelicopterReviveConfig()
-          if HelicopterConfig and HelicopterConfig.WaitingTime > ReviveConfig.TimeWaitingForBeforeSpectate then
-            uPlayerState.IsInWaittingRevivalState = true
-          end
-        end
-      else
-        uPlayerState.IsInWaittingRevivalState = true
+      if uCurrentPlayerControl.CheckParachuteOpenFeature.ResetCheckShowUI then
+        uCurrentPlayerControl.CheckParachuteOpenFeature:ResetCheckShowUI()
       end
-      print(bWriteLog and "GameModeBase:HandleOnPawnDie, IsInWaittingRevivalState = " .. tostring(uPlayerState.IsInWaittingRevivalState) .. ", PlayerKey = " .. tostring(Pawn.PlayerKey))
     end
-    self:CheckTeamTerminatedClearRevival(uPlayerState)
-  end
-  local DSPlayerDataReportSubsystem = SubsystemMgr:Get("DSPlayerDataReportSubsystem")
-  if DSPlayerDataReportSubsystem then
-    DSPlayerDataReportSubsystem:HandleOnPawnDie(Pawn)
   end
 end
 
-function GameModeBase:OnHandleRescued(_, _, WhoRescued, RescuedWho)
-  if WhoRescued and slua.isValid(WhoRescued) then
-    if RescuedWho and slua.isValid(RescuedWho) then
-      if WhoRescued.PlayerKey == RescuedWho.PlayerKey then
-        local PlayerState = WhoRescued:GetPlayerStateSafety()
-        if PlayerState and slua.isValid(PlayerState) then
-          if PlayerState.AfterSelfRescueSucceed then
-            PlayerState:AfterSelfRescueSucceed()
-          else
-            print(bWriteLog and "GameModeBase:OnHandleRescued, have no function AfterSelfRescueSucceed, PlayerKey = " .. tostring(RescuedWho.PlayerKey))
-          end
-          PlayerState:AddGeneralCount(1122, 1, false)
-        else
-          print(bWriteLog and "GameModeBase:OnHandleRescued, PlayerState = " .. tostring(PlayerState) .. ", PlayerKey = " .. tostring(RescuedWho.PlayerKey))
-        end
-      else
-        local PlayerState = RescuedWho:GetPlayerStateSafety()
-        if PlayerState and slua.isValid(PlayerState) then
-          if PlayerState.BeRescuedSucceed then
-            PlayerState:BeRescuedSucceed()
-          else
-            print(bWriteLog and "GameModeBase:OnHandleRescued, have no function BeRescuedSucceed, PlayerKey = " .. tostring(RescuedWho.PlayerKey))
-          end
-        end
-        print(bWriteLog and "GameModeBase:OnHandleRescued, WhoRescued != RescuedWho")
+function BRPlayerCharacterBase:ReceiveEndPlay(EndPlayReason)
+  BRPlayerCharacterBase.__super.ReceiveEndPlay(self, EndPlayReason)
+  if Client then
+    GameplayData.RemoveCharacter(self.Object)
+  end
+end
+
+function BRPlayerCharacterBase:IsWarGameMode()
+  local uGameState = GameplayData:GetGameState()
+  if slua.isValid(uGameState) and Game:IsClassOf(uGameState, STExtraGameStateBase) then
+    return uGameState.GameModeType == EGameModeType.EWarGameMode
+  else
+    return false
+  end
+end
+
+function BRPlayerCharacterBase:BPOnRecycled()
+  print(bWriteLog and string.format("%s BPOnRecycled()", Game:GetPlainName(self.Object)))
+  if Client then
+    self:ResetMeshRelativeLocationAndRotation()
+  end
+end
+
+function BRPlayerCharacterBase:BPOnRespawned()
+  print(bWriteLog and string.format("%s BPOnRespawned()", Game:GetPlainName(self.Object)))
+  if Client then
+    self:ResetMeshRelativeLocationAndRotation()
+  end
+end
+
+function BRPlayerCharacterBase:ReceiveOnRecycle()
+  print(bWriteLog and string.format("%s IReusable:ReceiveOnRecycle()", Game:GetPlainName(self.Object)))
+  if Client then
+    self:ResetMeshRelativeLocationAndRotation()
+    GameplayData.RemoveCharacter(self.Object)
+  end
+end
+
+function BRPlayerCharacterBase:ReceiveOnSpawn()
+  print(bWriteLog and string.format("%s IReusable:ReceiveOnSpawn()", Game:GetPlainName(self.Object)))
+  if Client then
+    self:ResetMeshRelativeLocationAndRotation()
+    GameplayData.AddCharacter(self.Object)
+  end
+end
+
+function BRPlayerCharacterBase:ResetMeshRelativeLocationAndRotation()
+  if Game:IsValid(self.Object) and Game:IsValid(self.Mesh) then
+    local uDefaultMeshRot = FRotator(0, -90, 0)
+    local uDefaultMeshRelativeLoc = FVector(0, 0, 0)
+    if self.Mesh.K2_SetRelativeRotation then
+      self.Mesh:K2_SetRelativeRotation(uDefaultMeshRot, false, nil, false)
+    end
+    self:CacheInitialMeshOffset(uDefaultMeshRelativeLoc, uDefaultMeshRot)
+    local vRelativeRot = self.Mesh.RelativeRotation
+    local vBaseRotationOffset = self.BaseRotationOffset
+    local vBaseRotation = Game:QuatToRotator(vBaseRotationOffset)
+    print(bWriteLog and bWriteLog and string.format("%s ResetMeshRelativeLocationAndRotation() Mesh.RelativeRotation: %s %s %s   Pawn.BaseRotationOffset:%s %s %s ", Game:GetPlainName(self.Object), tostring(vRelativeRot.Pitch), tostring(vRelativeRot.Yaw), tostring(vRelativeRot.Roll), tostring(vBaseRotation.Pitch), tostring(vBaseRotation.Yaw), tostring(vBaseRotation.Roll)))
+  end
+end
+
+function BRPlayerCharacterBase:HandleOnMovementModeChangedNew()
+  print(bWriteLog and "BRPlayerCharacterBase:HandleOnMovementModeChanged11")
+  if Game:IsValid(self.STCharacterMovement) and self.STCharacterMovement.MovementMode == EMovementMode.MOVE_Swimming and self:CheckBaseIsMoveable() then
+    print(bWriteLog and "BRPlayerCharacterBase:HandleOnMovementModeChanged22")
+    self.CharacterMovement:SetBase(nil, "", true)
+  end
+  if self.Role == ENetRole.ROLE_AutonomousProxy and Game:IsValid(self.STCharacterMovement) and self.STCharacterMovement.MovementMode == EMovementMode.MOVE_Walking and UIManager.UI_Config_InGame.ParachuteOpenUI then
+    print(bWriteLog and "BRPlayerCharacterBase:HandleOnMovementModeChangedNew CloseUI")
+    UIManager.CloseUI(UIManager.UI_Config_InGame.ParachuteOpenUI)
+  end
+end
+
+function BRPlayerCharacterBase:BPOnMissPlayerDamageRecord()
+end
+
+function BRPlayerCharacterBase:PreAttachedToVehicle()
+  local IsDS = UKismetSystemLibrary.IsDedicatedServer(self)
+  if not IsDS then
+    return
+  end
+  local MainPlayerController = self:GetPlayerControllerSafety()
+  if not slua.isValid(MainPlayerController) then
+    return
+  end
+  local CharacterAvatarComp2_BP = self.CharacterAvatarComp2_BP
+  if not slua.isValid(CharacterAvatarComp2_BP) then
+    return
+  end
+  local CommerAvatarDataUtil = require("GameLua.Activity.Commercialize.GamePlay.CommerAvatarDataUtil")
+  local changedVehicleId = CommerAvatarDataUtil:ChangeVehicleSkinByClothes(MainPlayerController, CharacterAvatarComp2_BP)
+  local ESTExtraVehicleShapeType = import("ESTExtraVehicleShapeType")
+  if changedVehicleId then
+    local UAvatarUtils = import("AvatarUtils")
+    if UAvatarUtils.GetVehicleShapeBySkinID(changedVehicleId) == ESTExtraVehicleShapeType.VST_Horse then
+      local uCurPlayerState = self:GetPlayerStateSafety()
+      if slua.isValid(uCurPlayerState) then
+        print(bWriteLog and "  BRPlayerCharacterBase:PreAttachedToVehicle. changedVehicleId: " .. tostring(changedVehicleId))
+        uCurPlayerState:AddGeneralCount(468, 1, false)
       end
+    end
+  end
+end
+
+function BRPlayerCharacterBase:ParachuteJump()
+  local uPlayerController = self:GetControllerSafety()
+  if slua.isValid(uPlayerController) then
+    if not self:GetEnsure() then
+      if uPlayerController:GetCurrentStateType() ~= EStateType.State_ParachuteJump and uPlayerController:GetCurrentStateType() ~= EStateType.State_ParachuteOpen then
+        self:SwitchPoseState(ESTEPoseState.Stand, true, true, true, false)
+        uPlayerController:ReInitParachuteItem()
+        uPlayerController:ServerChangeStatePC(EStateType.State_ParachuteJump)
+      end
+      print(bWriteLog and "BRPlayerCharacterBase:ParachuteJump over")
     else
-      print(bWriteLog and "GameModeBase:OnHandleRescued, RescuedWho = " .. tostring(WhoRescued))
+      EventSystem:postEvent(EVENTTYPE_INGAME_NORMAL, EVENTID_AI_CALL_PARACHUTE_JUMP, self.Object)
+      print(bWriteLog and "BRPlayerCharacterBase:ParachuteJump AI JUMP over, Loc=", tostring(self:K2_GetActorLocation():ToString()))
     end
+  end
+end
+
+function BRPlayerCharacterBase:OnMovementBaseChangedEvent(uCharacter, uNewMovementBase, uOldMovementBase)
+  if uCharacter ~= self.Object then
+    return
+  end
+  print(bWriteLog and string.format("BRPlayerCharacterBase:OnMovementBaseChangedEvent %s, Base: %s -> %s", uCharacter, uOldMovementBase, uNewMovementBase))
+  local MedievalCrane = self:GetMedievalCraneFromBase(uNewMovementBase)
+  if MedievalCrane and MedievalCrane.AddCharacter then
+    MedievalCrane:AddCharacter(self.Object)
   else
-    print(bWriteLog and "GameModeBase:OnHandleRescued, WhoRescued = " .. tostring(WhoRescued))
-  end
-end
-
-function GameModeBase:OnDropItem(_, _, PlayerKey, ItemID, Count, Reason)
-  local PlayerState = Game:GetPlayerStateByPlayerKey(PlayerKey)
-  if PlayerState and slua.isValid(PlayerState) then
-    local Config = require("GameLua.Mod.BaseMod.DS.Config.SelfRescueConfig")
-    if ItemID == Config.SelfRescueItemId then
-      if PlayerState.LostSelfRescueResource then
-        PlayerState:LostSelfRescueResource()
-      else
-        print(bWriteLog and "GameModeBase:OnDropItem, have no function LostSelfRescueResource, PlayerKey = " .. tostring(PlayerKey))
-      end
-    end
-    if not Client then
-      local uPlayerController = PlayerState:GetOwner()
-      if slua.isValid(uPlayerController) and uPlayerController.CommerFeature then
-        uPlayerController.CommerFeature:OnDropItem(nil, nil, PlayerKey, ItemID, nil, Reason, nil)
-      end
-    end
-  else
-    print(bWriteLog and "GameModeBase:OnDropItem, PlayerState = " .. tostring(PlayerState) .. ", PlayerKey = " .. tostring(PlayerKey))
-  end
-end
-
-function GameModeBase:OnHandlePickupItem(EventType, EventID, PlayerKey, ItemID, Count, Reason, Source)
-  local PlayerState = Game:GetPlayerStateByPlayerKey(PlayerKey)
-  if PlayerState and slua.isValid(PlayerState) then
-    PlayerState:OnHandlePickupItem(EventType, EventID, PlayerKey, ItemID, Count, Reason, Source)
-  end
-end
-
-function GameModeBase:OnHandleEnterBattle()
-  local Config = require("GameLua.Mod.BaseMod.DS.Config.SelfRescueConfig")
-  self:AddGameTimer(Config.SelfRescueInvalidTime, false, function()
-    print(bWriteLog and "GameModeBase:OnHandleEnterBattle, Clear Item")
-    local PlayerArray = Game:GetAllPlayerPawns()
-    for i = 0, PlayerArray:Num() - 1 do
-      local uPlayerCharacter = PlayerArray:Get(i)
-      if uPlayerCharacter and slua.isValid(uPlayerCharacter) then
-        Game:ConsumeItem(uPlayerCharacter, Config.SelfRescueItemId, 99)
-        local uPlayerState = uPlayerCharacter:GetPlayerStateSafety()
-        if uPlayerState and slua.isValid(uPlayerState) and uPlayerState.CheckCanSelfRescue then
-          uPlayerState:CheckCanSelfRescue()
-        end
-      else
-        print(bWriteLog and "GameModeBase:OnHandleEnterBattle, uPlayerCharacter = " .. tostring(uPlayerCharacter))
-      end
-    end
-  end)
-end
-
-function GameModeBase:HandleOnCharacterKill(_, __, uKillerPS, uVictimPawn)
-  print(bWriteLog and "[tinghaohu]GameModeBase:HandleOnCharacterKill")
-  if slua.isValid(uKillerPS) and slua.isValid(uKillerPS.CharacterOwner) then
-    self:HandleConsumeFootEffect(uKillerPS.CharacterOwner)
-  end
-  if self.bAddKillerFlow then
-    local FatalDamageSubsystem = SubsystemMgr:Get("FatalDamageSubsystem")
-    if FatalDamageSubsystem then
-      FatalDamageSubsystem:AddPlayerKillerFlow(uKillerPS, uVictimPawn)
+    MedievalCrane = self:GetMedievalCraneFromBase(uOldMovementBase)
+    if MedievalCrane and MedievalCrane.RemoveCharacter then
+      MedievalCrane:RemoveCharacter(self.Object)
     end
   end
 end
 
-function GameModeBase:HandleOnCharacterKnockOut(_, __, uVictimPawn, uEventInstigatorCtrl)
-  print(bWriteLog and "[tinghaohu]GameModeBase:HandleOnCharacterKnockOut")
-  local ASTExtraPlayerController = import("/Script/ShadowTrackerExtra.STExtraPlayerController")
-  if Game:IsClassOf(uEventInstigatorCtrl, ASTExtraPlayerController) then
-    local killer = uEventInstigatorCtrl:GetPlayerCharacterSafety()
-    self:HandleConsumeFootEffect(killer)
-  end
-end
-
-function GameModeBase:HandleConsumeFootEffect(killer)
-  if not slua.isValid(killer) then
+function BRPlayerCharacterBase:GetMedievalCraneFromBase(Base)
+  if not slua.isValid(Base) or not Base.GetOwner then
     return
   end
-  if self.footEffectConsumeList[killer.PlayerKey] == true then
+  local Lifter = Base:GetOwner()
+  if not slua.isValid(Lifter) then
     return
   end
-  local ASTExtraBaseCharacter = import("/Script/ShadowTrackerExtra.STExtraBaseCharacter")
-  if Game:IsClassOf(killer, ASTExtraBaseCharacter) and killer.getAvatarComponent2 then
-    local uAvatarComp2 = killer:getAvatarComponent2()
-    if slua.isValid(uAvatarComp2) then
-      local EAvatarSlotType = import("EAvatarSlotType")
-      local fFootEffectItem = uAvatarComp2:GetEquippedItemDefineID(EAvatarSlotType.EAvatarSlotType_FootEffectEquipemtSlot)
-      if fFootEffectItem and fFootEffectItem.TypeSpecificID ~= 0 then
-        print(bWriteLog and "[tinghaohu]GameModeBase:HandleConsumeFootEffect. fFootEffectItemID:" .. tostring(fFootEffectItem.TypeSpecificID))
-        self.footEffectConsumeList[killer.PlayerKey] = true
-        killer:ServerSendToLobbyServerUseItem(fFootEffectItem.TypeSpecificID, 1)
-      end
-    end
-  end
-end
-
-function GameModeBase:ReceiveEndPlay(EndPlayReason)
-  local GameplaySysMgr = require("GameLua.Mod.BaseMod.GamePlay.Core.GameplaySysMgr")
-  GameplaySysMgr.EndPlay()
-  GameModeBase.__super.ReceiveEndPlay(self, EndPlayReason)
-end
-
-function GameModeBase:PostInitGameplaySys()
-  EventSystem:registEvent(EVENTTYPE_INGAME_NORMAL, EVENTID_PLAYER_JOIN, function(_, __, uPlayer)
-    local GameplaySysMgr = require("GameLua.Mod.BaseMod.GamePlay.Core.GameplaySysMgr")
-    GameplaySysMgr.HandlePlayerJoinIn(uPlayer)
-  end)
-end
-
-function GameModeBase:IsRevivalGameMode(uPlayerState)
-  local bIsRevivalMode = false
-  if uPlayerState == nil or not slua.isValid(uPlayerState) then
-    print(bWriteLog and "GameModeBase:IsRevivalGameMode, return false when uPlayerState = " .. tostring(uPlayerState))
-    return bIsRevivalMode
-  end
-  bIsRevivalMode = self:IsPlayerCanSelfRevival(uPlayerState)
-  if bIsRevivalMode == false and uPlayerState.HasAnyReviveChance then
-    bIsRevivalMode = uPlayerState:HasAnyReviveChance()
-  end
-  print(bWriteLog and "GameModeBase:IsRevivalGameMode, bIsRevivalMode = " .. tostring(bIsRevivalMode) .. " when PlayerKey = " .. tostring(uPlayerState.PlayerKey))
-  return bIsRevivalMode
-end
-
-function GameModeBase:IsPlayerCanSelfRevival(uPlayerState)
-  local bCanSelfRevival = false
-  if uPlayerState == nil or not slua.isValid(uPlayerState) then
-    print(bWriteLog and "GameModeBase:IsPlayerCanSelfRevival, return false when uPlayerState = " .. tostring(uPlayerState))
-    return bCanSelfRevival
-  end
-  if uPlayerState.GetRevivalCount and uPlayerState.GetHaveSinglePlayerReviveItem then
-    bCanSelfRevival = uPlayerState:GetRevivalCount() > 0 and uPlayerState:GetHaveSinglePlayerReviveItem()
-  end
-  if bCanSelfRevival == false and uPlayerState.GetRevivalCount and uPlayerState:GetRevivalCount() > 0 then
-    local DSReviveSubsystem = SubsystemMgr:Get("DSReviveSubsystem")
-    if DSReviveSubsystem then
-      local HelicopterConfig = DSReviveSubsystem:GetHelicopterReviveConfig()
-      if HelicopterConfig and HelicopterConfig.NoAutoRevive ~= true then
-        bCanSelfRevival = true
-      end
-    end
-  end
-  if bCanSelfRevival == false then
-    bCanSelfRevival = self.Super:IsPlayerCanSelfRevival(uPlayerState)
-  end
-  if (not (not Server or Server.IsShipping()) or CGame:IsEditor()) and uPlayerState.bReviveIndefinitely == true then
-    bCanSelfRevival = true
-    print(bWriteLog and "GameModeBase:IsPlayerCanSelfRevival, bCanSelfRevival = true because bReviveIndefinitely")
-  end
-  if bCanSelfRevival == false then
-    local DSReviveSubsystem = SubsystemMgr:Get("DSReviveSubsystem")
-    if DSReviveSubsystem and DSReviveSubsystem:GetPOIAreaReviveConfig() and uPlayerState.GetBuyReviveCount and 0 < uPlayerState:GetBuyReviveCount() then
-      bCanSelfRevival = true
-    end
-  end
-  if uPlayerState.SetCanSelfRevival then
-    uPlayerState:SetCanSelfRevival(bCanSelfRevival)
-  end
-  print(bWriteLog and "GameModeBase:IsPlayerCanSelfRevival, bCanSelfRevival = " .. tostring(bCanSelfRevival) .. " when PlayerKey = " .. tostring(uPlayerState.PlayerKey))
-  return bCanSelfRevival
-end
-
-function GameModeBase:RevivalRestoreDataFinish(uPlayerCharacter, nPlayerKey, bAI)
-  if uPlayerCharacter and slua.isValid(uPlayerCharacter) then
-    print(bWriteLog and "revivaldebug GameModeBase RevivalRestoreDataFinish uPlayerCharacter:", uPlayerCharacter.PlayerKey)
-    if Game:IsValid(self.GameState) then
-      local CurState = self:GetCurrentState()
-      if CurState and slua.isValid(CurState) and CurState.PlayersInfoRecord then
-        CurState:PlayersInfoRecord()
-      else
-        local SelfRevival = false
-        local DSReviveSubsystem = SubsystemMgr:Get("DSReviveSubsystem")
-        if DSReviveSubsystem:GetItemReviveConfig() or DSReviveSubsystem:GetHelicopterReviveConfig() and DSReviveSubsystem.PlayerLastRevivalType[nPlayerKey] ~= DSReviveSubsystem.ReviveType.MVP then
-          local uPlayerState = uPlayerCharacter:GetPlayerStateSafety()
-          if uPlayerState and slua.isValid(uPlayerState) and self:IsPlayerCanSelfRevival(uPlayerState) then
-            print(bWriteLog and "GameModeBase:RevivalRestoreDataFinish, SelfRevive, PlayerKey = " .. tostring(uPlayerCharacter.PlayerKey))
-            SelfRevival = true
-          end
-        end
-        if not SelfRevival then
-          print(bWriteLog and "GameModeBase:RevivalRestoreDataFinish, no PlayersInfoRecord function, and AlivePlayerNum + 1")
-          self.GameState:SetAlivePlayerNum(self.GameState:GetAlivePlayerNum() + 1)
-        end
-      end
-    end
-    if uPlayerCharacter.AddRevivalCount then
-      uPlayerCharacter:AddRevivalCount(-1)
-    end
-    local uPlayerState = uPlayerCharacter:GetPlayerStateSafety()
-    if uPlayerState and slua.isValid(uPlayerState) then
-      print(bWriteLog and "revivaldebug GameModeBase HandleOnPawnDie IsInWaittingRevivalState false PlayerKey:", uPlayerCharacter.PlayerKey)
-      uPlayerState.IsInWaittingRevivalState = false
-      if uPlayerState.ResetDiedPlayerCount then
-        uPlayerState:ResetDiedPlayerCount()
-      end
-      uPlayerState:LuaBroadcastCommonEventCpp("EVENTTYPE_INGAME_NORMAL", "EVENTID_PLAYER_REVIVAL_FINISH", nPlayerKey)
-    end
-  end
-end
-
-function GameModeBase:CheckTeammateAllNearDeath(uCharacter)
-  if not slua.isValid(uCharacter) then
+  if not Lifter.AddCharacter then
     return
   end
-  if uCharacter.bEnsure then
+  return Lifter
+end
+
+function BRPlayerCharacterBase:CheckForbidFlaregun()
+  local uPlayerState = self:GetPlayerStateSafety()
+  if not slua.isValid(uPlayerState) then
+    return false
+  end
+  if uPlayerState.CanUseFlaregun == false and self:IsLocallyControlled() then
+    local uPlayerController = self:GetPlayerControllerSafety()
+    if slua.isValid(uPlayerController) then
+      uPlayerController:DisplayGameTipWithMsgID(48532)
+    end
+  end
+  return not uPlayerState.CanUseFlaregun
+end
+
+function BRPlayerCharacterBase:ServerRPC_NearDeathGiveupRescue()
+  self:HandleNearDeathGiveupRescue()
+end
+
+function BRPlayerCharacterBase:HandleNearDeathGiveupRescue()
+  local uNearDeathComp = self.NearDeatchComponent
+  if self:IsNearDeath() and slua.isValid(uNearDeathComp) and self.bCanNearDeathGiveup == true then
+    local uPlayerState = self:GetPlayerStateSafety()
+    if slua.isValid(uPlayerState) then
+      uPlayerState:AddGeneralCount(1613, 1, false)
+    end
+    uNearDeathComp:TriggerGotoDieExplictly(self.Object)
+  end
+end
+
+function BRPlayerCharacterBase:RPC_Server_GmPlayAction(actionId)
+  log(bWriteLog and "  BRPlayerCharacterBase:RPC_Server_GmPlayAction.  actionId: " .. tostring(actionId))
+  if USTExtraBlueprintFunctionLibrary.IsDevelopment() then
+    log(bWriteLog and "  BRPlayerCharacterBase:RPC_Server_GmPlayAction. IsDevelopment actionId: " .. tostring(actionId))
+    self:MulticastRPC_GmPlayAction(actionId)
+  end
+end
+
+function BRPlayerCharacterBase:MulticastRPC_GmPlayAction(actionId)
+  if not Client then
     return
   end
-  if slua.isValid(uCharacter) and uCharacter.GetPlayerStateSafety then
-    local bHasHealthTeammate = false
-    local uCurPlayerState = uCharacter:GetPlayerStateSafety()
-    if slua.isValid(uCurPlayerState) then
-      local tOtherTeammate = uCurPlayerState:GetTeamMatePlayerStateList({}, true)
-      for i, uTeammatePlayerState in pairs(tOtherTeammate) do
-        if slua.isValid(uTeammatePlayerState) then
-          local uOtherCharacter = uTeammatePlayerState:GetPlayerCharacter()
-          local CanSelfRevive = self:IsPlayerCanSelfRevival(uTeammatePlayerState)
-          if slua.isValid(uOtherCharacter) and (uOtherCharacter.Health and uOtherCharacter.Health > 1.0E-5 or uOtherCharacter:CanSelfRescue() or uTeammatePlayerState.bIsRespawning or CanSelfRevive) then
-            bHasHealthTeammate = true
-            break
-          end
+  log(bWriteLog and "  BRPlayerCharacterBase:MulticastRPC_GmPlayAction.  actionId: " .. tostring(actionId))
+  local uPlayEmoteComp = self:GetPlayEmoteComponent()
+  if not slua.isValid(uPlayEmoteComp) then
+    return
+  end
+  local LogFilter = require("common.log_filter")
+  LogFilter.SetLogTreeEnable(true)
+  local animCfg = CDataTable.GetTableData("EmoteBPTable", actionId)
+  if not animCfg then
+    return
+  end
+  local handlePath = animCfg.Path
+  local EmoteHandleAsset = slua.loadObject(handlePath)
+  local assetsArray = slua.Array(UEnums.EPropertyClass.Struct, import("/Script/CoreUObject.SoftObjectPath"))
+  local handle = EmoteHandleAsset()
+  uPlayEmoteComp:OnLoadEmoteAssetBegin(handle, actionId, assetsArray, "")
+  log(bWriteLog and "  BRPlayerCharacterBase:MulticastRPC_GmPlayAction. assetsArray:Num(): " .. tostring(assetsArray:Num()))
+  local tb = FuncUtil.LuaArrayToTable(assetsArray)
+  local asset_util = require("common.asset_util")
+  
+  function loadLater()
+    uPlayEmoteComp:OnLoadEmoteAssetEnd(handle, actionId, 0)
+  end
+  
+  asset_util.GetAssetsArrayAsyncParallel(tb, loadLater)
+end
+
+function BRPlayerCharacterBase:RPC_Client_SetShouldCheckPassWall(bServerSyncShouldCheckPassWall)
+  print(bWriteLog and "BRPlayerCharacterBase:RPC_Client_SetShouldCheckPassWall " .. tostring(bServerSyncShouldCheckPassWall))
+  if slua.isValid(self.ParachuteComponent) then
+    self.ParachuteComponent.bServerSyncShouldCheckPassWall = bServerSyncShouldCheckPassWall
+  end
+end
+
+function BRPlayerCharacterBase:OnPlayerEnterCarryBoxState()
+  self.Super:OnPlayerEnterCarryBoxState()
+  local CharName = self:GetPlayerNameSafety()
+  print(bWriteLog and string.format("DeadBoxLog BRPlayerCharacterBase:OnPlayerEnterCarryBoxState Role:%s PlayerKey:%s Name:%s", tostring(self.Role), tostring(self.PlayerKey), tostring(CharName)))
+  if self.CarryDeadBoxFeature then
+    self.CarryDeadBoxFeature:OnPlayerEnterCarryBoxState()
+  end
+end
+
+function BRPlayerCharacterBase:OnPlayerLeaveCarryBoxState(bInIsInterrupt)
+  self.Super:OnPlayerLeaveCarryBoxState(bInIsInterrupt)
+  local CharName = self:GetPlayerNameSafety()
+  print(bWriteLog and string.format("DeadBoxLog BRPlayerCharacterBase:OnPlayerLeaveCarryBoxState Role:%s PlayerKey:%s Name:%s bInIsInterrupt:%s", tostring(self.Role), tostring(self.PlayerKey), tostring(CharName), tostring(bInIsInterrupt)))
+  if self.CarryDeadBoxFeature then
+    self.CarryDeadBoxFeature:OnPlayerLeaveCarryBoxState(bInIsInterrupt)
+  end
+end
+
+function BRPlayerCharacterBase:ServerRPC_CarryDeadBox(uInDeadBox)
+  if slua.isValid(uInDeadBox) and Game:IsClassOf(uInDeadBox, import("/Script/ShadowTrackerExtra.PlayerTombBox")) and self.CarryDeadBoxFeature then
+    self.CarryDeadBoxFeature:CarryDeadBox(uInDeadBox)
+  end
+end
+
+function BRPlayerCharacterBase:SetAreaID(AreaID)
+  self:SetAttrValue("AreaID", AreaID, -1)
+end
+
+function BRPlayerCharacterBase:GetAreaID()
+  return math.floor(self:GetAttrValue("AreaID") + 0.5)
+end
+
+function BRPlayerCharacterBase:CannotChangeIntoPetSpectator()
+  print(bWriteLog and "BRPlayerCharacterBase:CannotChangeIntoPetSpectator")
+  return self.bCannotChangeIntoPetSpectator
+end
+
+function BRPlayerCharacterBase:DoModChangeToBT()
+  print(bWriteLog and string.format("BRPlayerCharacterBase:DoModChangeToBT, PlayerKey=%s", tostring(self.PlayerKey)))
+  if self:HasState(EPawnState.SpecialSuit) then
+    self:TriggerEntrySkillWithID(4301101, true)
+    print(bWriteLog and string.format("BRPlayerCharacterBase:DoModChangeToBT, PlayerKey=%s, HasState(EPawnState.SpecialSuit)", tostring(self.PlayerKey)))
+  end
+end
+
+function BRPlayerCharacterBase:SwitchCameraToParachuteOpening()
+  print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteOpening")
+  self.Super:SwitchCameraToParachuteOpening()
+  if self.ParachuteFormation and self.ParachuteFormation.ShouldApplyFormationCamera and self.ParachuteFormation:ShouldApplyFormationCamera() then
+    self.ParachuteFormation:OverlayFormationCameraParams()
+    print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteOpening - Formation camera overlaid")
+  end
+end
+
+function BRPlayerCharacterBase:SwitchCameraToParachuteFalling()
+  print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteFalling")
+  self.Super:SwitchCameraToParachuteFalling()
+  if self.ParachuteFormation and self.ParachuteFormation.ShouldApplyFormationCamera and self.ParachuteFormation:ShouldApplyFormationCamera() then
+    self.ParachuteFormation:OverlayFormationCameraParams()
+    print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteFalling - Formation camera overlaid")
+  end
+end
+
+function BRPlayerCharacterBase:SwitchCameraToNormal()
+  print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToNormal")
+  self.Super:SwitchCameraToNormal()
+  if self.ParachuteFormation and self.ParachuteFormation.OnLandingClearFormationCamera then
+    self.ParachuteFormation:OnLandingClearFormationCamera()
+  end
+end
+
+function BRPlayerCharacterBase:SwitchWeaponCheck(Slot, IgnoreState)
+  if self:HasState(EPawnState.AttachToOther) then
+    local Weapon = self:GetWeaponBySlot(Slot)
+    if slua.isValid(Weapon) then
+      local WeaponID = Weapon:GetWeaponID()
+      local AttachToOtherConfig = GamePlayTools.GetCurrentConfig("AttachToOtherConfig")
+      if AttachToOtherConfig and AttachToOtherConfig.CheckIsWeaponInBlackList and AttachToOtherConfig.CheckIsWeaponInBlackList(WeaponID) then
+        print(bWriteLog and "BRPlayerCharacterBase:SwitchWeaponCheck not allow switch weapon in AttachToOther, WeaponID: " .. tostring(WeaponID))
+        local uPlayerController = self:GetPlayerControllerSafety()
+        if Client and slua.isValid(uPlayerController) and uPlayerController.Role == ENetRole.ROLE_AutonomousProxy then
+          uPlayerController:DisplayGameTipWithMsgID(47306)
         end
-      end
-      if self:IsPlayerCanSelfRevival(uCurPlayerState) or uCharacter:CanSelfRescue() then
-        bHasHealthTeammate = true
-        print(bWriteLog and "GameModeBase:CheckTeammateAllNearDeath, PlayerCanSelfRevival when PlayerKey = " .. tostring(uCurPlayerState.PlayerKey))
-      end
-      if (not (not Server or Server.IsShipping()) or CGame:IsEditor()) and uCharacter.bReviveIndefinitely == true then
-        bHasHealthTeammate = true
-        print(bWriteLog and "GameModeBase:CheckTeammateAllNearDeath, bHasHealthTeammate = true because bReviveIndefinitely")
-      end
-      print(bWriteLog and "GameModeBase:CheckTeammateAllNearDeath, bHasHealthTeammate = " .. tostring(bHasHealthTeammate))
-      if bHasHealthTeammate == false then
-        self.AllTeammatesDied[uCharacter.TeamID] = true
-        print(bWriteLog and "revivaldebug GameModeBase CheckTeammateAllNearDeath bHasHealthTeammate false, uPlayerState:", uCharacter.PlayerKey)
-        for _, uTeamPlayerState in pairs(tOtherTeammate) do
-          if Game:IsValid(uTeamPlayerState) and uTeamPlayerState:IsAlive() == false then
-            self:ClearPlayerRevialAndSendBattleResult(uTeamPlayerState, true, false, false)
-          end
-        end
+        return false
       end
     end
   end
-end
-
-function GameModeBase:CheckTeamTerminatedClearRevival(uPlayerState)
-  if slua.isValid(uPlayerState) then
-    local tOtherTeammate = uPlayerState:GetTeamMatePlayerStateList({}, true)
-    local bHasHealthTeammate = false
-    for _, uTeamPlayerState in pairs(tOtherTeammate) do
-      if slua.isValid(uTeamPlayerState) then
-        local uOtherCharacter = uTeamPlayerState:GetPlayerCharacter()
-        local CanSelfRevive = self:IsPlayerCanSelfRevival(uTeamPlayerState)
-        if slua.isValid(uOtherCharacter) and (uOtherCharacter.Health and uOtherCharacter.Health > 1.0E-5 or uOtherCharacter:CanSelfRescue() or uTeamPlayerState.bIsRespawning or CanSelfRevive) then
-          bHasHealthTeammate = true
-          break
-        else
-          local bIsAI = false
-          local uController = uTeamPlayerState:GetOwner()
-          if Game:IsAIController(uController) then
-            bIsAI = true
-          end
-          if bIsAI and not Game:IsValid(uOtherCharacter) and uTeamPlayerState:IsAlive() then
-            bHasHealthTeammate = true
-            break
-          end
-        end
-      end
-    end
-    local uPlayerCharacter = uPlayerState:GetPlayerCharacter()
-    if self:IsPlayerCanSelfRevival(uPlayerState) or Game:IsValid(uPlayerCharacter) and uPlayerCharacter:CanSelfRescue() then
-      bHasHealthTeammate = true
-      print(bWriteLog and "GameModeBase:CheckTeamTerminatedClearRevival, PlayerCanSelfRevival when PlayerKey = " .. tostring(uPlayerState.PlayerKey))
-    end
-    if not (not Server or Server.IsShipping()) or CGame:IsEditor() then
-      local uCharacter = uPlayerState:GetPlayerCharacter()
-      if uCharacter and uCharacter.bReviveIndefinitely == true then
-        bHasHealthTeammate = true
-        print(bWriteLog and "GameModeBase:CheckTeamTerminatedClearRevival, bHasHealthTeammate = true because bReviveIndefinitely")
-      end
-    end
-    print(bWriteLog and "GameModeBase:CheckTeamTerminatedClearRevival, bHasHealthTeammate = " .. tostring(bHasHealthTeammate) .. ", PlayerKey = " .. tostring(uPlayerState.PlayerKey))
-    if bHasHealthTeammate == false then
-      do
-        local CanSendTeamResult = true
-        for _, uTeamPlayerState in pairs(tOtherTeammate) do
-          if Game:IsValid(uTeamPlayerState) then
-            if uTeamPlayerState:IsAlive() == false then
-              self:ClearPlayerRevialAndSendBattleResult(uTeamPlayerState, true, false, false)
-            else
-              CanSendTeamResult = false
-            end
-          end
-        end
-        self:ClearPlayerRevialAndSendBattleResult(uPlayerState, false, false, CanSendTeamResult)
-        if CanSendTeamResult == false then
-          self:AddGameTimer(0.1, false, function()
-            if Game:IsValid(uPlayerCharacter) then
-              local Component = uPlayerCharacter.NearDeatchComponent
-              if Component and slua.isValid(Component) then
-                Component:ClearNearDeathTeammate()
-              end
-            end
-          end)
-        end
+  if self:HasState(EPawnState.WebSwing) and Slot ~= ESurviveWeaponPropSlot.SWPS_None and slua.isValid(self.STCharacterMovement) then
+    local SpiderSwingObj = self.STCharacterMovement:GetSpecialMoveObjBySpecialMoveType(ESpecialMovementType.SPECIAL_MOVE_SpiderSwing)
+    if slua.isValid(SpiderSwingObj) then
+      local nCurState = SpiderSwingObj:GetCurMoveState()
+      if nCurState == ESpiderSwingMoveState.Launching or nCurState == ESpiderSwingMoveState.Swinging then
+        print(bWriteLog and "BRPlayerCharacterBase:SwitchWeaponCheck blocked by SpiderSwing state: " .. tostring(nCurState))
+        return false
       end
     end
   end
+  return self.Super:SwitchWeaponCheck(Slot, IgnoreState)
 end
 
-function GameModeBase:ClearPlayerRevialAndSendBattleResult(uPlayerState, bSendBattleResult, bSyncSend, bSendTeamResult)
-  if uPlayerState and slua.isValid(uPlayerState) then
-    if uPlayerState.ClearAllReviveCounts then
-      uPlayerState:ClearAllReviveCounts()
-    end
-    if bSendBattleResult then
-      if bSyncSend then
-        if uPlayerState.bHasSendBattleResult == false then
-          self:AddGameTimer(0.01, false, function()
-            if slua.isValid(self.Object) and slua.isValid(uPlayerState) then
-              Game:CheckSendBattleResult(self.Object, uPlayerState, bSendTeamResult or false)
-            end
-          end)
-        end
-      else
-        Game:CheckSendBattleResult(self.Object, uPlayerState, bSendTeamResult or false)
-      end
-    end
-  end
-end
+-- ==============================================================================
+-- ============================ MULAI LOGIC MOD LENGKAP ==========================
+-- ==============================================================================
 
-function GameModeBase:GetIdeaDecalManager()
-  if not slua.isValid(self.Object) then
-    return nil
-  end
-  if not slua.isValid(self.IdeaDecalManager) then
-    local UGameplayStatics = import("GameplayStatics")
-    local uActorArray = UGameplayStatics.GetAllActorsOfClass(self.Object, import("IdeaDecalManager"), slua.Array(UEnums.EPropertyClass.Object, import("/Script/Engine.Actor")))
-    if uActorArray:Num() > 0 then
-      self.IdeaDecalManager = uActorArray:Get(0)
-    elseif CGameWorld then
-      self.IdeaDecalManager = CGameWorld:SpawnActor(import("IdeaDecalManager"), nil, nil, nil)
-    end
-  end
-  return self.IdeaDecalManager
-end
-
-function GameModeBase:GetWeaponDamageFromRecord(PlayerKey, TargetWeaponType)
-  print(bWriteLog and "GameModeBase:GetWeaponDamageFromRecord", PlayerKey, TargetWeaponType)
-  PlayerKey = tonumber(PlayerKey)
-  local WeaponRecordSubSystem = SubsystemMgr:Get("WeaponRecordSubSystem")
-  if WeaponRecordSubSystem and PlayerKey then
-    return WeaponRecordSubSystem:GetWeaponDamageFromRecord(PlayerKey, TargetWeaponType)
-  end
-  return 0
-end
-
-function GameModeBase:GetWeaponReportByWeaponRecord(PlayerKey)
-  PlayerKey = tonumber(PlayerKey)
-  local WeaponRecordSubSystem = SubsystemMgr:Get("WeaponRecordSubSystem")
-  local OnePlayerWeapon = import("OnePlayerWeapon")()
-  local uPlayer = Game:GetPlayerByPlayerKey(tonumber(PlayerKey))
-  print(bWriteLog and "GameModeBase:GetWeaponReportByWeaponRecord", PlayerKey, uPlayer)
-  if WeaponRecordSubSystem and slua.isValid(uPlayer) then
-    OnePlayerWeapon = WeaponRecordSubSystem:InitWeaponReportByWeaponRecord(PlayerKey, Game:GetPlayerUID(uPlayer))
-  end
-  print(bWriteLog and "GameModeBase:GetWeaponReportByWeaponRecord", OnePlayerWeapon)
-  return OnePlayerWeapon
-end
-
-function GameModeBase:GetPlayerTotalShootNum(PlayerKey)
-  PlayerKey = tonumber(PlayerKey)
-  local WeaponRecordSubSystem = SubsystemMgr:Get("WeaponRecordSubSystem")
-  local ShootNum = 0
-  if WeaponRecordSubSystem then
-    ShootNum = WeaponRecordSubSystem:GetPlayerTotalShootNum(PlayerKey)
-  end
-  print(bWriteLog and "GameModeBase:GetPlayerTotalShootNum", PlayerKey, ShootNum)
-  return ShootNum
-end
-
-function GameModeBase:GetCircleTimeErrorFlow()
-  local CircleMgrComponentCls = import("/Script/ShadowTrackerExtra.CircleMgrComponent")
-  local uCircleMgrComponent = self:GetComponentByClass(CircleMgrComponentCls)
-  if slua.isValid(uCircleMgrComponent) and uCircleMgrComponent.TimerErrorFlow:Num() > 0 then
-    local ContentTable = {}
-    local TimerErrorFlowLen = uCircleMgrComponent.TimerErrorFlow:Num()
-    for CurrentIndex = 0, TimerErrorFlowLen - 1 do
-      table.insert(ContentTable, uCircleMgrComponent.TimerErrorFlow:Get(CurrentIndex))
-    end
-    local ContentParams = table.concat(ContentTable, ";")
-    return ContentParams
-  end
-end
-
-function GameModeBase:FindOrCreateMultiNavComponent()
-  if Game:IsValid(self.uMultiNavDataComp) then
-    return self.uMultiNavDataComp
-  end
-  local uMultiNavDataCompClass = slua.loadClass("/Game/BluePrints/Core/BP_MultiNavDataComponent.BP_MultiNavDataComponent")
-  local MultiNavComp = self:GetComponentByClass(uMultiNavDataCompClass)
-  if Game:IsValid(MultiNavComp) then
-    self.uMultiNavDataComp = MultiNavComp
-    return self.uMultiNavDataComp
-  end
-  self.uMultiNavDataComp = Game:AddComponent(uMultiNavDataCompClass, self.Object, "BP_MultiNavDataComponent")
-  if not Game:IsValid(self.uMultiNavDataComp) then
-    print(bWriteLog and "error GameModeBase:FindOrCreateMultiNavComponent failed to create.")
-    return nil
-  end
-  return self.uMultiNavDataComp
-end
-
-local function Notify(msg) local s = "[GODMODX VIP New] " .. tostring(msg)
+local function Notify(msg) local s = "[GODMODINGX VIP New] " .. tostring(msg)
 pcall(function() if _G.LynceXSFNotify then _G.LynceXSFNotify(s) end end)
 pcall(function() local sh = import("ScriptHelperClient") if sh and
 sh.AddOnScreenDebugMessage then sh.AddOnScreenDebugMessage(s, -1, 3.0, {R=1,
@@ -1455,7 +1398,7 @@ local function GetConfigPaths(fileName)
     return paths
 end
 
-local ConfigFileName = "GODMODX_settings.txt"
+local ConfigFileName = "godmodingx_settings.txt"
 _G.LastConfigSaveStr = ""
 
 -- FUNGSI SIMPAN CONFIG
@@ -1583,12 +1526,12 @@ function _G.InitModMenuTab()
     
     -- 1. TẠO BẢNG ID ẢO VỚI TEXT MỚI (Hỗ trợ 2 ngôn ngữ)
     local FakeTextMap = {
-        [999000] = T("MOD MILIK DŨNG", "GODMODXMOD"),
-        [999001] = T("TAMPILAN (ESP) TELE @GODMODX", "VISUALS (ESP) TELE @GODMODX"),
-        [999002] = T("AIMBOT ASLI & PELURU TELE @GODMODX", "NATIVE AIMBOT & BULLET TRACK"),
+        [999000] = T("MOD MILIK DŨNG", "GODMODINGXMOD"),
+        [999001] = T("TAMPILAN (ESP) TELE @GODMODINGX", "VISUALS (ESP) TELE @GODMODINGX"),
+        [999002] = T("AIMBOT ASLI & PELURU TELE @GODMODINGX", "NATIVE AIMBOT & BULLET TRACK"),
         [999003] = T("AIMBOT ROYAL - CUSTOM ( Aim Dekat - Aim Scope )", "CUSTOM AIMBOT (Close & Scope)"),
-        [999004] = T("DUKUNGAN & GRAFIS TELE @GODMODX", "SUPPORT & GRAPHICS TELE @GODMODX"),
-        [999005] = T("MOD SKIN MUDAH TERKENA BAN TELE @GODMODX", "MOD SKIN (RISKY) TELE @GODMODX")
+        [999004] = T("DUKUNGAN & GRAFIS TELE @GODMODINGX", "SUPPORT & GRAPHICS TELE @GODMODINGX"),
+        [999005] = T("MOD SKIN MUDAH TERKENA BAN TELE @GODMODINGX", "MOD SKIN (RISKY) TELE @GODMODINGX")
     }
 
     -- 2. HOOK TOÀN BỘ HÀM ĐỌC TEXT CỦA GAME (FIX LỖI TRỐNG THANH TAB)
@@ -1767,7 +1710,7 @@ function _G.InitModMenuTab()
             { Key = "ModMenu_SkinAttachment", UI = AliasMap.Switcher, Text = T("Skin Aksesori Senjata (Moncong, Grip...)", "Weapon Attachment Skin"), GetFunc = function() return _G.LynceXSFConfig.SkinAttachment end, SetFunc = function(c,v) _G.LynceXSFConfig.SkinAttachment = v return true end },
             { Key = "ModMenu_KillMessage", UI = AliasMap.Switcher, Text = T("Kill Messenger VIP", "VIP Kill Messenger"), GetFunc = function() return _G.LynceXSFConfig.KillMessage end, SetFunc = function(c,v) _G.LynceXSFConfig.KillMessage = v return true end },
             { Key = "ModMenu_KillCountUI", UI = AliasMap.Switcher, Text = T("Penghitung Kill (Menampilkan jumlah Kill senjata)", "Kill Counter UI"), GetFunc = function() return _G.LynceXSFConfig.KillCountUI end, SetFunc = function(c,v) _G.LynceXSFConfig.KillCountUI = v return true end },
-            { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceXSFConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceXSFConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODX") end end) end return true end },
+            { Key = "ModMenu_SkinOpenLink", UI = AliasMap.Switcher, Text = T("Panduan Mod Skin Helm/Tas (Link)", "Mod Skin Guide (Link)"), GetFunc = function() return _G.LynceXSFConfig.SkinOpenLink end, SetFunc = function(c,v) _G.LynceXSFConfig.SkinOpenLink = v; if v == true then pcall(function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODINGX") end end) end return true end },
         }
 
         local StackCombat = {
@@ -1862,12 +1805,12 @@ local function ShowLynceXSFVIPMenu()
         local function Step_ScamAlert()
             local title = _G.LynceXSFLang == "EN" and "SCAM ALERT" or "PERINGATAN SCAM MOD"
             local content = _G.LynceXSFLang == "EN" 
-                and "Join my Telegram to avoid scammers selling mods TELE @GODMODX" 
-                or "Gabung Telegram saya agar terhindar dari orang yang menjual mod. TELE @GODMODX\neh biji FEEDBACKya monyet, , ga feedback gue doain keban bangsd. JOIN TELEGRAM GUE YA PLER."
+                and "Join my Telegram to avoid scammers selling mods TELE @GODMODINGX" 
+                or "Gabung Telegram saya agar terhindar dari orang yang menjual mod. TELE @GODMODINGX\neh biji FEEDBACKya monyet, , ga feedback gue doain keban bangsd. JOIN TELEGRAM GUE YA PLER."
             local btn1 = _G.LynceXSFLang == "EN" and "JOIN" or "JOIN"
             local btn2 = _G.LynceXSFLang == "EN" and "CLOSE" or "TUTUP"
 
-            Msg.Show(1, title, content, function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODX") end end, function() end, btn1, btn2)
+            Msg.Show(1, title, content, function() local Web = require("client.slua.logic.url.logic_webview_sdk"); if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODINGX") end end, function() end, btn1, btn2)
             _G.LynceXSFState.MenuStep = 99
             _G.LynceXSFMenuAlreadyShown = true
         end
@@ -1875,10 +1818,10 @@ local function ShowLynceXSFVIPMenu()
         local function Step_Welcome()
             local title = _G.LynceXSFLang == "EN" and "WELCOME TO VIP MOD" or "SELAMAT DATANG"
             local content = _G.LynceXSFLang == "EN" 
-                and "Hi, GODMODX here. The VIP MENU is now inside Game Settings!\nIMPORTANT: Enable fewer features to avoid lag. Play safe!" 
-                or "Hai, saya GODMODX. Kamu tidak perlu memakai combo atau config tambahan lagi karena sekarang sudah ada MENU VIP di Pengaturan game!\nTapi dengarkan saya, aktifkan sedikit fitur saja karena bisa sangat lag. Saya khawatir perangkatmu tidak kuat. Selain itu, jangan terlalu terlihat saat bermain agar tetap aman."
+                and "Hi, GODMODINGX here. The VIP MENU is now inside Game Settings!\nIMPORTANT: Enable fewer features to avoid lag. Play safe!" 
+                or "Hai, saya GODMODINGX. Kamu tidak perlu memakai combo atau config tambahan lagi karena sekarang sudah ada MENU VIP di Pengaturan game!\nTapi dengarkan saya, aktifkan sedikit fitur saja karena bisa sangat lag. Saya khawatir perangkatmu tidak kuat. Selain itu, jangan terlalu terlihat saat bermain agar tetap aman."
             local btn1 = _G.LynceXSFLang == "EN" and "OPEN GAME MENU" or "BUKA MENU DI DALAM GAME"
-            local btn2 = _G.LynceXSFLang == "EN" and "CLOSE" or "GODMODX"
+            local btn2 = _G.LynceXSFLang == "EN" and "CLOSE" or "GODMODINGX"
 
             Msg.Show(1, title, content, 
             function() 
@@ -5236,10 +5179,10 @@ local function ExpiredTick()
         pcall(function()
             local Msg = require("client.slua.logic.common.logic_common_msg_box")
             if Msg and Msg.Show then
-                Msg.Show(1, "MOD SUDAH KEDALUWARSA", "VERSI MOD ANDA SUDAH KEDALUWARSA!\nSILAKAN INBOX ADMIN UNTUK MEMPERPANJANG.\nInbox Telegram @GODMODX untuk membeli. Jika ada orang lain yang menjual mod ini kepada Anda selain saya, selamat, Anda telah ditipu.", 
+                Msg.Show(1, "MOD SUDAH KEDALUWARSA", "VERSI MOD ANDA SUDAH KEDALUWARSA!\nSILAKAN INBOX ADMIN UNTUK MEMPERPANJANG.\nInbox Telegram @GODMODINGX untuk membeli. Jika ada orang lain yang menjual mod ini kepada Anda selain saya, selamat, Anda telah ditipu.", 
                 function() 
                     local Web = require("client.slua.logic.url.logic_webview_sdk")
-                    if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODX") end 
+                    if Web and Web.OpenURL then Web:OpenURL("https://t.me/GODMODINGX") end 
                 end, 
                 function() end, "INBOX CHỦ MOD", "TUTUP")
                 _G.LynceXSFNotifiedPopup = true 
@@ -5258,7 +5201,7 @@ end
 local function FastTick() 
     if isExpired then 
         if not _G.LynceXSFNotifiedExpire then
-            Notify("MOD ĐÃ HẾT HẠN! VUI LÒNG INBOX ADMIN ĐỂ GIA HẠN!\nInbox Tele @GODMODX  Để Mua Nếu Ai Đó Đã Bán Cho Bạn Thứ Này Ngoài Tôi Thì Xin Chúc Mừng Bạn Đã Bị Lừa")
+            Notify("MOD ĐÃ HẾT HẠN! VUI LÒNG INBOX ADMIN ĐỂ GIA HẠN!\nInbox Tele @GODMODINGX  Để Mua Nếu Ai Đó Đã Bán Cho Bạn Thứ Này Ngoài Tôi Thì Xin Chúc Mừng Bạn Đã Bị Lừa")
             _G.LynceXSFNotifiedExpire = true
             ExpiredTick() 
         end
@@ -5275,7 +5218,7 @@ end
 
 if not isExpired then
     FastTick() 
-    Notify("Bạn Đang Chơi Mod Vvip 4 Của Tôi Nếu Chưa Có Key Inbox Tele @GODMODX  Để Mua Nếu Ai Đó Đã Bán Cho Bạn Thứ Này Ngoài Tôi Thì Xin Chúc Mừng Bạn Đã Bị Lừa")
+    Notify("Bạn Đang Chơi Mod Vvip 4 Của Tôi Nếu Chưa Có Key Inbox Tele @GODMODINGX  Để Mua Nếu Ai Đó Đã Bán Cho Bạn Thứ Này Ngoài Tôi Thì Xin Chúc Mừng Bạn Đã Bị Lừa")
 else
     FastTick() 
 end
@@ -9095,7 +9038,7 @@ local function GetOutfitConfigPaths(fileName)
     return paths
 end
 
-local CONFIG_PATHS = GetOutfitConfigPaths("GODMODX_outfit.json")
+local CONFIG_PATHS = GetOutfitConfigPaths("GODMODINGX_outfit.json")
 
 local PERSIST_SLOTS = {
     { "outfit", "outfitRes", "outfitIns", "AddOutfitLastLobbyOutfitRes" },
@@ -14330,6 +14273,43 @@ end
 -- ==============================================================================
 
 local class = require("class")
-local CActorBase = require("GameLua.Mod.BaseMod.Common.Core.ActorBase")
-local CGameModeBase = class(CActorBase, nil, GameModeBase)
-return CGameModeBase
+local CCharacterBase = require("GameLua.GameCore.Framework.CharacterBase")
+local CBRPlayerCharacterBase = class(CCharacterBase, nil, BRPlayerCharacterBase)
+return require("combine_class").DeclareFeature(CBRPlayerCharacterBase, {
+  {
+    SkyTransition = "GameLua.Mod.BaseMod.Gameplay.Feature.SkyControl.PlayerCharacterSkyTransitionFeature"
+  },
+  {
+    CarryDeadBoxFeature = "GameLua.Mod.Library.GamePlay.Feature.CarryDeadBoxFeature"
+  },
+  {
+    SpecialSuitFeature = "GameLua.Mod.Library.GamePlay.Feature.SpecialSuitFeature"
+  },
+  {
+    TeleportPawnFeature = "GameLua.Mod.Library.GamePlay.Feature.TeleportPawnFeature"
+  },
+  {
+    LifterControl = "GameLua.Mod.BaseMod.Gameplay.Feature.Player.CharacterLifterControlFeature"
+  },
+  {
+    FinalKillEffect = "GameLua.Mod.BaseMod.Gameplay.Feature.Player.PlayerCharacterFinalKillEffectFeature"
+  },
+  {
+    CampFeature = "GameLua.Mod.BaseMod.GamePlay.Feature.Camp.PlayerCharacterCampFeature"
+  },
+  {
+    BuildSkateFeature = "GameLua.Mod.BaseMod.GamePlay.Feature.PlayerCharacterBuildVehicleFeature"
+  },
+  {
+    CommonBornlandTransformFeature = "GameLua.Mod.BaseMod.GamePlay.Feature.HeroPropFeature.CommonBornlandTransformFeature"
+  },
+  {
+    ParachuteFormation = "GameLua.Mod.BaseMod.GamePlay.Feature.ParachuteFormationFeature"
+  },
+  {
+    SpiderSenseFootprintFeature = "GameLua.Mod.Library.GamePlay.Feature.SpiderSenseFootprintFeature"
+  },
+  {
+    GeneralShowSpotFeature = "GameLua.Mod.BRMod.Gameplay.Feature.PlayerCharacterGeneralShowSpotFeature"
+  }
+}, "BRPlayerCharacterBase")
