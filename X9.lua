@@ -2404,7 +2404,7 @@ function _G.InitModMenuTab()
     local FakeTextMap = {
         [999000] = T("GOD MOD VIP"),
         [999001] = T(" ESP"),
-        [999002] = T("RECOIL"),
+        [999002] = T("AIM V1"),
         [999004] = T("SUPORT"),
         [999005] = T("SKIN MOD"),
         [999006] = T(" ESP V2"),
@@ -8578,7 +8578,6 @@ end)
                 SafeRemoveMark(data.hpMark)
                 SafeRemoveMark(data.distMark)
                 
-                end
                 
                 if data.MIDs then
                     for meshStr, midTable in pairs(data.MIDs) do
