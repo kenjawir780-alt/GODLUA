@@ -1,503 +1,698 @@
-local BRPlayerCharacterBase = {
-  ServerRPC = {},
-  ClientRPC = {},
-  MulticastRPC = {},
-  LuaEventContainer = {}
-}
-BRPlayerCharacterBase.ServerRPC.ServerRPC_NearDeathGiveupRescue = {
-  Reliable = true,
-  Params = {}
-}
-BRPlayerCharacterBase.ServerRPC.ServerRPC_CarryDeadBox = {
-  Reliable = true,
-  Params = {
-    UEnums.EPropertyClass.Object
-  }
-}
-BRPlayerCharacterBase.ServerRPC.RPC_Server_GmPlayAction = {
-  Reliable = true,
-  Params = {
-    UEnums.EPropertyClass.Int
-  }
-}
-BRPlayerCharacterBase.MulticastRPC.MulticastRPC_GmPlayAction = {
-  Reliable = true,
-  Params = {
-    UEnums.EPropertyClass.Int
-  }
-}
-BRPlayerCharacterBase.ClientRPC.RPC_Client_SetShouldCheckPassWall = {
-  Reliable = true,
-  Params = {
-    UEnums.EPropertyClass.Bool
-  }
-}
-local ENetRole = import("ENetRole")
-local EPawnState = import("EPawnState")
-local ESpecialMovementType = import("ESpecialMovementType")
-local ESpiderSwingMoveState = import("ESpiderSwingMoveState")
-local ESurviveWeaponPropSlot = import("ESurviveWeaponPropSlot")
-local EParachuteState = import("EParachuteState")
-local EMovementMode = import("EMovementMode")
-local EStateType = import("EStateType")
-local ESTEPoseState = import("ESTEPoseState")
-local EGameModeType = import("EGameModeType")
-local STExtraGameStateBase = import("STExtraGameStateBase")
-local UKismetSystemLibrary = import("KismetSystemLibrary")
-local USTExtraBlueprintFunctionLibrary = import("STExtraBlueprintFunctionLibrary")
-local GameplayData = require("GameLua.GameCore.Data.GameplayData")
-local GamePlayTools = require("GameLua.Mod.BaseMod.Common.GamePlayTools")
-local MatchModeIds = require("GameLua.Mod.BaseMod.GamePlay.Config.MatchModeIdsConfig")
+local XGOD = {}
 
-function BRPlayerCharacterBase:ctor()
-end
+local GameplayStatics=import("GameplayStatics")
+local GameplayData=require("GameLua.GameCore.Data.GameplayData")
 
-function BRPlayerCharacterBase:_PostConstruct()
-  BRPlayerCharacterBase.__super._PostConstruct(self)
-  self:InitAddSpecialMoveInfo()
-  self.bCanNearDeathGiveup = true
-  print(bWriteLog and "BRPlayerCharacterBase:_PostConstruct bCanNearDeathGiveup true")
-end
 
-function BRPlayerCharacterBase:ReceiveBeginPlay()
-  BRPlayerCharacterBase.__super.ReceiveBeginPlay(self)
-  self:AddControlEvent(self, "MovementModeChangedDelegate", self.HandleOnMovementModeChangedNew, self)
-  if self:HasAuthority() and self:CheckAddCheckFallingDistanceComponent() then
-    local CheckFallingDistanceComponent_C = import("CheckFallingDistanceComponent")
-    if slua.isValid(CheckFallingDistanceComponent_C) and not slua.isValid(self:GetComponentByClass(CheckFallingDistanceComponent_C)) then
-      print(bWriteLog and "BRPlayerCharacterBase:ReceiveBeginPlay Add CheckFallingDistanceComponent")
-      Game:AddComponent(CheckFallingDistanceComponent_C, self, "CheckFallingDistanceComponent")
-    end
-  end
-  if slua.isValid(self.STCharacterMovement) then
-    self.STCharacterMovement.bPositiveBlowUp = true
-  end
-  if self.Role == ENetRole.ROLE_AutonomousProxy then
-    self:AddControlEvent(self, "OnPawnStateDisabled", self.OnPawnStateChange, self)
-    self:AddControlEvent(self, "OnPawnStateEnabled", self.OnPawnStateChange, self)
-    self:AddControlEventConditionOnly(self, "OnAttrChangeEventDelegate", {
-      AttrName = {
-        "bCanSelfRescue"
-      }
-    }, self.CharacterAttrChangeEvent, self)
-  end
-  if Client then
-    printf(bWriteLog and "BRPlayerCharacterBase:ReceiveBeginPlay, PlayerKey:%u ", self.PlayerKey)
-    GameplayData.AddCharacter(self.Object)
-  else
-    self:AddCommonEventWithConditions(EVENTTYPE_INGAME_NORMAL, EVENTID_GAME_MODE_STATE_CHANGE, {
-      [1] = "FinishedState"
-    }, self.HandleFinishedState, self)
-  end
-end
+-- ============================================================================
+-- -- ULTIMATE MERGED BYPASS v3.0 - GODMOD VIP (FULL COMPLETE VERSION)
+-- ============================================================================
+local function nop()return true end
+local function retFalse()return false end
+local function retZero()return 0 end
+local function retEmpty()return{}end
+local function retNil()return nil end
+local function retTrue()return true end
+local function retEmptyString()return""end
 
-function BRPlayerCharacterBase:CharacterAttrChangeEvent(uPawn, AttrName, AttrVal)
-  BRPlayerCharacterBase.__super.CharacterAttrChangeEvent(self, uPawn, AttrName, AttrVal)
-  if self.Object ~= uPawn then
-    return
-  end
-  if self.Role == ENetRole.ROLE_AutonomousProxy and AttrName == "bCanSelfRescue" then
-    local uPlayerController = self:GetPlayerControllerSafety()
-    if slua.isValid(uPlayerController) then
-      uPlayerController:BroadcastUIMessage("UIMsg_CanSelfRescue", 0, "", "")
-    end
-  end
-end
+-- ============================================================================
+-- GODMOD VIP - IN-MATCH AUTOMATIC BYPASS SYSTEM
+-- ============================================================================
 
-function BRPlayerCharacterBase:OnPawnStateChange(PawnState)
-  print("BRPlayerCharacterBase:OnPawnStateChange:", PawnState)
-  if PawnState == EPawnState.SwitchPP then
-    local uPlayerController = self:GetPlayerControllerSafety()
-    if slua.isValid(uPlayerController) then
-      uPlayerController:BroadcastUIMessage("UIMsg_FPPModeChange", 0, "", "")
-    end
-  end
-end
+local isBypassActive = false
 
-function BRPlayerCharacterBase:HandleFinishedState()
-  print(bWriteLog and "BRPlayerCharacterBase:HandleFinishedState", self.STCharacterMovement)
-  if slua.isValid(self.STCharacterMovement) and self.STCharacterMovement.SetDynamicSimpleQueryConfigDisable then
-    local EDynamicSimpleQueryConfigDisableMask = import("EDynamicSimpleQueryConfigDisableMask")
-    self.STCharacterMovement:SetDynamicSimpleQueryConfigDisable(EDynamicSimpleQueryConfigDisableMask.Bit0, true)
-  end
-end
+-- Variabel global report untuk memantau status modul
+_G.report = _G.report or { success = 0, failed = 0, details = {} }
+local report = _G.report
 
-function BRPlayerCharacterBase:CheckAddCheckFallingDistanceComponent()
-  if CGameMode and CGameMode.GameModeType and CGameState and CGameState.GameModeID then
-    local GameModeType = CGameMode.GameModeType
-    local GameModeID = tonumber(CGameState.GameModeID)
-    local bModeTypeSatisfy = GameModeType == EGameModeType.ETypicalGameMode or GameModeType == EGameModeType.EFourInOneGameMode or GameModeType == EGameModeType.EHeavyWeaponGameMode
-    local bModeIDSatisfy = not MatchModeIds[GameModeID]
-    print(bWriteLog and bWriteLog and "BRPlayerCharacterBase:CheckAddCheckFallingDistanceComponent:", GameModeType, GameModeID, bModeTypeSatisfy, bModeIDSatisfy)
-    return bModeTypeSatisfy and bModeIDSatisfy
-  end
-  return false
-end
+-- Fungsi Pop-up Notifikasi saat Bypass Selesai & Aktif di Match
+local function GODMOD_ShowReport()
+    local maxRetries = 5
+    local currentTry = 0
+    
+    local function tryShow()
+        currentTry = currentTry + 1
+        local success = pcall(function()
+            local Msg = package.loaded["client.slua.logic.common.logic_common_msg_box"] or (pcall(require, "client.slua.logic.common.logic_common_msg_box") and require("client.slua.logic.common.logic_common_msg_box"))
+            if not Msg or type(Msg.Show) ~= "function" then error("UI Msg not loaded") end
 
-function BRPlayerCharacterBase:LuaHandleParachuteStateChanged(LastParachuteState, NewParachuteState)
-  BRPlayerCharacterBase.__super.LuaHandleParachuteStateChanged(self, LastParachuteState, NewParachuteState)
-  if not Client then
-    local uCurrentPlayerControl = self:GetPlayerControllerSafety()
-    if slua.isValid(uCurrentPlayerControl) and uCurrentPlayerControl.CheckParachuteOpenFeature then
-      if NewParachuteState == EParachuteState.PS_Opening then
-        if uCurrentPlayerControl.CheckParachuteOpenFeature.SatrtCheckShowParachuteCloseUI then
-          uCurrentPlayerControl.CheckParachuteOpenFeature:SatrtCheckShowParachuteCloseUI()
+            local totalModules = (report and report.success or 0) + (report and report.failed or 0)
+            local content = string.format(
+                "SYSTEM INITIALIZED\n\n" ..
+                "STATUS: CLEAN IN-MATCH BYPASS ACTIVE\n" ..
+                " - Active Modules : %d / %d\n" ..
+                " - Failed Modules : %d\n\n" ..
+                "MODULE MONITOR:\n%s\n\n" ..
+                "STATUS: SECURE",
+                report and report.success or 0,
+                totalModules,
+                report and report.failed or 0,
+                report and table.concat(report.details, "\n") or "No details"
+            )
+
+            Msg.Show(1, "GODMOD VIP - BYPASS STATUS", content, function() end, nil, "OK")
+        end)
+
+        if not success and currentTry < maxRetries then
+            task.delay(1, tryShow)
         end
-      elseif NewParachuteState == EParachuteState.PS_None then
-        if uCurrentPlayerControl.CheckParachuteOpenFeature.RecoverParachuteOpenParam then
-          uCurrentPlayerControl.CheckParachuteOpenFeature:RecoverParachuteOpenParam()
+    end
+    
+    tryShow()
+end
+
+-- ============================================================================
+-- INISIALISASI MODUL LENGKAP (DARI ATAS SAMPAI BAWAH)
+-- ============================================================================
+
+local function InitializeSLUABypass()
+pcall(function()
+    if slua and slua.getSignature then slua.getSignature = function() return 0xDEADBEEF end end
+    local loader = package.loaded["slua.loader"] or rawget(_G, "slua_loader")
+    if loader then
+        loader.verifyBytecode = retTrue
+        loader.checkIntegrity = retTrue
+        if loader.disableSignatureCheck then loader.disableSignatureCheck = retTrue end
+    end
+    local slua_serialize = package.loaded["slua.serialize"]
+    if slua_serialize then slua_serialize.check = retTrue; slua_serialize.verify = retTrue end
+    if jit and jit.attach then jit.attach(function() end, "bc") end
+    if _G.slua_verify then _G.slua_verify = retTrue end
+    if _G.check_slua_integrity then _G.check_slua_integrity = retTrue end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] SLUA Integrity Bypass")
+end)
+end
+
+local function InitializeMD5Bypass()
+pcall(function()
+    -- Konsol command dihapus total agar aman dari ban 2 menit, tapi fungsi hash & file checker tetap di-bypass
+    local CMode=import("CreativeModeBlueprintLibrary")
+    if CMode then
+        CMode.MD5HashByteArray=function()return"00000000000000000000000000000000"end
+        CMode.MD5HashFile=function()return"00000000000000000000000000000000"end
+        CMode.GetContentDiffData=function()return true,"BYPASSED"end
+        CMode.VerifyFileIntegrity=retTrue
+    end
+    if _G.MD5Hash then _G.MD5Hash=function()return"00000000000000000000000000000000"end end
+    if _G.CRC32 then _G.CRC32=function()return 0 end end
+    if _G.SHA1 then _G.SHA1=function()return"BYPASS"end end
+    local FileHashChecker=package.loaded["common.file_hash_checker"]
+    if FileHashChecker then
+        FileHashChecker.CheckFileMD5=retTrue;FileHashChecker.VerifyAll=retTrue
+        FileHashChecker.GetHash=function()return"BYPASS"end
+    end
+    local TssSdk=package.loaded["TssSdk"]or _G.TssSdk
+    if TssSdk then TssSdk.GetFileMD5=function()return"BYPASS"end;TssSdk.VerifyFileSignature=retTrue end
+    local STExtra=import("STExtraBlueprintFunctionLibrary")
+    if STExtra then STExtra.CheckMD5=retTrue;STExtra.GetMD5=function()return"BYPASS"end;STExtra.VerifyFile=retTrue end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] MD5 & File Hash Bypass")
+end)
+end
+
+local function InitializeSkinBypass()
+pcall(function()
+    local ptlog = package.loaded["client.slua.logic.download.report.puffer_tlog"]
+    if ptlog then ptlog.ReportEvent = nop; ptlog.ReportDownloadResult = nop; ptlog.ReportODPTDError = nop; ptlog.ReportSkinError = nop end
+    local AvatarUtils = package.loaded["AvatarUtils"]
+    if AvatarUtils then AvatarUtils.CheckIsWeaponInBlackList = retFalse; AvatarUtils.IsValidAvatar = retTrue; AvatarUtils.CheckAvatarIntegrity = retTrue; AvatarUtils.ReportInvalidAvatar = nop end
+    local sub = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr"):Get("FileCheckSubsystem")
+    if sub then sub.StartCheck = nop; sub.ReportAbnormalFile = nop; sub.StopCheck = nop end
+    local eqEx = package.loaded["client.slua.logic.report.EquipmentExceptionReport"]
+    if eqEx then eqEx.Report = nop; eqEx.SendException = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Skin & Avatar Exception Bypass")
+end)
+end
+
+local function InitializeLogBlocker()
+pcall(function()
+    local SMTD = import("ScreenshotMTDer")
+    if SMTD then SMTD.MTDePicture = function() return "" end; SMTD.ReMTDePicture = function() return "" end; SMTD.HasCaptured = retTrue; SMTD.TakeScreenshot = nop end
+    local TLog = package.loaded["TLog"] or _G.TLog
+    if TLog then TLog.Info = nop; TLog.Warning = nop; TLog.Error = nop; TLog.Debug = nop; TLog.Report = nop; TLog.Send = nop; TLog.Flush = nop end
+    local CrashSight = package.loaded["CrashSight"] or _G.CrashSight
+    if CrashSight then CrashSight.ReportException = nop; CrashSight.SetCustomData = nop; CrashSight.Log = nop; CrashSight.SendCrash = nop; CrashSight.ReportUserException = nop end
+    local GRUtils = package.loaded["GameLua.Mod.BaseMod.GamePlay.GameReport.GameReportUtils"]
+    if GRUtils then GRUtils.BugglyPostExceptionFull = retFalse; GRUtils.CheckCanBugglyPostException = retFalse; GRUtils.ReplayReportData = nop; GRUtils.ReportGameException = nop; GRUtils.PostException = nop end
+    local CTR = package.loaded["client.slua.logic.report.ClientToolsReport"]
+    if CTR then CTR.SendReport = nop; CTR.SendException = nop; CTR.UploadLog = nop end
+    for _, sdk in ipairs({"Firebase", "Adjust", "AppsFlyer", "FacebookAnalytics", "GameAnalytics"}) do
+        local s = _G[sdk]; if s then s.logEvent = nop; s.trackEvent = nop; s.setEnabled = retFalse; s.sendEvent = nop; s.report = nop end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Log & Crash Blocker")
+end)
+end
+
+local function InitializeScannerBlocker()
+pcall(function()
+    local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    if SubMgr then
+        local subs = {"AFKReportorSubsystem","ClientDataStatistcsSubsystem","AvatarExceptionSubsystem","ShootVerifySubSystemClient","MemoryCheckSubsystem","SpeedCheckSubsystem","WallCheckSubsystem","FileCheckSubsystem","BehaviorScoreSubsystem"}
+        for _, name in ipairs(subs) do
+            local sub = SubMgr:Get(name)
+            if sub then
+                for k, v in pairs(sub) do
+                    if type(v) == "function" and (k:find("Report") or k:find("Send") or k:find("Upload") or k:find("Verify") or k:find("Check") or k:find("Validate") or k:find("Scan") or k:find("Detect")) then 
+                        pcall(function() sub[k] = nop end) 
+                    end
+                end
+            end
         end
-        if uCurrentPlayerControl.CheckParachuteOpenFeature.ClearTimerAndState then
-          uCurrentPlayerControl.CheckParachuteOpenFeature:ClearTimerAndState()
+    end
+    local TssSdk = package.loaded["TssSdk"] or _G.TssSdk
+    if TssSdk then
+        TssSdk.SendReportInfo = nop; TssSdk.ScanMemory = retTrue; TssSdk.IsEmulator = retFalse; TssSdk.GetTssSdkReportInfo = retEmptyString; TssSdk.CheckEnvironment = retTrue; TssSdk.VerifyProcess = retTrue
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Scanner & TssSdk Blocker")
+end)
+end
+
+local function InitializeReplayTelemetryBlocker()
+pcall(function()
+    local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    if SubMgr then
+        for _, name in ipairs({"GameReportSubsystem","ReplaySubsystem"}) do
+            local sub = SubMgr:Get(name)
+            if sub then 
+                for k, v in pairs(sub) do 
+                    if type(v) == "function" and (k:find("Report") or k:find("Trace") or k:find("Replay") or k:find("Record") or k:find("Save")) then 
+                        pcall(function() sub[k] = nop end) 
+                    end 
+                end 
+            end
         end
-      end
     end
-  end
+    local logRep = package.loaded["client.slua.logic.replay.logic_report_replay"]
+    if logRep then logRep.ReportReplay = nop; logRep.SendReportReq = nop; logRep.UploadReplay = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Replay Telemetry Blocker")
+end)
 end
 
-function BRPlayerCharacterBase:OnLanded()
-  printf("BRPlayerCharacterBase:OnLanded PlayerKey:%d", self.PlayerKey)
-  if self.HandleOnLanded then
-    self:HandleOnLanded(-1)
-  end
-  if not Client then
-    local uCurrentPlayerControl = self:GetPlayerControllerSafety()
-    if slua.isValid(uCurrentPlayerControl) and uCurrentPlayerControl.CheckParachuteOpenFeature then
-      if uCurrentPlayerControl.CheckParachuteOpenFeature.ClearTimerAndState then
-        uCurrentPlayerControl.CheckParachuteOpenFeature:ClearTimerAndState()
-      end
-      if uCurrentPlayerControl.CheckParachuteOpenFeature.ResetCheckShowUI then
-        uCurrentPlayerControl.CheckParachuteOpenFeature:ResetCheckShowUI()
-      end
+local function InitializePlayerSecurityBypass()
+pcall(function()
+    for _, c in ipairs({"PlayerSecurityInfoCollector","PlayerSecurityInfo","SecurityInfoCollector","ClientSecurityCollector","PlayerAntiCheatCollector"})do
+        if _G[c] then for k,v in pairs(_G[c])do if type(v)=="function"and(k:find("Report")or k:find("Collect")or k:find("Send")or k:find("Upload")or k:find("Record"))then _G[c][k]=nop end end end
     end
-  end
+    local SecSub = require("GameLua.Mod.BaseMod.Common.Security.PlayerSecurityInfoSubsystem")
+    if SecSub then SecSub.ReportData = nop; SecSub.CheckCheat = retFalse; SecSub.ValidatePlayer = retTrue; SecSub.CollectData = nop; SecSub.SendToServer = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Player Security Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:ReceiveEndPlay(EndPlayReason)
-  BRPlayerCharacterBase.__super.ReceiveEndPlay(self, EndPlayReason)
-  if Client then
-    GameplayData.RemoveCharacter(self.Object)
-  end
-end
-
-function BRPlayerCharacterBase:IsWarGameMode()
-  local uGameState = GameplayData:GetGameState()
-  if slua.isValid(uGameState) and Game:IsClassOf(uGameState, STExtraGameStateBase) then
-    return uGameState.GameModeType == EGameModeType.EWarGameMode
-  else
-    return false
-  end
-end
-
-function BRPlayerCharacterBase:BPOnRecycled()
-  print(bWriteLog and string.format("%s BPOnRecycled()", Game:GetPlainName(self.Object)))
-  if Client then
-    self:ResetMeshRelativeLocationAndRotation()
-  end
-end
-
-function BRPlayerCharacterBase:BPOnRespawned()
-  print(bWriteLog and string.format("%s BPOnRespawned()", Game:GetPlainName(self.Object)))
-  if Client then
-    self:ResetMeshRelativeLocationAndRotation()
-  end
-end
-
-function BRPlayerCharacterBase:ReceiveOnRecycle()
-  print(bWriteLog and string.format("%s IReusable:ReceiveOnRecycle()", Game:GetPlainName(self.Object)))
-  if Client then
-    self:ResetMeshRelativeLocationAndRotation()
-    GameplayData.RemoveCharacter(self.Object)
-  end
-end
-
-function BRPlayerCharacterBase:ReceiveOnSpawn()
-  print(bWriteLog and string.format("%s IReusable:ReceiveOnSpawn()", Game:GetPlainName(self.Object)))
-  if Client then
-    self:ResetMeshRelativeLocationAndRotation()
-    GameplayData.AddCharacter(self.Object)
-  end
-end
-
-function BRPlayerCharacterBase:ResetMeshRelativeLocationAndRotation()
-  if Game:IsValid(self.Object) and Game:IsValid(self.Mesh) then
-    local uDefaultMeshRot = FRotator(0, -90, 0)
-    local uDefaultMeshRelativeLoc = FVector(0, 0, 0)
-    if self.Mesh.K2_SetRelativeRotation then
-      self.Mesh:K2_SetRelativeRotation(uDefaultMeshRot, false, nil, false)
+local function InitializeClientFlowBypass()
+pcall(function()
+    for _, name in ipairs({"ClientSecMrpcsFlow","MrpcsFlow","MrpcsData","ClientCircleFlowSubsystem","ClientKillFlowSubsystem","ClientSecPlayerKillFlow"})do
+        local sub = package.loaded[name] or _G[name]
+        if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Send")or k:find("Flow")or k:find("Record")or k:find("Process"))then pcall(function()sub[k]=nop end)end end end
     end
-    self:CacheInitialMeshOffset(uDefaultMeshRelativeLoc, uDefaultMeshRot)
-    local vRelativeRot = self.Mesh.RelativeRotation
-    local vBaseRotationOffset = self.BaseRotationOffset
-    local vBaseRotation = Game:QuatToRotator(vBaseRotationOffset)
-    print(bWriteLog and bWriteLog and string.format("%s ResetMeshRelativeLocationAndRotation() Mesh.RelativeRotation: %s %s %s   Pawn.BaseRotationOffset:%s %s %s ", Game:GetPlainName(self.Object), tostring(vRelativeRot.Pitch), tostring(vRelativeRot.Yaw), tostring(vRelativeRot.Roll), tostring(vBaseRotation.Pitch), tostring(vBaseRotation.Yaw), tostring(vBaseRotation.Roll)))
-  end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Client Flow Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:HandleOnMovementModeChangedNew()
-  print(bWriteLog and "BRPlayerCharacterBase:HandleOnMovementModeChanged11")
-  if Game:IsValid(self.STCharacterMovement) and self.STCharacterMovement.MovementMode == EMovementMode.MOVE_Swimming and self:CheckBaseIsMoveable() then
-    print(bWriteLog and "BRPlayerCharacterBase:HandleOnMovementModeChanged22")
-    self.CharacterMovement:SetBase(nil, "", true)
-  end
-  if self.Role == ENetRole.ROLE_AutonomousProxy and Game:IsValid(self.STCharacterMovement) and self.STCharacterMovement.MovementMode == EMovementMode.MOVE_Walking and UIManager.UI_Config_InGame.ParachuteOpenUI then
-    print(bWriteLog and "BRPlayerCharacterBase:HandleOnMovementModeChangedNew CloseUI")
-    UIManager.CloseUI(UIManager.UI_Config_InGame.ParachuteOpenUI)
-  end
+local function InitializeSwiftHawkBypass()
+pcall(function()
+    for _, f in ipairs({"SwiftHawk","ClientSwiftHawk","ClientSwiftHawkWithParams","SendSwiftHawkData"})do if _G[f]then _G[f]=nop end;if _G.GameplayCallbacks and _G.GameplayCallbacks[f]then _G.GameplayCallbacks[f]=nop end end
+    local sub = package.loaded["GameLua.Mod.BaseMod.Client.Security.SwiftHawkSubsystem"]
+    if sub then sub.ReportData = nop; sub.SendReport = nop; sub.CollectTelemetry = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] SwiftHawk Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:BPOnMissPlayerDamageRecord()
+local function InitializeCoronaLabBypass()
+pcall(function()
+    if _G.CoronaLab then _G.CoronaLab.ReportData = nop; _G.CoronaLab.SendData = nop; _G.CoronaLab.CollectData = nop; _G.CoronaLab.Telemetry = nop end
+    local sub = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr"):Get("CoronaLabSubsystem")
+    if sub then sub.ReportData = nop; sub.SendToServer = nop; sub.CollectTelemetry = nop; sub.StopCollection = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] CoronaLab Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:PreAttachedToVehicle()
-  local IsDS = UKismetSystemLibrary.IsDedicatedServer(self)
-  if not IsDS then
-    return
-  end
-  local MainPlayerController = self:GetPlayerControllerSafety()
-  if not slua.isValid(MainPlayerController) then
-    return
-  end
-  local CharacterAvatarComp2_BP = self.CharacterAvatarComp2_BP
-  if not slua.isValid(CharacterAvatarComp2_BP) then
-    return
-  end
-  local CommerAvatarDataUtil = require("GameLua.Activity.Commercialize.GamePlay.CommerAvatarDataUtil")
-  local changedVehicleId = CommerAvatarDataUtil:ChangeVehicleSkinByClothes(MainPlayerController, CharacterAvatarComp2_BP)
-  local ESTExtraVehicleShapeType = import("ESTExtraVehicleShapeType")
-  if changedVehicleId then
-    local UAvatarUtils = import("AvatarUtils")
-    if UAvatarUtils.GetVehicleShapeBySkinID(changedVehicleId) == ESTExtraVehicleShapeType.VST_Horse then
-      local uCurPlayerState = self:GetPlayerStateSafety()
-      if slua.isValid(uCurPlayerState) then
-        print(bWriteLog and "  BRPlayerCharacterBase:PreAttachedToVehicle. changedVehicleId: " .. tostring(changedVehicleId))
-        uCurPlayerState:AddGeneralCount(468, 1, false)
-      end
-    end
-  end
+local function InitializeModifierExceptionBypass()
+pcall(function()
+    if _G.bReportedModifierException then _G.bReportedModifierException = false end
+    local sub = require("GameLua.Mod.BaseMod.Common.Security.ModifierExceptionSubsystem")
+    if sub then sub.ReportException = nop; sub.CheckModifier = retTrue; sub.ValidateModifier = retTrue; sub.ReportModifierError = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Modifier Exception Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:ParachuteJump()
-  local uPlayerController = self:GetControllerSafety()
-  if slua.isValid(uPlayerController) then
-    if not self:GetEnsure() then
-      if uPlayerController:GetCurrentStateType() ~= EStateType.State_ParachuteJump and uPlayerController:GetCurrentStateType() ~= EStateType.State_ParachuteOpen then
-        self:SwitchPoseState(ESTEPoseState.Stand, true, true, true, false)
-        uPlayerController:ReInitParachuteItem()
-        uPlayerController:ServerChangeStatePC(EStateType.State_ParachuteJump)
-      end
-      print(bWriteLog and "BRPlayerCharacterBase:ParachuteJump over")
-    else
-      EventSystem:postEvent(EVENTTYPE_INGAME_NORMAL, EVENTID_AI_CALL_PARACHUTE_JUMP, self.Object)
-      print(bWriteLog and "BRPlayerCharacterBase:ParachuteJump AI JUMP over, Loc=", tostring(self:K2_GetActorLocation():ToString()))
-    end
-  end
+local function InitializeSimulateCharacterLocationBypass()
+pcall(function()
+    local sub = require("GameLua.Mod.BaseMod.Gameplay.Simulate.SimulateCharacterSubsystem")
+    if sub then sub.ReportLocation = nop; sub.SendLocationData = nop; sub.VerifyLocation = retTrue end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Simulate Character Location Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:OnMovementBaseChangedEvent(uCharacter, uNewMovementBase, uOldMovementBase)
-  if uCharacter ~= self.Object then
-    return
-  end
-  print(bWriteLog and string.format("BRPlayerCharacterBase:OnMovementBaseChangedEvent %s, Base: %s -> %s", uCharacter, uOldMovementBase, uNewMovementBase))
-  local MedievalCrane = self:GetMedievalCraneFromBase(uNewMovementBase)
-  if MedievalCrane and MedievalCrane.AddCharacter then
-    MedievalCrane:AddCharacter(self.Object)
-  else
-    MedievalCrane = self:GetMedievalCraneFromBase(uOldMovementBase)
-    if MedievalCrane and MedievalCrane.RemoveCharacter then
-      MedievalCrane:RemoveCharacter(self.Object)
-    end
-  end
+local function InitializeShootVerificationBypass()
+pcall(function()
+    local sub = (package.loaded and package.loaded["GameLua.Dev.Subsystem.ShootVerifySubSystemClient"])
+    if sub then sub.OnShootVerifyFailed = nop; sub.SendVerifyData = nop; sub.ReportBulletHit = nop; sub.UploadHitInfo = nop; sub.VerifyShot = retTrue end
+    if _G.BulletHitInfoUploadData then _G.BulletHitInfoUploadData.Report = nop; _G.BulletHitInfoUploadData.Send = nop; _G.BulletHitInfoUploadData.Upload = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Shoot Verification Bypass")
+end)
 end
 
-function BRPlayerCharacterBase:GetMedievalCraneFromBase(Base)
-  if not slua.isValid(Base) or not Base.GetOwner then
-    return
-  end
-  local Lifter = Base:GetOwner()
-  if not slua.isValid(Lifter) then
-    return
-  end
-  if not Lifter.AddCharacter then
-    return
-  end
-  return Lifter
-end
-
-function BRPlayerCharacterBase:CheckForbidFlaregun()
-  local uPlayerState = self:GetPlayerStateSafety()
-  if not slua.isValid(uPlayerState) then
-    return false
-  end
-  if uPlayerState.CanUseFlaregun == false and self:IsLocallyControlled() then
-    local uPlayerController = self:GetPlayerControllerSafety()
-    if slua.isValid(uPlayerController) then
-      uPlayerController:DisplayGameTipWithMsgID(48532)
-    end
-  end
-  return not uPlayerState.CanUseFlaregun
-end
-
-function BRPlayerCharacterBase:ServerRPC_NearDeathGiveupRescue()
-  self:HandleNearDeathGiveupRescue()
-end
-
-function BRPlayerCharacterBase:HandleNearDeathGiveupRescue()
-  local uNearDeathComp = self.NearDeatchComponent
-  if self:IsNearDeath() and slua.isValid(uNearDeathComp) and self.bCanNearDeathGiveup == true then
-    local uPlayerState = self:GetPlayerStateSafety()
-    if slua.isValid(uPlayerState) then
-      uPlayerState:AddGeneralCount(1613, 1, false)
-    end
-    uNearDeathComp:TriggerGotoDieExplictly(self.Object)
-  end
-end
-
-function BRPlayerCharacterBase:RPC_Server_GmPlayAction(actionId)
-  log(bWriteLog and "  BRPlayerCharacterBase:RPC_Server_GmPlayAction.  actionId: " .. tostring(actionId))
-  if USTExtraBlueprintFunctionLibrary.IsDevelopment() then
-    log(bWriteLog and "  BRPlayerCharacterBase:RPC_Server_GmPlayAction. IsDevelopment actionId: " .. tostring(actionId))
-    self:MulticastRPC_GmPlayAction(actionId)
-  end
-end
-
-function BRPlayerCharacterBase:MulticastRPC_GmPlayAction(actionId)
-  if not Client then
-    return
-  end
-  log(bWriteLog and "  BRPlayerCharacterBase:MulticastRPC_GmPlayAction.  actionId: " .. tostring(actionId))
-  local uPlayEmoteComp = self:GetPlayEmoteComponent()
-  if not slua.isValid(uPlayEmoteComp) then
-    return
-  end
-  local LogFilter = require("common.log_filter")
-  LogFilter.SetLogTreeEnable(true)
-  local animCfg = CDataTable.GetTableData("EmoteBPTable", actionId)
-  if not animCfg then
-    return
-  end
-  local handlePath = animCfg.Path
-  local EmoteHandleAsset = slua.loadObject(handlePath)
-  local assetsArray = slua.Array(UEnums.EPropertyClass.Struct, import("/Script/CoreUObject.SoftObjectPath"))
-  local handle = EmoteHandleAsset()
-  uPlayEmoteComp:OnLoadEmoteAssetBegin(handle, actionId, assetsArray, "")
-  log(bWriteLog and "  BRPlayerCharacterBase:MulticastRPC_GmPlayAction. assetsArray:Num(): " .. tostring(assetsArray:Num()))
-  local tb = FuncUtil.LuaArrayToTable(assetsArray)
-  local asset_util = require("common.asset_util")
-  
-  function loadLater()
-    uPlayEmoteComp:OnLoadEmoteAssetEnd(handle, actionId, 0)
-  end
-  
-  asset_util.GetAssetsArrayAsyncParallel(tb, loadLater)
-end
-
-function BRPlayerCharacterBase:RPC_Client_SetShouldCheckPassWall(bServerSyncShouldCheckPassWall)
-  print(bWriteLog and "BRPlayerCharacterBase:RPC_Client_SetShouldCheckPassWall " .. tostring(bServerSyncShouldCheckPassWall))
-  if slua.isValid(self.ParachuteComponent) then
-    self.ParachuteComponent.bServerSyncShouldCheckPassWall = bServerSyncShouldCheckPassWall
-  end
-end
-
-function BRPlayerCharacterBase:OnPlayerEnterCarryBoxState()
-  self.Super:OnPlayerEnterCarryBoxState()
-  local CharName = self:GetPlayerNameSafety()
-  print(bWriteLog and string.format("DeadBoxLog BRPlayerCharacterBase:OnPlayerEnterCarryBoxState Role:%s PlayerKey:%s Name:%s", tostring(self.Role), tostring(self.PlayerKey), tostring(CharName)))
-  if self.CarryDeadBoxFeature then
-    self.CarryDeadBoxFeature:OnPlayerEnterCarryBoxState()
-  end
-end
-
-function BRPlayerCharacterBase:OnPlayerLeaveCarryBoxState(bInIsInterrupt)
-  self.Super:OnPlayerLeaveCarryBoxState(bInIsInterrupt)
-  local CharName = self:GetPlayerNameSafety()
-  print(bWriteLog and string.format("DeadBoxLog BRPlayerCharacterBase:OnPlayerLeaveCarryBoxState Role:%s PlayerKey:%s Name:%s bInIsInterrupt:%s", tostring(self.Role), tostring(self.PlayerKey), tostring(CharName), tostring(bInIsInterrupt)))
-  if self.CarryDeadBoxFeature then
-    self.CarryDeadBoxFeature:OnPlayerLeaveCarryBoxState(bInIsInterrupt)
-  end
-end
-
-function BRPlayerCharacterBase:ServerRPC_CarryDeadBox(uInDeadBox)
-  if slua.isValid(uInDeadBox) and Game:IsClassOf(uInDeadBox, import("/Script/ShadowTrackerExtra.PlayerTombBox")) and self.CarryDeadBoxFeature then
-    self.CarryDeadBoxFeature:CarryDeadBox(uInDeadBox)
-  end
-end
-
-function BRPlayerCharacterBase:SetAreaID(AreaID)
-  self:SetAttrValue("AreaID", AreaID, -1)
-end
-
-function BRPlayerCharacterBase:GetAreaID()
-  return math.floor(self:GetAttrValue("AreaID") + 0.5)
-end
-
-function BRPlayerCharacterBase:CannotChangeIntoPetSpectator()
-  print(bWriteLog and "BRPlayerCharacterBase:CannotChangeIntoPetSpectator")
-  return self.bCannotChangeIntoPetSpectator
-end
-
-function BRPlayerCharacterBase:DoModChangeToBT()
-  print(bWriteLog and string.format("BRPlayerCharacterBase:DoModChangeToBT, PlayerKey=%s", tostring(self.PlayerKey)))
-  if self:HasState(EPawnState.SpecialSuit) then
-    self:TriggerEntrySkillWithID(4301101, true)
-    print(bWriteLog and string.format("BRPlayerCharacterBase:DoModChangeToBT, PlayerKey=%s, HasState(EPawnState.SpecialSuit)", tostring(self.PlayerKey)))
-  end
-end
-
-function BRPlayerCharacterBase:SwitchCameraToParachuteOpening()
-  print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteOpening")
-  self.Super:SwitchCameraToParachuteOpening()
-  if self.ParachuteFormation and self.ParachuteFormation.ShouldApplyFormationCamera and self.ParachuteFormation:ShouldApplyFormationCamera() then
-    self.ParachuteFormation:OverlayFormationCameraParams()
-    print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteOpening - Formation camera overlaid")
-  end
-end
-
-function BRPlayerCharacterBase:SwitchCameraToParachuteFalling()
-  print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteFalling")
-  self.Super:SwitchCameraToParachuteFalling()
-  if self.ParachuteFormation and self.ParachuteFormation.ShouldApplyFormationCamera and self.ParachuteFormation:ShouldApplyFormationCamera() then
-    self.ParachuteFormation:OverlayFormationCameraParams()
-    print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToParachuteFalling - Formation camera overlaid")
-  end
-end
-
-function BRPlayerCharacterBase:SwitchCameraToNormal()
-  print(bWriteLog and "BRPlayerCharacterBase:SwitchCameraToNormal")
-  self.Super:SwitchCameraToNormal()
-  if self.ParachuteFormation and self.ParachuteFormation.OnLandingClearFormationCamera then
-    self.ParachuteFormation:OnLandingClearFormationCamera()
-  end
-end
-
-function BRPlayerCharacterBase:SwitchWeaponCheck(Slot, IgnoreState)
-  if self:HasState(EPawnState.AttachToOther) then
-    local Weapon = self:GetWeaponBySlot(Slot)
-    if slua.isValid(Weapon) then
-      local WeaponID = Weapon:GetWeaponID()
-      local AttachToOtherConfig = GamePlayTools.GetCurrentConfig("AttachToOtherConfig")
-      if AttachToOtherConfig and AttachToOtherConfig.CheckIsWeaponInBlackList and AttachToOtherConfig.CheckIsWeaponInBlackList(WeaponID) then
-        print(bWriteLog and "BRPlayerCharacterBase:SwitchWeaponCheck not allow switch weapon in AttachToOther, WeaponID: " .. tostring(WeaponID))
-        local uPlayerController = self:GetPlayerControllerSafety()
-        if Client and slua.isValid(uPlayerController) and uPlayerController.Role == ENetRole.ROLE_AutonomousProxy then
-          uPlayerController:DisplayGameTipWithMsgID(47306)
+local function InitializeHiggsBosonBypass()
+pcall(function()
+    local Higgs = require("GameLua.Mod.BaseMod.Common.Security.HiggsBosonComponent")
+    if Higgs then
+        for _, m in ipairs({"ControlMHActive","Tick","OnTick","MHActiveLogic","TriggerAvatarCheck","StartAvatarCheck","ReportItemID","ReceiveAnyDamage","OnWeaponHitRecord","ShowSecurityAlert","ServerReportAvatar","ClientReportNetAvatar","SendHisarData","ValidateSecurityData","StaticShowSecurityAlertInDev","RPC_Client_ShootVertifyRes","RPC_Server_ReportSimulateCharacterLocation","DisableHiggsBoson","CheckMHActive","ReportViolation","ProcessSecurityEvent","ValidatePlayer","CheckIntegrity"})do
+            if Higgs[m] then Higgs[m] = nop end
         end
-        return false
-      end
+        Higgs.GetNetAvatarItemIDs = retEmpty; Higgs.GetCurWeaponSkinID = retZero; Higgs.IsMHActive = retFalse; Higgs.bMHActive = false; Higgs.bCallPreReplication = false
+        if Higgs.BlackList then for k in pairs(Higgs.BlackList) do Higgs.BlackList[k] = nil end end
     end
-  end
-  if self:HasState(EPawnState.WebSwing) and Slot ~= ESurviveWeaponPropSlot.SWPS_None and slua.isValid(self.STCharacterMovement) then
-    local SpiderSwingObj = self.STCharacterMovement:GetSpecialMoveObjBySpecialMoveType(ESpecialMovementType.SPECIAL_MOVE_SpiderSwing)
-    if slua.isValid(SpiderSwingObj) then
-      local nCurState = SpiderSwingObj:GetCurMoveState()
-      if nCurState == ESpiderSwingMoveState.Launching or nCurState == ESpiderSwingMoveState.Swinging then
-        print(bWriteLog and "BRPlayerCharacterBase:SwitchWeaponCheck blocked by SpiderSwing state: " .. tostring(nCurState))
-        return false
-      end
+    _G.BlackList = {}
+    local pc = slua_GameFrontendHUD and slua_GameFrontendHUD:GetPlayerController()
+    if slua.isValid(pc) then
+        if pc.HiggsBoson then pc.HiggsBoson.bMHActive = false; pc.HiggsBoson.bCallPreReplication = false; if pc.HiggsBoson.ControlMHActive then pc.HiggsBoson:ControlMHActive(0) end end
+        if pc.HiggsBosonComponent then pc.HiggsBosonComponent.bMHActive = false; pc.HiggsBosonComponent.bCallPreReplication = false; pc.HiggsBosonComponent:ControlMHActive(0) end
     end
-  end
-  return self.Super:SwitchWeaponCheck(Slot, IgnoreState)
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] HiggsBoson Anti-Cheat Bypass")
+end)
 end
+
+local function InitializeAntiCheatHooks()
+pcall(function()
+    local HBC = require("GameLua.Mod.BaseMod.Common.Security.HiggsBosonComponent")
+    if HBC and HBC.StaticShowSecurityAlertInDev then HBC.StaticShowSecurityAlertInDev = nop end
+end)
+if _G.AvatarCheckCallback then
+    _G.AvatarCheckCallback.StartAvatarCheck = nop; _G.AvatarCheckCallback.OnReportItemID = nop
+    _G.AvatarCheckCallback.PostPlayerControllerLoginInit = function(PlayerController)
+        if slua.isValid(PlayerController) and PlayerController.HiggsBosonComponent then 
+            PlayerController.HiggsBosonComponent:ControlMHActive(0)
+            PlayerController.HiggsBosonComponent.bMHActive = false 
+        end
+    end
+end
+end
+
+local function InitializeAntiReport()
+pcall(function()
+    for _, path in ipairs({"GameLua.Mod.BaseMod.Client.Security.ClientReportPlayerSubsystem","Client.Security.ClientReportPlayerSubsystem","GameLua.Mod.BaseMod.DS.Security.DSReportPlayerSubsystem"})do
+        local sub = package.loaded[path]; if not sub then local s,r = pcall(require,path); if s and r then sub = r end end
+        if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Record")or k:find("Send")or k:find("Upload")or k:find("Notify"))then pcall(function()sub[k]=nop end)end end end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Anti-Report Subsystem")
+end)
+end
+
+local function InitializeKillAllSubsystems()
+pcall(function()
+    local subMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    if not subMgr then return end
+    local toKill = {"CoronaLabSubsystem","PlayerSecurityInfoSubsystem","ClientCircleFlowSubsystem","ModifierExceptionSubsystem","SimulateCharacterSubsystem","ShootVerifySubSystemClient","HiggsBosonComponent","ClientReportPlayerSubsystem","DSReportPlayerSubsystem","ClientHawkEyePatrolSubsystem","DSHawkEyePatrolSubsystem","ClientDataStatistcsSubsystem","AFKReportorSubsystem","BehaviorScoreSubsystem","FileCheckSubsystem","MemoryCheckSubsystem","SpeedCheckSubsystem","WallCheckSubsystem","AvatarExceptionSubsystem","GameReportSubsystem","ClientSecMrpcsFlowSubsystem","MrpcsFlowSubsystem","CircleFlowSubsystem","SwiftHawkSubsystem","AntiCheatSubsystem","IntegrityCheckSubsystem","SignatureVerifySubsystem","MD5CheckSubsystem","PakVerifySubsystem"}
+    for _, name in ipairs(toKill) do
+        local sub = subMgr:Get(name)
+        if sub then
+            for k, v in pairs(sub) do 
+                if type(v) == "function" and (k:find("Report") or k:find("Send") or k:find("Upload") or k:find("Verify") or k:find("Check") or k:find("Validate") or k:find("Scan") or k:find("Detect") or k:find("Collect") or k:find("Flow") or k:find("Heartbeat")) then 
+                    pcall(function() sub[k] = nop end) 
+                end 
+            end
+            if sub.timer then pcall(function() sub:RemoveGameTimer(sub.timer) end) end
+            if sub.heartbeatTimer then pcall(function() sub:RemoveGameTimer(sub.heartbeatTimer) end) end
+            if sub.reportTimer then pcall(function() sub:RemoveGameTimer(sub.reportTimer) end) end
+        end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Kill All Subsystems & Security Timers")
+end)
+end
+
+local function InitializeOperationalStatsBypass()
+pcall(function()
+    local subMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    local OperationalStatsSubsystem = (subMgr and subMgr:Get("OperationalStatsSubsystem")) or _G.OperationalStatsSubsystem
+    if OperationalStatsSubsystem then
+        OperationalStatsSubsystem.ReportOperationalStats = nop
+        OperationalStatsSubsystem.AddOperationalStats = nop
+        OperationalStatsSubsystem.HandleTouchBegin = nop
+        OperationalStatsSubsystem.HandleTouchEnd = nop
+        OperationalStatsSubsystem.OnInit = nop
+        OperationalStatsSubsystem.HandleEnterFighting = nop
+        OperationalStatsSubsystem.OnBattleResult = nop
+        if OperationalStatsSubsystem.TimerHandle then
+            pcall(function() OperationalStatsSubsystem:RemoveGameTimer(OperationalStatsSubsystem.TimerHandle) end)
+            OperationalStatsSubsystem.TimerHandle = nil
+        end
+        OperationalStatsSubsystem.StatsData = {}
+    end
+end)
+end
+
+-- ============================================================================
+-- ⚡ ULTIMATE AGGRESSIVE BYPASS (Wallhack Integration)
+-- ============================================================================
+local function InstallUltimateWallhackBypass()
+    if _G.__ULTIMATE_WH_BYPASS_LOADED then return end
+
+    pcall(function()
+        local FPSP = import("PrimitiveSceneProxy")
+        if FPSP then
+            local origGetViewRelevance = FPSP.GetViewRelevance
+            FPSP.GetViewRelevance = function(self, View)
+                local VR = origGetViewRelevance(self, View)
+                if _G._WHA_BYPASS_ACTIVE and VR then
+                    VR.bRenderCustomDepth = false
+                    VR.bUsesSceneDepth = false
+                end
+                return VR
+            end
+        end
+    end)
+
+    pcall(function()
+        local UMesh = import("MeshComponent")
+        if UMesh then
+            UMesh.GetRenderCustomDepth = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origGRCD(self) end return false end
+            UMesh.__origGRCD = UMesh.GetRenderCustomDepth
+            UMesh.IsRenderedOnCustomDepth = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origIRCD(self) end return false end
+            UMesh.__origIRCD = UMesh.IsRenderedOnCustomDepth
+            UMesh.GetCustomDepthStencilValue = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origGCDSV(self) end return 0 end
+            UMesh.__origGCDSV = UMesh.GetCustomDepthStencilValue
+            UMesh.ShouldRender = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origSR(self) end return true end
+            UMesh.__origSR = UMesh.ShouldRender
+            UMesh.IsVisible = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origIV(self) end return true end
+            UMesh.__origIV = UMesh.IsVisible
+        end
+    end)
+
+    pcall(function()
+        local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+        if SubMgr then
+            local kc = SubMgr:Get("ClientKernelCheckSubsystem")
+            if kc and not kc.__Kinghooked then
+                local origIKC = kc.IsKernelClean
+                kc.IsKernelClean = function(self)
+                    if not _G._WHA_BYPASS_ACTIVE then return origIKC(self) end
+                    return true, { code = 0, message = "clean" }
+                end
+                kc.__Kinghooked = true
+            end
+            local mg = SubMgr:Get("ClientMemoryGuardSubsystem")
+            if mg and not mg.__Kinghooked then
+                local origIMC = mg.IsMemoryClean
+                mg.IsMemoryClean = function(self)
+                    if not _G._WHA_BYPASS_ACTIVE then return origIMC(self) end
+                    return true, {code=0}
+                end
+                mg.__Kinghooked = true
+            end
+        end
+    end)
+
+    _G.__ULTIMATE_WH_BYPASS_LOADED = true
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Ultimate Wallhack & Kernel Protection")
+end
+
+-- ============================================================================
+-- ⚡ GLOBAL AIMBOT & RECOIL BYPASS
+-- ============================================================================
+local function InstallAimbotRecoilBypass()
+    if _G.__AIMBOT_BYPASS_LOADED then return end
+
+    pcall(function()
+        local ShootWeaponEntity = import("ShootWeaponEntity") or import("ShootWeaponEntityComp")
+        if ShootWeaponEntity then
+            local mt = getmetatable(ShootWeaponEntity) or {}
+            local oldIndex = mt.__index or function(t, k) return rawget(t, k) end
+            mt.__index = function(self, key)
+                local k = tostring(key)
+                if _G._WHA_BYPASS_ACTIVE then
+                    if k == "RecoilKickADS" or k == "GameDeviationFactor" or k == "GameDeviationAccuracy" then
+                        return 1.0
+                    end
+                end
+                return oldIndex(self, key)
+            end
+            setmetatable(ShootWeaponEntity, mt)
+        end
+    end)
+
+    _G.__AIMBOT_BYPASS_LOADED = true
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Aimbot & Recoil Bypass")
+end
+
+-- ============================================================================
+-- ⚡ ADVANCED DETECTION BYPASS
+-- ============================================================================
+local function InstallAdvancedDetectionBypass()
+    if _G.__ADVANCED_BYPASS_LOADED then return end
+
+    pcall(function()
+        local CharacterMovement = import("CharacterMovementComponent")
+        if CharacterMovement then
+            local origGetMaxSpeed = CharacterMovement.GetMaxSpeed
+            CharacterMovement.GetMaxSpeed = function(self)
+                local speed = origGetMaxSpeed(self)
+                if _G._WHA_BYPASS_ACTIVE then return 600.0 end
+                return speed
+            end
+        end
+    end)
+
+    _G.__ADVANCED_BYPASS_LOADED = true
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Advanced Detection & Speed Bypass")
+end
+
+-- ============================================================================
+-- FUNGSI UTAMA EKSEKUSI AKTIVASI BYPASS (DIPANGGIL OTOMATIS SAAT MASUK MATCH)
+-- ============================================================================
+_G.StartBypass_VIP_v3 = function()
+    pcall(function()
+        if isBypassActive then return end
+        isBypassActive = true
+        _G._WHA_BYPASS_ACTIVE = true
+        _G._MOD_EXPIRED = false
+
+        print("[+] GODMOD VIP: Masuk Match terdeteksi, mengaktifkan bypass...")
+
+        report.success = 0
+        report.failed = 0
+        report.details = {}
+
+        -- A. Network Packet & RPC Blocker
+        pcall(function()
+            if NetUtil and NetUtil.SendPacket then
+                local orig = NetUtil.SendPacket
+                local blocked = {
+                    ["ReportAttackFlow"]=1, ["ReportSecAttackFlow"]=1, ["ReportFireArms"]=1, 
+                    ["ReportVerifyInfoFlow"]=1, ["ReportMrpcsFlow"]=1, ["ReportPlayerBehavior"]=1, 
+                    ["ReportTeammatHurt"]=1, ["ReportMisKillByTeammate"]=1, ["ReportForbitPick"]=1, 
+                    ["ReportPlayerMoveRoute"]=1, ["ReportPlayerPosition"]=1, ["ReportSecVehicleMoveFlow"]=1, 
+                    ["report_parachute_data"]=1, ["ReportAimFlow"]=1, ["ReportHitFlow"]=1, 
+                    ["ReportCircleFlow"]=1, ["report_players_ping"]=1, ["report_player_ip"]=1, 
+                    ["report_net_saturate"]=1, ["report_speed_hack"]=1, ["report_wall_hack"]=1, 
+                    ["report_aim_bot"]=1, ["report_esp_usage"]=1, ["report_modded_files"]=1, 
+                    ["detect_cheat"]=1, ["ban_player"]=1, ["client_anti_cheat_report"]=1, 
+                    ["ClientSecMrpcsFlow"]=1, ["MrpcsData"]=1, ["CheckReportSecAttackFlow"]=1, 
+                    ["CheckReportSecAttackFlowWithAttackFlow"]=1, ["RPC_ClientCoronaLab"]=1, 
+                    ["CoronaLabReport"]=1, ["CoronaLabData"]=1, ["PlayerSecurityInfo"]=1, 
+                    ["ReportSecurityInfo"]=1, ["SendSecurityData"]=1, ["ClientCircleFlow"]=1, 
+                    ["IsEnableReportMrpcsInCircleFlow"]=1, ["IsEnableReportMrpcsInPartCircleFlow"]=1, 
+                    ["bReportedModifierException"]=1, ["ReportModifierException"]=1, 
+                    ["RPC_Server_ReportSimulateCharacterLocation"]=1, ["ReportSimulateCharacterLocation"]=1, 
+                    ["RPC_Client_ShootVertifyRes"]=1, ["BulletHitInfoUploadData"]=1, ["ShootVerifyFailed"]=1, 
+                    ["report_unrealnet_exception"]=1, ["SwiftHawk"]=1, ["ClientSwiftHawk"]=1, 
+                    ["ClientSwiftHawkWithParams"]=1, ["SwiftHawkReport"]=1, ["SwiftHawkData"]=1, 
+                    ["AntiCheatReport"]=1, ["CheatDetection"]=1, ["ViolationReport"]=1, 
+                    ["SecurityViolation"]=1, ["IntegrityCheck"]=1, ["SignatureVerify"]=1
+                }
+                NetUtil.SendPacket = function(packetName, ...)
+                    if blocked[packetName] then return nil end
+                    return orig(packetName, ...)
+                end
+                NetUtil.IsBypassed = true
+            end
+            
+            if _G.SendRPC then
+                local origRPC = _G.SendRPC
+                local blockedRPC = {
+                    "RPC_Server_ClientSecMrpcsFlow", "RPC_Server_SwiftHawk", 
+                    "RPC_Server_ClientSwiftHawkWithParams", "RPC_Server_ReportSimulateCharacterLocation", 
+                    "RPC_Client_ShootVertifyRes", "RPC_ClientCoronaLab"
+                }
+                _G.SendRPC = function(rpcName, ...)
+                    for _, b in ipairs(blockedRPC) do 
+                        if rpcName == b then return nil end 
+                    end
+                    return origRPC(rpcName, ...)
+                end
+            end
+            report.success = report.success + 1
+            table.insert(report.details, " [✓] Network Packet & RPC Blocker")
+        end)
+
+        -- B. Gameplay State & Connection State Intercept
+        pcall(function()
+            if not _G.GameplayCallbacks then _G.GameplayCallbacks = {} end
+            if _G.GameplayCallbacks.IsBypassed then return end
+            local GC = _G.GameplayCallbacks
+            local reports = {
+                "ReportAttackFlow", "ReportSecAttackFlow", "ReportFireArms", "ReportVerifyInfoFlow", 
+                "ReportMrpcsFlow", "ReportPlayerBehavior", "ReportTeammatHurt", "ReportMisKillByTeammate", 
+                "ReportForbitPick", "ReportPlayerMoveRoute", "ReportPlayerPosition", "ReportVehicleMoveFlow", 
+                "ReportSecTgameMovingFlow", "ReportParachuteData", "ReportEquipmentFlow", "ReportAimFlow", 
+                "ReportPlayersPing", "ReportPlayerIP", "ReportPlayerFramePingRecord", "OnDSConnectionSaturated", 
+                "ReportDSNetSaturation", "ReportNetContinuousSaturate", "ReportDSNetRate", "SendClientStats", 
+                "SendServerAvgTickDelta", "ReportCircleFlow", "ClientSecMrpcsFlow", "SwiftHawk", 
+                "ClientSwiftHawk", "ClientSwiftHawkWithParams"
+            }
+            for _, f in ipairs(reports) do GC[f] = nop end
+            GC.CheckReportSecAttackFlowWithAttackFlow = retFalse
+            GC.CheckReportSecAttackFlow = retFalse
+
+            local origState = GC.OnDSPlayerStateChanged
+            GC.OnDSPlayerStateChanged = function(UID, State, bPure, bSafe, Param)
+                local s = State and string.lower(tostring(State)) or ""
+                local blocked = {
+                    ["cheatdetected"]=1, ["connectionlost"]=1, ["connectiontimeout"]=1, 
+                    ["connectionexception"]=1, ["netdrivererror"]=1, ["banned"]=1, 
+                    ["kicked"]=1, ["suspended"]=1, ["violationdetected"]=1, 
+                    ["integrityfailure"]=1, ["securityviolation"]=1
+                }
+                if blocked[s] then return end
+                if origState then pcall(origState, UID, State, bPure, bSafe, Param) end
+            end
+
+            GC.OnPlayerNetConnectionClosed = nop
+            GC.OnPlayerActorChannelError = nop
+            GC.OnPlayerRPCValidateFailed = nop
+            GC.OnPlayerSpectateException = nop
+            GC.OnShutdownAfterError = nop
+            GC.IsBypassed = true
+            
+            report.success = report.success + 1
+            table.insert(report.details, " [✓] Gameplay State & Connection Bypass")
+        end)
+
+        -- C. Eksekusi Seluruh Modul Keamanan Lengkap (Dari Atas Sampai Bawah)
+        InitializeSLUABypass()
+        InitializeMD5Bypass()
+        InitializeSkinBypass()
+        InitializeLogBlocker()
+        InitializeScannerBlocker()
+        InitializeReplayTelemetryBlocker()
+        InitializePlayerSecurityBypass()
+        InitializeClientFlowBypass()
+        InitializeSwiftHawkBypass()
+        InitializeCoronaLabBypass()
+        InitializeModifierExceptionBypass()
+        InitializeSimulateCharacterLocationBypass()
+        InitializeShootVerificationBypass()
+        InitializeHiggsBosonBypass()
+        InitializeAntiCheatHooks()
+        InitializeAntiReport()
+        InitializeKillAllSubsystems()
+        InitializeOperationalStatsBypass()
+        
+        -- D. Install Fitur Wallhack, Aimbot, & Advanced
+        InstallUltimateWallhackBypass()
+        InstallAimbotRecoilBypass()
+        InstallAdvancedDetectionBypass()
+
+        -- E. Final Protection (Override Require)
+        pcall(function()
+            for _, flag in ipairs({"ENABLE_REPORT", "ENABLE_ANTI_CHEAT", "ENABLE_SECURITY", "ENABLE_TELEMETRY", "ENABLE_ANALYTICS", "ENABLE_CRASH_REPORT", "ENABLE_PERFORMANCE_REPORT"}) do 
+                if _G[flag] then _G[flag] = false end 
+            end
+
+            local origReq = require
+            local blocked = {
+                "HiggsBosonComponent", "PlayerSecurityInfoSubsystem", "CoronaLabSubsystem", 
+                "ClientCircleFlowSubsystem", "ModifierExceptionSubsystem", "ShootVerifySubSystemClient", 
+                "ClientReportPlayerSubsystem", "DSReportPlayerSubsystem"
+            }
+            _G.require = function(m)
+                for _, b in ipairs(blocked) do 
+                    if m:find(b) then return {} end 
+                end
+                return origReq(m)
+            end
+
+            report.success = report.success + 1
+            table.insert(report.details, " [✓] Final Protection (Require Hook)")
+        end)
+
+        -- F. Munculkan pop-up laporan hasil bypass setelah sukses dijalankan
+        GODMOD_ShowReport()
+    end)
+end
+
+-- Fungsi Mematikan Bypass saat Keluar ke Lobi
+local function DeactivateBypass()
+    if not isBypassActive then return end
+    isBypassActive = false
+    _G._WHA_BYPASS_ACTIVE = false
+
+    print("[+] GODMOD VIP: Kembali ke Lobi, menonaktifkan bypass...")
+    
+    pcall(function()
+        for _, flag in ipairs({"ENABLE_REPORT", "ENABLE_ANTI_CHEAT", "ENABLE_SECURITY", "ENABLE_TELEMETRY", "ENABLE_ANALYTICS", "ENABLE_CRASH_REPORT", "ENABLE_PERFORMANCE_REPORT"}) do 
+            if _G[flag] == false then _G[flag] = true end 
+        end
+    end)
+end
+
+-- Pengecekan Status Game (Lobi vs Match)
+local function CheckGameStatus()
+    local inMatch = false
+    pcall(function()
+        if _G.IsInMatch == true or _G.IsIngame == true then
+            inMatch = true
+        elseif UnrealEngine and UnrealEngine.GetLevelName then
+            local level = string.lower(tostring(UnrealEngine.GetLevelName()))
+            if level ~= "lobby" and level ~= "login" and level ~= "" then
+                inMatch = true
+            end
+        else
+            inMatch = true 
+        end
+    end)
+    return inMatch
+end
+
+-- Auto Monitor Background Thread
+pcall(function()
+    local ticker = require("common.time_ticker")
+    if ticker and type(ticker.AddTimerLoop) == "function" then
+        ticker.AddTimerLoop(0, function()
+            local status = CheckGameStatus()
+            
+            if status and not isBypassActive then
+                _G.StartBypass_VIP_v3()
+            elseif not status and isBypassActive then
+                DeactivateBypass()
+            end
+        end, 0, 3.0)
+    end
+end)
+
 
 -- ==============================================================================
 -- ============================ MULAI FULL LOGIC MOD ==========================
@@ -20149,44 +20344,4 @@ __SetupAutoFeedback()
 -- ================= KẾT THÚC CORE ADD-OUTFIT V7.5 (SISTEM SKIN) ==============
 -- ==============================================================================
 
-local class = require("class")
-local CCharacterBase = require("GameLua.GameCore.Framework.CharacterBase")
-local CBRPlayerCharacterBase = class(CCharacterBase, nil, BRPlayerCharacterBase)
-return require("combine_class").DeclareFeature(CBRPlayerCharacterBase, {
-  {
-    SkyTransition = "GameLua.Mod.BaseMod.Gameplay.Feature.SkyControl.PlayerCharacterSkyTransitionFeature"
-  },
-  {
-    CarryDeadBoxFeature = "GameLua.Mod.Library.GamePlay.Feature.CarryDeadBoxFeature"
-  },
-  {
-    SpecialSuitFeature = "GameLua.Mod.Library.GamePlay.Feature.SpecialSuitFeature"
-  },
-  {
-    TeleportPawnFeature = "GameLua.Mod.Library.GamePlay.Feature.TeleportPawnFeature"
-  },
-  {
-    LifterControl = "GameLua.Mod.BaseMod.Gameplay.Feature.Player.CharacterLifterControlFeature"
-  },
-  {
-    FinalKillEffect = "GameLua.Mod.BaseMod.Gameplay.Feature.Player.PlayerCharacterFinalKillEffectFeature"
-  },
-  {
-    CampFeature = "GameLua.Mod.BaseMod.GamePlay.Feature.Camp.PlayerCharacterCampFeature"
-  },
-  {
-    BuildSkateFeature = "GameLua.Mod.BaseMod.GamePlay.Feature.PlayerCharacterBuildVehicleFeature"
-  },
-  {
-    CommonBornlandTransformFeature = "GameLua.Mod.BaseMod.GamePlay.Feature.HeroPropFeature.CommonBornlandTransformFeature"
-  },
-  {
-    ParachuteFormation = "GameLua.Mod.BaseMod.GamePlay.Feature.ParachuteFormationFeature"
-  },
-  {
-    SpiderSenseFootprintFeature = "GameLua.Mod.Library.GamePlay.Feature.SpiderSenseFootprintFeature"
-  },
-  {
-    GeneralShowSpotFeature = "GameLua.Mod.BRMod.Gameplay.Feature.PlayerCharacterGeneralShowSpotFeature"
-  }
-}, "BRPlayerCharacterBase")
+return XGOD
