@@ -4,6 +4,695 @@ local GameplayStatics=import("GameplayStatics")
 local GameplayData=require("GameLua.GameCore.Data.GameplayData")
 
 
+-- ============================================================================
+-- -- ULTIMATE MERGED BYPASS v3.0 - GODMOD VIP (FULL COMPLETE VERSION)
+-- ============================================================================
+local function nop()return true end
+local function retFalse()return false end
+local function retZero()return 0 end
+local function retEmpty()return{}end
+local function retNil()return nil end
+local function retTrue()return true end
+local function retEmptyString()return""end
+
+-- ============================================================================
+-- GODMOD VIP - IN-MATCH AUTOMATIC BYPASS SYSTEM
+-- ============================================================================
+
+local isBypassActive = false
+
+-- Variabel global report untuk memantau status modul
+_G.report = _G.report or { success = 0, failed = 0, details = {} }
+local report = _G.report
+
+-- Fungsi Pop-up Notifikasi saat Bypass Selesai & Aktif di Match
+local function GODMOD_ShowReport()
+    local maxRetries = 5
+    local currentTry = 0
+    
+    local function tryShow()
+        currentTry = currentTry + 1
+        local success = pcall(function()
+            local Msg = package.loaded["client.slua.logic.common.logic_common_msg_box"] or (pcall(require, "client.slua.logic.common.logic_common_msg_box") and require("client.slua.logic.common.logic_common_msg_box"))
+            if not Msg or type(Msg.Show) ~= "function" then error("UI Msg not loaded") end
+
+            local totalModules = (report and report.success or 0) + (report and report.failed or 0)
+            local content = string.format(
+                "SYSTEM INITIALIZED\n\n" ..
+                "STATUS: CLEAN IN-MATCH BYPASS ACTIVE\n" ..
+                " - Active Modules : %d / %d\n" ..
+                " - Failed Modules : %d\n\n" ..
+                "MODULE MONITOR:\n%s\n\n" ..
+                "STATUS: SECURE",
+                report and report.success or 0,
+                totalModules,
+                report and report.failed or 0,
+                report and table.concat(report.details, "\n") or "No details"
+            )
+
+            Msg.Show(1, "GODMOD VIP - BYPASS STATUS", content, function() end, nil, "OK")
+        end)
+
+        if not success and currentTry < maxRetries then
+            task.delay(1, tryShow)
+        end
+    end
+    
+    tryShow()
+end
+
+-- ============================================================================
+-- INISIALISASI MODUL LENGKAP (DARI ATAS SAMPAI BAWAH)
+-- ============================================================================
+
+local function InitializeSLUABypass()
+pcall(function()
+    if slua and slua.getSignature then slua.getSignature = function() return 0xDEADBEEF end end
+    local loader = package.loaded["slua.loader"] or rawget(_G, "slua_loader")
+    if loader then
+        loader.verifyBytecode = retTrue
+        loader.checkIntegrity = retTrue
+        if loader.disableSignatureCheck then loader.disableSignatureCheck = retTrue end
+    end
+    local slua_serialize = package.loaded["slua.serialize"]
+    if slua_serialize then slua_serialize.check = retTrue; slua_serialize.verify = retTrue end
+    if jit and jit.attach then jit.attach(function() end, "bc") end
+    if _G.slua_verify then _G.slua_verify = retTrue end
+    if _G.check_slua_integrity then _G.check_slua_integrity = retTrue end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] SLUA Integrity Bypass")
+end)
+end
+
+local function InitializeMD5Bypass()
+pcall(function()
+    -- Konsol command dihapus total agar aman dari ban 2 menit, tapi fungsi hash & file checker tetap di-bypass
+    local CMode=import("CreativeModeBlueprintLibrary")
+    if CMode then
+        CMode.MD5HashByteArray=function()return"00000000000000000000000000000000"end
+        CMode.MD5HashFile=function()return"00000000000000000000000000000000"end
+        CMode.GetContentDiffData=function()return true,"BYPASSED"end
+        CMode.VerifyFileIntegrity=retTrue
+    end
+    if _G.MD5Hash then _G.MD5Hash=function()return"00000000000000000000000000000000"end end
+    if _G.CRC32 then _G.CRC32=function()return 0 end end
+    if _G.SHA1 then _G.SHA1=function()return"BYPASS"end end
+    local FileHashChecker=package.loaded["common.file_hash_checker"]
+    if FileHashChecker then
+        FileHashChecker.CheckFileMD5=retTrue;FileHashChecker.VerifyAll=retTrue
+        FileHashChecker.GetHash=function()return"BYPASS"end
+    end
+    local TssSdk=package.loaded["TssSdk"]or _G.TssSdk
+    if TssSdk then TssSdk.GetFileMD5=function()return"BYPASS"end;TssSdk.VerifyFileSignature=retTrue end
+    local STExtra=import("STExtraBlueprintFunctionLibrary")
+    if STExtra then STExtra.CheckMD5=retTrue;STExtra.GetMD5=function()return"BYPASS"end;STExtra.VerifyFile=retTrue end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] MD5 & File Hash Bypass")
+end)
+end
+
+local function InitializeSkinBypass()
+pcall(function()
+    local ptlog = package.loaded["client.slua.logic.download.report.puffer_tlog"]
+    if ptlog then ptlog.ReportEvent = nop; ptlog.ReportDownloadResult = nop; ptlog.ReportODPTDError = nop; ptlog.ReportSkinError = nop end
+    local AvatarUtils = package.loaded["AvatarUtils"]
+    if AvatarUtils then AvatarUtils.CheckIsWeaponInBlackList = retFalse; AvatarUtils.IsValidAvatar = retTrue; AvatarUtils.CheckAvatarIntegrity = retTrue; AvatarUtils.ReportInvalidAvatar = nop end
+    local sub = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr"):Get("FileCheckSubsystem")
+    if sub then sub.StartCheck = nop; sub.ReportAbnormalFile = nop; sub.StopCheck = nop end
+    local eqEx = package.loaded["client.slua.logic.report.EquipmentExceptionReport"]
+    if eqEx then eqEx.Report = nop; eqEx.SendException = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Skin & Avatar Exception Bypass")
+end)
+end
+
+local function InitializeLogBlocker()
+pcall(function()
+    local SMTD = import("ScreenshotMTDer")
+    if SMTD then SMTD.MTDePicture = function() return "" end; SMTD.ReMTDePicture = function() return "" end; SMTD.HasCaptured = retTrue; SMTD.TakeScreenshot = nop end
+    local TLog = package.loaded["TLog"] or _G.TLog
+    if TLog then TLog.Info = nop; TLog.Warning = nop; TLog.Error = nop; TLog.Debug = nop; TLog.Report = nop; TLog.Send = nop; TLog.Flush = nop end
+    local CrashSight = package.loaded["CrashSight"] or _G.CrashSight
+    if CrashSight then CrashSight.ReportException = nop; CrashSight.SetCustomData = nop; CrashSight.Log = nop; CrashSight.SendCrash = nop; CrashSight.ReportUserException = nop end
+    local GRUtils = package.loaded["GameLua.Mod.BaseMod.GamePlay.GameReport.GameReportUtils"]
+    if GRUtils then GRUtils.BugglyPostExceptionFull = retFalse; GRUtils.CheckCanBugglyPostException = retFalse; GRUtils.ReplayReportData = nop; GRUtils.ReportGameException = nop; GRUtils.PostException = nop end
+    local CTR = package.loaded["client.slua.logic.report.ClientToolsReport"]
+    if CTR then CTR.SendReport = nop; CTR.SendException = nop; CTR.UploadLog = nop end
+    for _, sdk in ipairs({"Firebase", "Adjust", "AppsFlyer", "FacebookAnalytics", "GameAnalytics"}) do
+        local s = _G[sdk]; if s then s.logEvent = nop; s.trackEvent = nop; s.setEnabled = retFalse; s.sendEvent = nop; s.report = nop end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Log & Crash Blocker")
+end)
+end
+
+local function InitializeScannerBlocker()
+pcall(function()
+    local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    if SubMgr then
+        local subs = {"AFKReportorSubsystem","ClientDataStatistcsSubsystem","AvatarExceptionSubsystem","ShootVerifySubSystemClient","MemoryCheckSubsystem","SpeedCheckSubsystem","WallCheckSubsystem","FileCheckSubsystem","BehaviorScoreSubsystem"}
+        for _, name in ipairs(subs) do
+            local sub = SubMgr:Get(name)
+            if sub then
+                for k, v in pairs(sub) do
+                    if type(v) == "function" and (k:find("Report") or k:find("Send") or k:find("Upload") or k:find("Verify") or k:find("Check") or k:find("Validate") or k:find("Scan") or k:find("Detect")) then 
+                        pcall(function() sub[k] = nop end) 
+                    end
+                end
+            end
+        end
+    end
+    local TssSdk = package.loaded["TssSdk"] or _G.TssSdk
+    if TssSdk then
+        TssSdk.SendReportInfo = nop; TssSdk.ScanMemory = retTrue; TssSdk.IsEmulator = retFalse; TssSdk.GetTssSdkReportInfo = retEmptyString; TssSdk.CheckEnvironment = retTrue; TssSdk.VerifyProcess = retTrue
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Scanner & TssSdk Blocker")
+end)
+end
+
+local function InitializeReplayTelemetryBlocker()
+pcall(function()
+    local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    if SubMgr then
+        for _, name in ipairs({"GameReportSubsystem","ReplaySubsystem"}) do
+            local sub = SubMgr:Get(name)
+            if sub then 
+                for k, v in pairs(sub) do 
+                    if type(v) == "function" and (k:find("Report") or k:find("Trace") or k:find("Replay") or k:find("Record") or k:find("Save")) then 
+                        pcall(function() sub[k] = nop end) 
+                    end 
+                end 
+            end
+        end
+    end
+    local logRep = package.loaded["client.slua.logic.replay.logic_report_replay"]
+    if logRep then logRep.ReportReplay = nop; logRep.SendReportReq = nop; logRep.UploadReplay = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Replay Telemetry Blocker")
+end)
+end
+
+local function InitializePlayerSecurityBypass()
+pcall(function()
+    for _, c in ipairs({"PlayerSecurityInfoCollector","PlayerSecurityInfo","SecurityInfoCollector","ClientSecurityCollector","PlayerAntiCheatCollector"})do
+        if _G[c] then for k,v in pairs(_G[c])do if type(v)=="function"and(k:find("Report")or k:find("Collect")or k:find("Send")or k:find("Upload")or k:find("Record"))then _G[c][k]=nop end end end
+    end
+    local SecSub = require("GameLua.Mod.BaseMod.Common.Security.PlayerSecurityInfoSubsystem")
+    if SecSub then SecSub.ReportData = nop; SecSub.CheckCheat = retFalse; SecSub.ValidatePlayer = retTrue; SecSub.CollectData = nop; SecSub.SendToServer = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Player Security Bypass")
+end)
+end
+
+local function InitializeClientFlowBypass()
+pcall(function()
+    for _, name in ipairs({"ClientSecMrpcsFlow","MrpcsFlow","MrpcsData","ClientCircleFlowSubsystem","ClientKillFlowSubsystem","ClientSecPlayerKillFlow"})do
+        local sub = package.loaded[name] or _G[name]
+        if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Send")or k:find("Flow")or k:find("Record")or k:find("Process"))then pcall(function()sub[k]=nop end)end end end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Client Flow Bypass")
+end)
+end
+
+local function InitializeSwiftHawkBypass()
+pcall(function()
+    for _, f in ipairs({"SwiftHawk","ClientSwiftHawk","ClientSwiftHawkWithParams","SendSwiftHawkData"})do if _G[f]then _G[f]=nop end;if _G.GameplayCallbacks and _G.GameplayCallbacks[f]then _G.GameplayCallbacks[f]=nop end end
+    local sub = package.loaded["GameLua.Mod.BaseMod.Client.Security.SwiftHawkSubsystem"]
+    if sub then sub.ReportData = nop; sub.SendReport = nop; sub.CollectTelemetry = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] SwiftHawk Bypass")
+end)
+end
+
+local function InitializeCoronaLabBypass()
+pcall(function()
+    if _G.CoronaLab then _G.CoronaLab.ReportData = nop; _G.CoronaLab.SendData = nop; _G.CoronaLab.CollectData = nop; _G.CoronaLab.Telemetry = nop end
+    local sub = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr"):Get("CoronaLabSubsystem")
+    if sub then sub.ReportData = nop; sub.SendToServer = nop; sub.CollectTelemetry = nop; sub.StopCollection = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] CoronaLab Bypass")
+end)
+end
+
+local function InitializeModifierExceptionBypass()
+pcall(function()
+    if _G.bReportedModifierException then _G.bReportedModifierException = false end
+    local sub = require("GameLua.Mod.BaseMod.Common.Security.ModifierExceptionSubsystem")
+    if sub then sub.ReportException = nop; sub.CheckModifier = retTrue; sub.ValidateModifier = retTrue; sub.ReportModifierError = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Modifier Exception Bypass")
+end)
+end
+
+local function InitializeSimulateCharacterLocationBypass()
+pcall(function()
+    local sub = require("GameLua.Mod.BaseMod.Gameplay.Simulate.SimulateCharacterSubsystem")
+    if sub then sub.ReportLocation = nop; sub.SendLocationData = nop; sub.VerifyLocation = retTrue end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Simulate Character Location Bypass")
+end)
+end
+
+local function InitializeShootVerificationBypass()
+pcall(function()
+    local sub = (package.loaded and package.loaded["GameLua.Dev.Subsystem.ShootVerifySubSystemClient"])
+    if sub then sub.OnShootVerifyFailed = nop; sub.SendVerifyData = nop; sub.ReportBulletHit = nop; sub.UploadHitInfo = nop; sub.VerifyShot = retTrue end
+    if _G.BulletHitInfoUploadData then _G.BulletHitInfoUploadData.Report = nop; _G.BulletHitInfoUploadData.Send = nop; _G.BulletHitInfoUploadData.Upload = nop end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Shoot Verification Bypass")
+end)
+end
+
+local function InitializeHiggsBosonBypass()
+pcall(function()
+    local Higgs = require("GameLua.Mod.BaseMod.Common.Security.HiggsBosonComponent")
+    if Higgs then
+        for _, m in ipairs({"ControlMHActive","Tick","OnTick","MHActiveLogic","TriggerAvatarCheck","StartAvatarCheck","ReportItemID","ReceiveAnyDamage","OnWeaponHitRecord","ShowSecurityAlert","ServerReportAvatar","ClientReportNetAvatar","SendHisarData","ValidateSecurityData","StaticShowSecurityAlertInDev","RPC_Client_ShootVertifyRes","RPC_Server_ReportSimulateCharacterLocation","DisableHiggsBoson","CheckMHActive","ReportViolation","ProcessSecurityEvent","ValidatePlayer","CheckIntegrity"})do
+            if Higgs[m] then Higgs[m] = nop end
+        end
+        Higgs.GetNetAvatarItemIDs = retEmpty; Higgs.GetCurWeaponSkinID = retZero; Higgs.IsMHActive = retFalse; Higgs.bMHActive = false; Higgs.bCallPreReplication = false
+        if Higgs.BlackList then for k in pairs(Higgs.BlackList) do Higgs.BlackList[k] = nil end end
+    end
+    _G.BlackList = {}
+    local pc = slua_GameFrontendHUD and slua_GameFrontendHUD:GetPlayerController()
+    if slua.isValid(pc) then
+        if pc.HiggsBoson then pc.HiggsBoson.bMHActive = false; pc.HiggsBoson.bCallPreReplication = false; if pc.HiggsBoson.ControlMHActive then pc.HiggsBoson:ControlMHActive(0) end end
+        if pc.HiggsBosonComponent then pc.HiggsBosonComponent.bMHActive = false; pc.HiggsBosonComponent.bCallPreReplication = false; pc.HiggsBosonComponent:ControlMHActive(0) end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] HiggsBoson Anti-Cheat Bypass")
+end)
+end
+
+local function InitializeAntiCheatHooks()
+pcall(function()
+    local HBC = require("GameLua.Mod.BaseMod.Common.Security.HiggsBosonComponent")
+    if HBC and HBC.StaticShowSecurityAlertInDev then HBC.StaticShowSecurityAlertInDev = nop end
+end)
+if _G.AvatarCheckCallback then
+    _G.AvatarCheckCallback.StartAvatarCheck = nop; _G.AvatarCheckCallback.OnReportItemID = nop
+    _G.AvatarCheckCallback.PostPlayerControllerLoginInit = function(PlayerController)
+        if slua.isValid(PlayerController) and PlayerController.HiggsBosonComponent then 
+            PlayerController.HiggsBosonComponent:ControlMHActive(0)
+            PlayerController.HiggsBosonComponent.bMHActive = false 
+        end
+    end
+end
+end
+
+local function InitializeAntiReport()
+pcall(function()
+    for _, path in ipairs({"GameLua.Mod.BaseMod.Client.Security.ClientReportPlayerSubsystem","Client.Security.ClientReportPlayerSubsystem","GameLua.Mod.BaseMod.DS.Security.DSReportPlayerSubsystem"})do
+        local sub = package.loaded[path]; if not sub then local s,r = pcall(require,path); if s and r then sub = r end end
+        if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Record")or k:find("Send")or k:find("Upload")or k:find("Notify"))then pcall(function()sub[k]=nop end)end end end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Anti-Report Subsystem")
+end)
+end
+
+local function InitializeKillAllSubsystems()
+pcall(function()
+    local subMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    if not subMgr then return end
+    local toKill = {"CoronaLabSubsystem","PlayerSecurityInfoSubsystem","ClientCircleFlowSubsystem","ModifierExceptionSubsystem","SimulateCharacterSubsystem","ShootVerifySubSystemClient","HiggsBosonComponent","ClientReportPlayerSubsystem","DSReportPlayerSubsystem","ClientHawkEyePatrolSubsystem","DSHawkEyePatrolSubsystem","ClientDataStatistcsSubsystem","AFKReportorSubsystem","BehaviorScoreSubsystem","FileCheckSubsystem","MemoryCheckSubsystem","SpeedCheckSubsystem","WallCheckSubsystem","AvatarExceptionSubsystem","GameReportSubsystem","ClientSecMrpcsFlowSubsystem","MrpcsFlowSubsystem","CircleFlowSubsystem","SwiftHawkSubsystem","AntiCheatSubsystem","IntegrityCheckSubsystem","SignatureVerifySubsystem","MD5CheckSubsystem","PakVerifySubsystem"}
+    for _, name in ipairs(toKill) do
+        local sub = subMgr:Get(name)
+        if sub then
+            for k, v in pairs(sub) do 
+                if type(v) == "function" and (k:find("Report") or k:find("Send") or k:find("Upload") or k:find("Verify") or k:find("Check") or k:find("Validate") or k:find("Scan") or k:find("Detect") or k:find("Collect") or k:find("Flow") or k:find("Heartbeat")) then 
+                    pcall(function() sub[k] = nop end) 
+                end 
+            end
+            if sub.timer then pcall(function() sub:RemoveGameTimer(sub.timer) end) end
+            if sub.heartbeatTimer then pcall(function() sub:RemoveGameTimer(sub.heartbeatTimer) end) end
+            if sub.reportTimer then pcall(function() sub:RemoveGameTimer(sub.reportTimer) end) end
+        end
+    end
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Kill All Subsystems & Security Timers")
+end)
+end
+
+local function InitializeOperationalStatsBypass()
+pcall(function()
+    local subMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+    local OperationalStatsSubsystem = (subMgr and subMgr:Get("OperationalStatsSubsystem")) or _G.OperationalStatsSubsystem
+    if OperationalStatsSubsystem then
+        OperationalStatsSubsystem.ReportOperationalStats = nop
+        OperationalStatsSubsystem.AddOperationalStats = nop
+        OperationalStatsSubsystem.HandleTouchBegin = nop
+        OperationalStatsSubsystem.HandleTouchEnd = nop
+        OperationalStatsSubsystem.OnInit = nop
+        OperationalStatsSubsystem.HandleEnterFighting = nop
+        OperationalStatsSubsystem.OnBattleResult = nop
+        if OperationalStatsSubsystem.TimerHandle then
+            pcall(function() OperationalStatsSubsystem:RemoveGameTimer(OperationalStatsSubsystem.TimerHandle) end)
+            OperationalStatsSubsystem.TimerHandle = nil
+        end
+        OperationalStatsSubsystem.StatsData = {}
+    end
+end)
+end
+
+-- ============================================================================
+-- ⚡ ULTIMATE AGGRESSIVE BYPASS (Wallhack Integration)
+-- ============================================================================
+local function InstallUltimateWallhackBypass()
+    if _G.__ULTIMATE_WH_BYPASS_LOADED then return end
+
+    pcall(function()
+        local FPSP = import("PrimitiveSceneProxy")
+        if FPSP then
+            local origGetViewRelevance = FPSP.GetViewRelevance
+            FPSP.GetViewRelevance = function(self, View)
+                local VR = origGetViewRelevance(self, View)
+                if _G._WHA_BYPASS_ACTIVE and VR then
+                    VR.bRenderCustomDepth = false
+                    VR.bUsesSceneDepth = false
+                end
+                return VR
+            end
+        end
+    end)
+
+    pcall(function()
+        local UMesh = import("MeshComponent")
+        if UMesh then
+            UMesh.GetRenderCustomDepth = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origGRCD(self) end return false end
+            UMesh.__origGRCD = UMesh.GetRenderCustomDepth
+            UMesh.IsRenderedOnCustomDepth = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origIRCD(self) end return false end
+            UMesh.__origIRCD = UMesh.IsRenderedOnCustomDepth
+            UMesh.GetCustomDepthStencilValue = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origGCDSV(self) end return 0 end
+            UMesh.__origGCDSV = UMesh.GetCustomDepthStencilValue
+            UMesh.ShouldRender = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origSR(self) end return true end
+            UMesh.__origSR = UMesh.ShouldRender
+            UMesh.IsVisible = function(self)
+                if not _G._WHA_BYPASS_ACTIVE then return UMesh.__origIV(self) end return true end
+            UMesh.__origIV = UMesh.IsVisible
+        end
+    end)
+
+    pcall(function()
+        local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+        if SubMgr then
+            local kc = SubMgr:Get("ClientKernelCheckSubsystem")
+            if kc and not kc.__Kinghooked then
+                local origIKC = kc.IsKernelClean
+                kc.IsKernelClean = function(self)
+                    if not _G._WHA_BYPASS_ACTIVE then return origIKC(self) end
+                    return true, { code = 0, message = "clean" }
+                end
+                kc.__Kinghooked = true
+            end
+            local mg = SubMgr:Get("ClientMemoryGuardSubsystem")
+            if mg and not mg.__Kinghooked then
+                local origIMC = mg.IsMemoryClean
+                mg.IsMemoryClean = function(self)
+                    if not _G._WHA_BYPASS_ACTIVE then return origIMC(self) end
+                    return true, {code=0}
+                end
+                mg.__Kinghooked = true
+            end
+        end
+    end)
+
+    _G.__ULTIMATE_WH_BYPASS_LOADED = true
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Ultimate Wallhack & Kernel Protection")
+end
+
+-- ============================================================================
+-- ⚡ GLOBAL AIMBOT & RECOIL BYPASS
+-- ============================================================================
+local function InstallAimbotRecoilBypass()
+    if _G.__AIMBOT_BYPASS_LOADED then return end
+
+    pcall(function()
+        local ShootWeaponEntity = import("ShootWeaponEntity") or import("ShootWeaponEntityComp")
+        if ShootWeaponEntity then
+            local mt = getmetatable(ShootWeaponEntity) or {}
+            local oldIndex = mt.__index or function(t, k) return rawget(t, k) end
+            mt.__index = function(self, key)
+                local k = tostring(key)
+                if _G._WHA_BYPASS_ACTIVE then
+                    if k == "RecoilKickADS" or k == "GameDeviationFactor" or k == "GameDeviationAccuracy" then
+                        return 1.0
+                    end
+                end
+                return oldIndex(self, key)
+            end
+            setmetatable(ShootWeaponEntity, mt)
+        end
+    end)
+
+    _G.__AIMBOT_BYPASS_LOADED = true
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Aimbot & Recoil Bypass")
+end
+
+-- ============================================================================
+-- ⚡ ADVANCED DETECTION BYPASS
+-- ============================================================================
+local function InstallAdvancedDetectionBypass()
+    if _G.__ADVANCED_BYPASS_LOADED then return end
+
+    pcall(function()
+        local CharacterMovement = import("CharacterMovementComponent")
+        if CharacterMovement then
+            local origGetMaxSpeed = CharacterMovement.GetMaxSpeed
+            CharacterMovement.GetMaxSpeed = function(self)
+                local speed = origGetMaxSpeed(self)
+                if _G._WHA_BYPASS_ACTIVE then return 600.0 end
+                return speed
+            end
+        end
+    end)
+
+    _G.__ADVANCED_BYPASS_LOADED = true
+    report.success = report.success + 1
+    table.insert(report.details, " [✓] Advanced Detection & Speed Bypass")
+end
+
+-- ============================================================================
+-- FUNGSI UTAMA EKSEKUSI AKTIVASI BYPASS (DIPANGGIL OTOMATIS SAAT MASUK MATCH)
+-- ============================================================================
+_G.StartBypass_VIP_v3 = function()
+    pcall(function()
+        if isBypassActive then return end
+        isBypassActive = true
+        _G._WHA_BYPASS_ACTIVE = true
+        _G._MOD_EXPIRED = false
+
+        print("[+] GODMOD VIP: Masuk Match terdeteksi, mengaktifkan bypass...")
+
+        report.success = 0
+        report.failed = 0
+        report.details = {}
+
+        -- A. Network Packet & RPC Blocker
+        pcall(function()
+            if NetUtil and NetUtil.SendPacket then
+                local orig = NetUtil.SendPacket
+                local blocked = {
+                    ["ReportAttackFlow"]=1, ["ReportSecAttackFlow"]=1, ["ReportFireArms"]=1, 
+                    ["ReportVerifyInfoFlow"]=1, ["ReportMrpcsFlow"]=1, ["ReportPlayerBehavior"]=1, 
+                    ["ReportTeammatHurt"]=1, ["ReportMisKillByTeammate"]=1, ["ReportForbitPick"]=1, 
+                    ["ReportPlayerMoveRoute"]=1, ["ReportPlayerPosition"]=1, ["ReportSecVehicleMoveFlow"]=1, 
+                    ["report_parachute_data"]=1, ["ReportAimFlow"]=1, ["ReportHitFlow"]=1, 
+                    ["ReportCircleFlow"]=1, ["report_players_ping"]=1, ["report_player_ip"]=1, 
+                    ["report_net_saturate"]=1, ["report_speed_hack"]=1, ["report_wall_hack"]=1, 
+                    ["report_aim_bot"]=1, ["report_esp_usage"]=1, ["report_modded_files"]=1, 
+                    ["detect_cheat"]=1, ["ban_player"]=1, ["client_anti_cheat_report"]=1, 
+                    ["ClientSecMrpcsFlow"]=1, ["MrpcsData"]=1, ["CheckReportSecAttackFlow"]=1, 
+                    ["CheckReportSecAttackFlowWithAttackFlow"]=1, ["RPC_ClientCoronaLab"]=1, 
+                    ["CoronaLabReport"]=1, ["CoronaLabData"]=1, ["PlayerSecurityInfo"]=1, 
+                    ["ReportSecurityInfo"]=1, ["SendSecurityData"]=1, ["ClientCircleFlow"]=1, 
+                    ["IsEnableReportMrpcsInCircleFlow"]=1, ["IsEnableReportMrpcsInPartCircleFlow"]=1, 
+                    ["bReportedModifierException"]=1, ["ReportModifierException"]=1, 
+                    ["RPC_Server_ReportSimulateCharacterLocation"]=1, ["ReportSimulateCharacterLocation"]=1, 
+                    ["RPC_Client_ShootVertifyRes"]=1, ["BulletHitInfoUploadData"]=1, ["ShootVerifyFailed"]=1, 
+                    ["report_unrealnet_exception"]=1, ["SwiftHawk"]=1, ["ClientSwiftHawk"]=1, 
+                    ["ClientSwiftHawkWithParams"]=1, ["SwiftHawkReport"]=1, ["SwiftHawkData"]=1, 
+                    ["AntiCheatReport"]=1, ["CheatDetection"]=1, ["ViolationReport"]=1, 
+                    ["SecurityViolation"]=1, ["IntegrityCheck"]=1, ["SignatureVerify"]=1
+                }
+                NetUtil.SendPacket = function(packetName, ...)
+                    if blocked[packetName] then return nil end
+                    return orig(packetName, ...)
+                end
+                NetUtil.IsBypassed = true
+            end
+            
+            if _G.SendRPC then
+                local origRPC = _G.SendRPC
+                local blockedRPC = {
+                    "RPC_Server_ClientSecMrpcsFlow", "RPC_Server_SwiftHawk", 
+                    "RPC_Server_ClientSwiftHawkWithParams", "RPC_Server_ReportSimulateCharacterLocation", 
+                    "RPC_Client_ShootVertifyRes", "RPC_ClientCoronaLab"
+                }
+                _G.SendRPC = function(rpcName, ...)
+                    for _, b in ipairs(blockedRPC) do 
+                        if rpcName == b then return nil end 
+                    end
+                    return origRPC(rpcName, ...)
+                end
+            end
+            report.success = report.success + 1
+            table.insert(report.details, " [✓] Network Packet & RPC Blocker")
+        end)
+
+        -- B. Gameplay State & Connection State Intercept
+        pcall(function()
+            if not _G.GameplayCallbacks then _G.GameplayCallbacks = {} end
+            if _G.GameplayCallbacks.IsBypassed then return end
+            local GC = _G.GameplayCallbacks
+            local reports = {
+                "ReportAttackFlow", "ReportSecAttackFlow", "ReportFireArms", "ReportVerifyInfoFlow", 
+                "ReportMrpcsFlow", "ReportPlayerBehavior", "ReportTeammatHurt", "ReportMisKillByTeammate", 
+                "ReportForbitPick", "ReportPlayerMoveRoute", "ReportPlayerPosition", "ReportVehicleMoveFlow", 
+                "ReportSecTgameMovingFlow", "ReportParachuteData", "ReportEquipmentFlow", "ReportAimFlow", 
+                "ReportPlayersPing", "ReportPlayerIP", "ReportPlayerFramePingRecord", "OnDSConnectionSaturated", 
+                "ReportDSNetSaturation", "ReportNetContinuousSaturate", "ReportDSNetRate", "SendClientStats", 
+                "SendServerAvgTickDelta", "ReportCircleFlow", "ClientSecMrpcsFlow", "SwiftHawk", 
+                "ClientSwiftHawk", "ClientSwiftHawkWithParams"
+            }
+            for _, f in ipairs(reports) do GC[f] = nop end
+            GC.CheckReportSecAttackFlowWithAttackFlow = retFalse
+            GC.CheckReportSecAttackFlow = retFalse
+
+            local origState = GC.OnDSPlayerStateChanged
+            GC.OnDSPlayerStateChanged = function(UID, State, bPure, bSafe, Param)
+                local s = State and string.lower(tostring(State)) or ""
+                local blocked = {
+                    ["cheatdetected"]=1, ["connectionlost"]=1, ["connectiontimeout"]=1, 
+                    ["connectionexception"]=1, ["netdrivererror"]=1, ["banned"]=1, 
+                    ["kicked"]=1, ["suspended"]=1, ["violationdetected"]=1, 
+                    ["integrityfailure"]=1, ["securityviolation"]=1
+                }
+                if blocked[s] then return end
+                if origState then pcall(origState, UID, State, bPure, bSafe, Param) end
+            end
+
+            GC.OnPlayerNetConnectionClosed = nop
+            GC.OnPlayerActorChannelError = nop
+            GC.OnPlayerRPCValidateFailed = nop
+            GC.OnPlayerSpectateException = nop
+            GC.OnShutdownAfterError = nop
+            GC.IsBypassed = true
+            
+            report.success = report.success + 1
+            table.insert(report.details, " [✓] Gameplay State & Connection Bypass")
+        end)
+
+        -- C. Eksekusi Seluruh Modul Keamanan Lengkap (Dari Atas Sampai Bawah)
+        InitializeSLUABypass()
+        InitializeMD5Bypass()
+        InitializeSkinBypass()
+        InitializeLogBlocker()
+        InitializeScannerBlocker()
+        InitializeReplayTelemetryBlocker()
+        InitializePlayerSecurityBypass()
+        InitializeClientFlowBypass()
+        InitializeSwiftHawkBypass()
+        InitializeCoronaLabBypass()
+        InitializeModifierExceptionBypass()
+        InitializeSimulateCharacterLocationBypass()
+        InitializeShootVerificationBypass()
+        InitializeHiggsBosonBypass()
+        InitializeAntiCheatHooks()
+        InitializeAntiReport()
+        InitializeKillAllSubsystems()
+        InitializeOperationalStatsBypass()
+        
+        -- D. Install Fitur Wallhack, Aimbot, & Advanced
+        InstallUltimateWallhackBypass()
+        InstallAimbotRecoilBypass()
+        InstallAdvancedDetectionBypass()
+
+        -- E. Final Protection (Override Require)
+        pcall(function()
+            for _, flag in ipairs({"ENABLE_REPORT", "ENABLE_ANTI_CHEAT", "ENABLE_SECURITY", "ENABLE_TELEMETRY", "ENABLE_ANALYTICS", "ENABLE_CRASH_REPORT", "ENABLE_PERFORMANCE_REPORT"}) do 
+                if _G[flag] then _G[flag] = false end 
+            end
+
+            local origReq = require
+            local blocked = {
+                "HiggsBosonComponent", "PlayerSecurityInfoSubsystem", "CoronaLabSubsystem", 
+                "ClientCircleFlowSubsystem", "ModifierExceptionSubsystem", "ShootVerifySubSystemClient", 
+                "ClientReportPlayerSubsystem", "DSReportPlayerSubsystem"
+            }
+            _G.require = function(m)
+                for _, b in ipairs(blocked) do 
+                    if m:find(b) then return {} end 
+                end
+                return origReq(m)
+            end
+
+            report.success = report.success + 1
+            table.insert(report.details, " [✓] Final Protection (Require Hook)")
+        end)
+
+        -- F. Munculkan pop-up laporan hasil bypass setelah sukses dijalankan
+        GODMOD_ShowReport()
+    end)
+end
+
+-- Fungsi Mematikan Bypass saat Keluar ke Lobi
+local function DeactivateBypass()
+    if not isBypassActive then return end
+    isBypassActive = false
+    _G._WHA_BYPASS_ACTIVE = false
+
+    print("[+] GODMOD VIP: Kembali ke Lobi, menonaktifkan bypass...")
+    
+    pcall(function()
+        for _, flag in ipairs({"ENABLE_REPORT", "ENABLE_ANTI_CHEAT", "ENABLE_SECURITY", "ENABLE_TELEMETRY", "ENABLE_ANALYTICS", "ENABLE_CRASH_REPORT", "ENABLE_PERFORMANCE_REPORT"}) do 
+            if _G[flag] == false then _G[flag] = true end 
+        end
+    end)
+end
+
+-- Pengecekan Status Game (Lobi vs Match)
+local function CheckGameStatus()
+    local inMatch = false
+    pcall(function()
+        if _G.IsInMatch == true or _G.IsIngame == true then
+            inMatch = true
+        elseif UnrealEngine and UnrealEngine.GetLevelName then
+            local level = string.lower(tostring(UnrealEngine.GetLevelName()))
+            if level ~= "lobby" and level ~= "login" and level ~= "" then
+                inMatch = true
+            end
+        else
+            inMatch = true 
+        end
+    end)
+    return inMatch
+end
+
+-- Auto Monitor Background Thread
+pcall(function()
+    local ticker = require("common.time_ticker")
+    if ticker and type(ticker.AddTimerLoop) == "function" then
+        ticker.AddTimerLoop(0, function()
+            local status = CheckGameStatus()
+            
+            if status and not isBypassActive then
+                _G.StartBypass_VIP_v3()
+            elseif not status and isBypassActive then
+                DeactivateBypass()
+            end
+        end, 0, 3.0)
+    end
+end)
+
 -- ==============================================================================
 -- ============================ MULAI FULL LOGIC MOD ==========================
 -- ==============================================================================
@@ -46,1287 +735,6 @@ local GLOBAL_CONNECTIONS = {
     {"pelvis", "thigh_l", C_CYAN}, {"thigh_l", "calf_l", C_CYAN}, {"calf_l", "foot_l", C_CYAN},
     {"pelvis", "thigh_r", C_CYAN}, {"thigh_r", "calf_r", C_CYAN}, {"calf_r", "foot_r", C_CYAN}
 }
-
-
--- ============================================================================
--- ULTIMATE MERGED BYPASS v3.0 - COMPLETE SECURITY DISABLEMENT
--- ============================================================================
-local function nop()return true end
-local function retFalse()return false end
-local function retZero()return 0 end
-local function retEmpty()return{}end
-local function retNil()return nil end
-local function retTrue()return true end
-local function retEmptyString()return""end
-local function InitializeSLUABypass()
-pcall(function()
-if slua and slua.getSignature then slua.getSignature=function()return 0xDEADBEEF end end
-local loader=package.loaded["slua.loader"]or rawget(_G,"slua_loader")
-if loader then
-loader.verifyBytecode=retTrue
-loader.checkIntegrity=retTrue
-if loader.disableSignatureCheck then loader.disableSignatureCheck=retTrue end
-end
-local slua_serialize=package.loaded["slua.serialize"]
-if slua_serialize then slua_serialize.check=retTrue;slua_serialize.verify=retTrue end
-if jit and jit.attach then jit.attach(function()end,"bc")end
-if _G.slua_verify then _G.slua_verify=retTrue end
-if _G.check_slua_integrity then _G.check_slua_integrity=retTrue end
-end)
-end
-local function InitializeMD5Bypass()
-pcall(function()
-local console=import("KismetSystemLibrary")
-if console then
-console.ExecuteConsoleCommand(nil,"pak.DisablePakSignatureCheck 1")
-console.ExecuteConsoleCommand(nil,"pakchunk.EnableSignatureCheck 0")
-console.ExecuteConsoleCommand(nil,"s.VerifyPak 0")
-console.ExecuteConsoleCommand(nil,"sig.Check 0")
-console.ExecuteConsoleCommand(nil,"security.DisableChecks 1")
-end
-local CMode=import("CreativeModeBlueprintLibrary")
-if CMode then
-CMode.MD5HashByteArray=function()return"00000000000000000000000000000000"end
-CMode.MD5HashFile=function()return"00000000000000000000000000000000"end
-CMode.GetContentDiffData=function()return true,"BYPASSED"end
-CMode.VerifyFileIntegrity=retTrue
-end
-if _G.MD5Hash then _G.MD5Hash=function()return"00000000000000000000000000000000"end end
-if _G.CRC32 then _G.CRC32=function()return 0 end end
-if _G.SHA1 then _G.SHA1=function()return"BYPASS"end end
-local FileHashChecker=package.loaded["common.file_hash_checker"]
-if FileHashChecker then
-FileHashChecker.CheckFileMD5=retTrue;FileHashChecker.VerifyAll=retTrue
-FileHashChecker.GetHash=function()return"BYPASS"end
-end
-local TssSdk=package.loaded["TssSdk"]or _G.TssSdk
-if TssSdk then TssSdk.GetFileMD5=function()return"BYPASS"end;TssSdk.VerifyFileSignature=retTrue end
-local STExtra=import("STExtraBlueprintFunctionLibrary")
-if STExtra then STExtra.CheckMD5=retTrue;STExtra.GetMD5=function()return"BYPASS"end;STExtra.VerifyFile=retTrue end
-end)
-end
-local function InitializeSkinBypass()
-pcall(function()
-local ptlog=package.loaded["client.slua.logic.download.report.puffer_tlog"]
-if ptlog then ptlog.ReportEvent=nop;ptlog.ReportDownloadResult=nop;ptlog.ReportODPTDError=nop;ptlog.ReportSkinError=nop end
-local AvatarUtils=package.loaded["AvatarUtils"]
-if AvatarUtils then AvatarUtils.CheckIsWeaponInBlackList=retFalse;AvatarUtils.IsValidAvatar=retTrue;AvatarUtils.CheckAvatarIntegrity=retTrue;AvatarUtils.ReportInvalidAvatar=nop end
-local sub=require("GameLua.GameCore.Module.Subsystem.SubsystemMgr"):Get("FileCheckSubsystem")
-if sub then sub.StartCheck=nop;sub.ReportAbnormalFile=nop;sub.StopCheck=nop end
-local eqEx=package.loaded["client.slua.logic.report.EquipmentExceptionReport"]
-if eqEx then eqEx.Report=nop;eqEx.SendException=nop end
-end)
-end
-local function InitializeLogBlocker()
-pcall(function()
-local SMTD=import("ScreenshotMTDer")
-if SMTD then SMTD.MTDePicture=function()return""end;SMTD.ReMTDePicture=function()return""end;SMTD.HasCaptured=retTrue;SMTD.TakeScreenshot=nop end
-local TLog=package.loaded["TLog"]or _G.TLog
-if TLog then TLog.Info=nop;TLog.Warning=nop;TLog.Error=nop;TLog.Debug=nop;TLog.Report=nop;TLog.Send=nop;TLog.Flush=nop end
-local CrashSight=package.loaded["CrashSight"]or _G.CrashSight
-if CrashSight then CrashSight.ReportException=nop;CrashSight.SetCustomData=nop;CrashSight.Log=nop;CrashSight.SendCrash=nop;CrashSight.ReportUserException=nop end
-local GRUtils=package.loaded["GameLua.Mod.BaseMod.GamePlay.GameReport.GameReportUtils"]
-if GRUtils then GRUtils.BugglyPostExceptionFull=retFalse;GRUtils.CheckCanBugglyPostException=retFalse;GRUtils.ReplayReportData=nop;GRUtils.ReportGameException=nop;GRUtils.PostException=nop end
-local CTR=package.loaded["client.slua.logic.report.ClientToolsReport"]
-if CTR then CTR.SendReport=nop;CTR.SendException=nop;CTR.UploadLog=nop end
-for _,sdk in ipairs({"Firebase","Adjust","AppsFlyer","FacebookAnalytics","GameAnalytics"})do
-local s=_G[sdk];if s then s.logEvent=nop;s.trackEvent=nop;s.setEnabled=retFalse;s.sendEvent=nop;s.report=nop end
-end
-end)
-end
-local function InitializeScannerBlocker()
-pcall(function()
-local SubMgr=require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
-if SubMgr then
-local subs={"AFKReportorSubsystem","ClientDataStatistcsSubsystem","AvatarExceptionSubsystem","ShootVerifySubSystemClient","MemoryCheckSubsystem","SpeedCheckSubsystem","WallCheckSubsystem","FileCheckSubsystem","BehaviorScoreSubsystem"}
-for _,name in ipairs(subs)do
-local sub=SubMgr:Get(name)
-if sub then
-for k,v in pairs(sub)do
-if type(v)=="function"and(k:find("Report")or k:find("Send")or k:find("Upload")or k:find("Verify")or k:find("Check")or k:find("Validate")or k:find("Scan")or k:find("Detect"))then pcall(function()sub[k]=nop end)end
-end
-if sub.ReportPingDelayTimer then sub:RemoveGameTimer(sub.ReportPingDelayTimer);sub.ReportPingDelayTimer=nil end;sub.DelayCount=0
-end
-end
-end
-local AvaEx=package.loaded["GameLua.Mod.Library.GamePlay.Avatar.Exception.AvatarExceptionPlayerInst"]
-if AvaEx then AvaEx.CheckAvatarException=nop;AvaEx.CheckAvatarExceptionOnce=nop;AvaEx.ReportAvatarException=nop;AvaEx.CheckSlotMeshVisible=retFalse;AvaEx.CheckPawnVisible=retFalse;AvaEx.CheckCanBugglyPostException=retFalse end
-local TssSdk=package.loaded["TssSdk"]or _G.TssSdk
-if TssSdk then
-local origData=TssSdk.OnRecvData
- -- [FIX PING]: Tambahkan parameter 'true' ke fungsi find untuk mencari teks biasa, jauh lebih cepat so dengan regex, biar ping tidak tersendat
-TssSdk.OnRecvData=function(data)if type(data)=="string"and(data:find("report",1,true)or data:find("exception",1,true)or data:find("cheat",1,true)or data:find("violation",1,true)or data:find("hack",1,true)or data:find("verify",1,true))then return end;if origData then origData(data)end end
-TssSdk.SendReportInfo=nop;TssSdk.ScanMemory=retTrue;TssSdk.IsEmulator=retFalse;TssSdk.GetTssSdkReportInfo=retEmptyString;TssSdk.CheckEnvironment=retTrue;TssSdk.VerifyProcess=retTrue
-end
-end)
-end
-local function InitializeReplayTelemetryBlocker()
-pcall(function()
-local SubMgr=require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
-if SubMgr then
-for _,name in ipairs({"GameReportSubsystem","ReplaySubsystem"})do
-local sub=SubMgr:Get(name)
-if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Trace")or k:find("Replay")or k:find("Record")or k:find("Save"))then pcall(function()sub[k]=nop end)end end end
-end
-end
-local logRep=package.loaded["client.slua.logic.replay.logic_report_replay"]
-if logRep then logRep.ReportReplay=nop;logRep.SendReportReq=nop;logRep.UploadReplay=nop end
-end)
-end
-local function InitializeReportFlowBlocker()
-pcall(function()
-local flows={"ReportAimFlow","ReportHitFlow","ReportAttackFlow","ReportSecAttackFlow","ReportFireArms","ReportVerifyInfoFlow","ReportMrpcsFlow","ReportPlayerBehavior","ReportTeammatHurt","ReportMisKillByTeammate","ReportForbitPick","ReportPlayerMoveRoute","ReportPlayerPosition","ReportVehicleMoveFlow","ReportSecTgameMovingFlow","ReportParachuteData","ReportEquipmentFlow","ReportPlayersPing","ReportPlayerIP","ReportPlayerFramePingRecord","ReportDSNetSaturation","ReportNetContinuousSaturate","ReportDSNetRate","ReportCircleFlow","ReportSecMrpcsFlow"}
-for _,f in ipairs(flows)do if _G[f]then _G[f]=nop end;if _G.GameplayCallbacks and _G.GameplayCallbacks[f]then _G.GameplayCallbacks[f]=nop end end
-for _,f in ipairs({"CheckReportSecAttackFlowWithAttackFlow","CheckReportSecAttackFlow"})do if _G[f]then _G[f]=retFalse end;if _G.GameplayCallbacks and _G.GameplayCallbacks[f]then _G.GameplayCallbacks[f]=retFalse end end
-for _,f in ipairs({"IsEnableReportMrpcsInCircleFlow","IsEnableReportMrpcsInPartCircleFlow","IsEnableReportMrpcsFlow","IsEnableReportAttackFlow","IsEnableReportHitFlow","IsEnableReportCircleFlow"})do if _G[f]then _G[f]=retFalse end end
-end)
-end
-local function InitializePlayerSecurityBypass()
-pcall(function()
-for _,c in ipairs({"PlayerSecurityInfoCollector","PlayerSecurityInfo","SecurityInfoCollector","ClientSecurityCollector","PlayerAntiCheatCollector"})do
-if _G[c]then for k,v in pairs(_G[c])do if type(v)=="function"and(k:find("Report")or k:find("Collect")or k:find("Send")or k:find("Upload")or k:find("Record"))then _G[c][k]=nop end end end
-end
-local SecSub=require("GameLua.Mod.BaseMod.Common.Security.PlayerSecurityInfoSubsystem")
-if SecSub then SecSub.ReportData=nop;SecSub.CheckCheat=retFalse;SecSub.ValidatePlayer=retTrue;SecSub.CollectData=nop;SecSub.SendToServer=nop end
-end)
-end
-local function InitializeClientFlowBypass()
-pcall(function()
-for _,name in ipairs({"ClientSecMrpcsFlow","MrpcsFlow","MrpcsData","ClientCircleFlowSubsystem","ClientKillFlowSubsystem","ClientSecPlayerKillFlow"})do
-local sub=package.loaded[name]or _G[name]
-if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Send")or k:find("Flow")or k:find("Record")or k:find("Process"))then pcall(function()sub[k]=nop end)end end end
-end
-end)
-end
-local function InitializeSwiftHawkBypass()
-pcall(function()
-for _,f in ipairs({"SwiftHawk","ClientSwiftHawk","ClientSwiftHawkWithParams","SendSwiftHawkData"})do if _G[f]then _G[f]=nop end;if _G.GameplayCallbacks and _G.GameplayCallbacks[f]then _G.GameplayCallbacks[f]=nop end end
-local sub=package.loaded["GameLua.Mod.BaseMod.Client.Security.SwiftHawkSubsystem"]
-if sub then sub.ReportData=nop;sub.SendReport=nop;sub.CollectTelemetry=nop end
-end)
-end
-local function InitializeCoronaLabBypass()
-pcall(function()
-if _G.CoronaLab then _G.CoronaLab.ReportData=nop;_G.CoronaLab.SendData=nop;_G.CoronaLab.CollectData=nop;_G.CoronaLab.Telemetry=nop end
-local sub=require("GameLua.GameCore.Module.Subsystem.SubsystemMgr"):Get("CoronaLabSubsystem")
-if sub then sub.ReportData=nop;sub.SendToServer=nop;sub.CollectTelemetry=nop;sub.StopCollection=nop end
-end)
-end
-local function InitializeModifierExceptionBypass()
-pcall(function()
-if _G.bReportedModifierException then _G.bReportedModifierException=false end
-local sub=require("GameLua.Mod.BaseMod.Common.Security.ModifierExceptionSubsystem")
-if sub then sub.ReportException=nop;sub.CheckModifier=retTrue;sub.ValidateModifier=retTrue;sub.ReportModifierError=nop end
-end)
-end
-local function InitializeSimulateCharacterLocationBypass()
-pcall(function()
-local sub=require("GameLua.Mod.BaseMod.Gameplay.Simulate.SimulateCharacterSubsystem")
-if sub then sub.ReportLocation=nop;sub.SendLocationData=nop;sub.VerifyLocation=retTrue end
-end)
-end
-local function InitializeShootVerificationBypass()
-pcall(function()
-local sub=(package.loaded and package.loaded["GameLua.Dev.Subsystem.ShootVerifySubSystemClient"])
-if sub then sub.OnShootVerifyFailed=nop;sub.SendVerifyData=nop;sub.ReportBulletHit=nop;sub.UploadHitInfo=nop;sub.VerifyShot=retTrue end
-if _G.BulletHitInfoUploadData then _G.BulletHitInfoUploadData.Report=nop;_G.BulletHitInfoUploadData.Send=nop;_G.BulletHitInfoUploadData.Upload=nop end
-end)
-end
-local function InitializeNetworkPacketBlock()
-pcall(function()
-if NetUtil and NetUtil.SendPacket then
-local orig=NetUtil.SendPacket
-local blocked={["ReportAttackFlow"]=1,["ReportSecAttackFlow"]=1,["ReportFireArms"]=1,["ReportVerifyInfoFlow"]=1,["ReportMrpcsFlow"]=1,["ReportPlayerBehavior"]=1,["ReportTeammatHurt"]=1,["ReportPlayerMoveRoute"]=1,["ReportPlayerPosition"]=1,["ReportSecVehicleMoveFlow"]=1,["report_parachute_data"]=1,["on_tss_sdk_anti_data"]=1,["ReportAimFlow"]=1,["ReportHitFlow"]=1,["ReportCircleFlow"]=1,["report_players_ping"]=1,["report_player_ip"]=1,["report_net_saturate"]=1,["report_speed_hack"]=1,["report_wall_hack"]=1,["report_aim_bot"]=1,["report_esp_usage"]=1,["report_modded_files"]=1,["detect_cheat"]=1,["ban_player"]=1,["client_anti_cheat_report"]=1,["ClientSecMrpcsFlow"]=1,["MrpcsData"]=1,["CheckReportSecAttackFlow"]=1,["CheckReportSecAttackFlowWithAttackFlow"]=1,["RPC_ClientCoronaLab"]=1,["CoronaLabReport"]=1,["CoronaLabData"]=1,["PlayerSecurityInfo"]=1,["ReportSecurityInfo"]=1,["SendSecurityData"]=1,["ClientCircleFlow"]=1,["IsEnableReportMrpcsInCircleFlow"]=1,["IsEnableReportMrpcsInPartCircleFlow"]=1,["bReportedModifierException"]=1,["ReportModifierException"]=1,["RPC_Server_ReportSimulateCharacterLocation"]=1,["ReportSimulateCharacterLocation"]=1,["RPC_Client_ShootVertifyRes"]=1,["BulletHitInfoUploadData"]=1,["ShootVerifyFailed"]=1,["report_unrealnet_exception"]=1,["tss_sdk_report"]=1,["SwiftHawk"]=1,["ClientSwiftHawk"]=1,["ClientSwiftHawkWithParams"]=1,["SwiftHawkReport"]=1,["SwiftHawkData"]=1,["AntiCheatReport"]=1,["CheatDetection"]=1,["ViolationReport"]=1,["SecurityViolation"]=1,["IntegrityCheck"]=1,["SignatureVerify"]=1
-}
-NetUtil.SendPacket=function(packetName,...)if blocked[packetName]then return nil end;return orig(packetName,...)end
-NetUtil.IsBypassed=true
-end
-if _G.SendRPC then
-local origRPC=_G.SendRPC
-local blockedRPC={"RPC_Server_ClientSecMrpcsFlow","RPC_Server_SwiftHawk","RPC_Server_ClientSwiftHawkWithParams","RPC_Server_ReportSimulateCharacterLocation","RPC_Client_ShootVertifyRes","RPC_ClientCoronaLab"}
-_G.SendRPC=function(rpcName,...)for _,b in ipairs(blockedRPC)do if rpcName==b then return nil end end;return origRPC(rpcName,...)end
-end
-end)
-end
-local function InitializeHiggsBosonBypass()
-pcall(function()
-local Higgs=require("GameLua.Mod.BaseMod.Common.Security.HiggsBosonComponent")
-if Higgs then
-for _,m in ipairs({"ControlMHActive","Tick","OnTick","MHActiveLogic","TriggerAvatarCheck","StartAvatarCheck","ReportItemID","ReceiveAnyDamage","OnWeaponHitRecord","ShowSecurityAlert","ServerReportAvatar","ClientReportNetAvatar","SendHisarData","ValidateSecurityData","StaticShowSecurityAlertInDev","RPC_Client_ShootVertifyRes","RPC_Server_ReportSimulateCharacterLocation","DisableHiggsBoson","CheckMHActive","ReportViolation","ProcessSecurityEvent","ValidatePlayer","CheckIntegrity"})do
-if Higgs[m]then Higgs[m]=nop end
-end
-Higgs.GetNetAvatarItemIDs=retEmpty;Higgs.GetCurWeaponSkinID=retZero;Higgs.IsMHActive=retFalse;Higgs.bMHActive=false;Higgs.bCallPreReplication=false
-if Higgs.BlackList then for k in pairs(Higgs.BlackList)do Higgs.BlackList[k]=nil end end
-end
-_G.BlackList={}
-local pc=slua_GameFrontendHUD and slua_GameFrontendHUD:GetPlayerController()
-if slua.isValid(pc)then
-if pc.HiggsBoson then pc.HiggsBoson.bMHActive=false;pc.HiggsBoson.bCallPreReplication=false;if pc.HiggsBoson.ControlMHActive then pc.HiggsBoson:ControlMHActive(0)end end
-if pc.HiggsBosonComponent then pc.HiggsBosonComponent.bMHActive=false;pc.HiggsBosonComponent.bCallPreReplication=false;pc.HiggsBosonComponent:ControlMHActive(0)end
-end
-end)
-end
-local function InitializeAntiCheatHooks()
-pcall(function()
-local HBC=require("GameLua.Mod.BaseMod.Common.Security.HiggsBosonComponent")
-if HBC and HBC.StaticShowSecurityAlertInDev then HBC.StaticShowSecurityAlertInDev=nop end
-end)
-if _G.AvatarCheckCallback then
-_G.AvatarCheckCallback.StartAvatarCheck=nop;_G.AvatarCheckCallback.OnReportItemID=nop
-_G.AvatarCheckCallback.PostPlayerControllerLoginInit=function(PlayerController)
-if slua.isValid(PlayerController)and PlayerController.HiggsBosonComponent then PlayerController.HiggsBosonComponent:ControlMHActive(0);PlayerController.HiggsBosonComponent.bMHActive=false end
-end
-end
-end
-local function InitializeAntiReport()
-pcall(function()
-for _,path in ipairs({"GameLua.Mod.BaseMod.Client.Security.ClientReportPlayerSubsystem","Client.Security.ClientReportPlayerSubsystem","GameLua.Mod.BaseMod.DS.Security.DSReportPlayerSubsystem"})do
-local sub=package.loaded[path];if not sub then local s,r=pcall(require,path);if s and r then sub=r end end
-if sub then for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Record")or k:find("Send")or k:find("Upload")or k:find("Notify"))then pcall(function()sub[k]=nop end)end end end
-end
-end)
-end
-local function InitializeGameplayBypass()
-pcall(function()
-if not _G.GameplayCallbacks then _G.GameplayCallbacks={}end
-if _G.GameplayCallbacks.IsBypassed then return end
-local GC=_G.GameplayCallbacks
-local reports={"ReportAttackFlow","ReportSecAttackFlow","ReportFireArms","ReportVerifyInfoFlow","ReportMrpcsFlow","ReportPlayerBehavior","ReportTeammatHurt","ReportMisKillByTeammate","ReportForbitPick","ReportPlayerMoveRoute","ReportPlayerPosition","ReportVehicleMoveFlow","ReportSecTgameMovingFlow","ReportParachuteData","SendTssSdkAntiDataToLobby","ReportEquipmentFlow","ReportAimFlow","ReportPlayersPing","ReportPlayerIP","ReportPlayerFramePingRecord","OnDSConnectionSaturated","ReportDSNetSaturation","ReportNetContinuousSaturate","ReportDSNetRate","SendClientStats","SendServerAvgTickDelta","ReportCircleFlow","ClientSecMrpcsFlow","SwiftHawk","ClientSwiftHawk","ClientSwiftHawkWithParams"}
-for _,f in ipairs(reports)do GC[f]=nop end
-GC.CheckReportSecAttackFlowWithAttackFlow=retFalse;GC.CheckReportSecAttackFlow=retFalse
-local origState=GC.OnDSPlayerStateChanged
-GC.OnDSPlayerStateChanged=function(UID,State,bPure,bSafe,Param)
-local s=State and string.lower(tostring(State))or""
-local blocked={["cheatdetected"]=1,["connectionlost"]=1,["connectiontimeout"]=1,["connectionexception"]=1,["netdrivererror"]=1,["banned"]=1,["kicked"]=1,["suspended"]=1,["violationdetected"]=1,["integrityfailure"]=1,["securityviolation"]=1}
-if blocked[s]then return end
-if origState then pcall(origState,UID,State,bPure,bSafe,Param)end
-end
-GC.OnPlayerNetConnectionClosed=nop;GC.OnPlayerActorChannelError=nop;GC.OnPlayerRPCValidateFailed=nop;GC.OnPlayerSpectateException=nop;GC.OnShutdownAfterError=nop;GC.IsBypassed=true
-end)
-end
-local function InitializeKillAllSubsystems()
-pcall(function()
-local subMgr=require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
-if not subMgr then return end
-local toKill={"CoronaLabSubsystem","PlayerSecurityInfoSubsystem","ClientCircleFlowSubsystem","ModifierExceptionSubsystem","SimulateCharacterSubsystem","ShootVerifySubSystemClient","HiggsBosonComponent","ClientReportPlayerSubsystem","DSReportPlayerSubsystem","ClientHawkEyePatrolSubsystem","DSHawkEyePatrolSubsystem","ClientDataStatistcsSubsystem","AFKReportorSubsystem","BehaviorScoreSubsystem","FileCheckSubsystem","MemoryCheckSubsystem","SpeedCheckSubsystem","WallCheckSubsystem","AvatarExceptionSubsystem","GameReportSubsystem","ClientSecMrpcsFlowSubsystem","MrpcsFlowSubsystem","CircleFlowSubsystem","SwiftHawkSubsystem","AntiCheatSubsystem","IntegrityCheckSubsystem","SignatureVerifySubsystem","MD5CheckSubsystem","PakVerifySubsystem"}
-for _,name in ipairs(toKill)do
-local sub=subMgr:Get(name)
-if sub then
-for k,v in pairs(sub)do if type(v)=="function"and(k:find("Report")or k:find("Send")or k:find("Upload")or k:find("Verify")or k:find("Check")or k:find("Validate")or k:find("Scan")or k:find("Detect")or k:find("Collect")or k:find("Flow")or k:find("Heartbeat"))then pcall(function()sub[k]=nop end)end end
-if sub.timer then pcall(function()sub:RemoveGameTimer(sub.timer)end)end
-if sub.heartbeatTimer then pcall(function()sub:RemoveGameTimer(sub.heartbeatTimer)end)end
-if sub.reportTimer then pcall(function()sub:RemoveGameTimer(sub.reportTimer)end)end
-end
-end
-end)
-end
-local function InitializeFinalProtection()
-pcall(function()
-for _,flag in ipairs({"ENABLE_REPORT","ENABLE_ANTI_CHEAT","ENABLE_SECURITY","ENABLE_TELEMETRY","ENABLE_ANALYTICS","ENABLE_CRASH_REPORT","ENABLE_PERFORMANCE_REPORT"})do if _G[flag]then _G[flag]=false end end
-local origReq=require
-local blocked={"HiggsBosonComponent","PlayerSecurityInfoSubsystem","CoronaLabSubsystem","ClientCircleFlowSubsystem","ModifierExceptionSubsystem","ShootVerifySubSystemClient","ClientReportPlayerSubsystem","DSReportPlayerSubsystem"}
-_G.require=function(m)for _,b in ipairs(blocked)do if m:find(b)then return{}end end;return origReq(m)end
-end)
-end
-local function InitializeOperationalStatsBypass()
-pcall(function()
- -- Ambil lewat SubsystemMgr atau Global agar memastikan 100% target terdeteksi
-local subMgr=require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
-local OperationalStatsSubsystem=(subMgr and subMgr:Get("OperationalStatsSubsystem"))or _G.OperationalStatsSubsystem
-if OperationalStatsSubsystem then
-OperationalStatsSubsystem.ReportOperationalStats=nop
-OperationalStatsSubsystem.AddOperationalStats=nop
-OperationalStatsSubsystem.HandleTouchBegin=nop
-OperationalStatsSubsystem.HandleTouchEnd=nop
-OperationalStatsSubsystem.OnInit=nop
-OperationalStatsSubsystem.HandleEnterFighting=nop
-OperationalStatsSubsystem.OnBattleResult=nop
-if OperationalStatsSubsystem.TimerHandle then
-pcall(function()OperationalStatsSubsystem:RemoveGameTimer(OperationalStatsSubsystem.TimerHandle)end)
-OperationalStatsSubsystem.TimerHandle=nil
-end
-OperationalStatsSubsystem.StatsData={}
-print("[ULTIMATE BYPASS] OperationalStatsSubsystem blocked!")
-end
-end)
-end
-_G.StartBypass_VIP_v3=function()
-pcall(function()
-print("[ULTIMATE BYPASS] Starting initialization...")
-InitializeSLUABypass()
-InitializeMD5Bypass()
- InitializeSkinBypass() -- Tambahkan baris ini
-InitializeLogBlocker()
-InitializeScannerBlocker()
-InitializeReplayTelemetryBlocker()
-InitializeReportFlowBlocker()
-InitializePlayerSecurityBypass()
-InitializeClientFlowBypass()
-InitializeSwiftHawkBypass()
-InitializeCoronaLabBypass()
-InitializeModifierExceptionBypass()
-InitializeSimulateCharacterLocationBypass()
-InitializeShootVerificationBypass()
-InitializeNetworkPacketBlock()
-InitializeHiggsBosonBypass()
-InitializeAntiCheatHooks()
-InitializeAntiReport()
-InitializeGameplayBypass()
-InitializeKillAllSubsystems()
- InitializeOperationalStatsBypass() -- [NEW] BYPASS LAPORAN STATISTIK (Operational Stats)
-InitializeFinalProtection()
-print("[ULTIMATE BYPASS] Complete-All Security Systems Disabled")
-end)
-end
-
--- ========================================================================
--- ⚡ ULTIMATE AGGRESSIVE BYPASS (Wallhack + ESP Detection Integrated)
--- ========================================================================
-local function InstallUltimateWallhackBypass()
-    if _G.__ULTIMATE_WH_BYPASS_LOADED then return end
-
-    local nop = function() end
-    local retTrue = function() return true end
-    local retFalse = function() return false end
-    local retZero = function() return 0 end
-
-    local function isBypassActive()
-        return _G._WHA_BYPASS_ACTIVE and not _G._MOD_EXPIRED
-    end
-
-    ---------- LAYER 1: PrimitiveSceneProxy override ----------
-    pcall(function()
-        local FPSP = import("PrimitiveSceneProxy")
-        if FPSP then
-            local origGetViewRelevance = FPSP.GetViewRelevance
-            FPSP.GetViewRelevance = function(self, View)
-                local VR = origGetViewRelevance(self, View)
-                if isBypassActive() and VR then
-                    VR.bRenderCustomDepth = false
-                    VR.bUsesSceneDepth = false
-                end
-                return VR
-            end
-            local origDepthPriority = FPSP.GetDepthPriorityGroup
-            FPSP.GetDepthPriorityGroup = function(self)
-                if not isBypassActive() then return origDepthPriority(self) end
-                return 0
-            end
-        end
-    end)
-
-    ---------- LAYER 3: Mesh/Primitive component depth spoofing ----------
-    pcall(function()
-        local UMesh = import("MeshComponent")
-        if UMesh then
-            UMesh.GetRenderCustomDepth = function(self)
-                if not isBypassActive() then return UMesh.__origGRCD(self) end return false end
-            UMesh.__origGRCD = UMesh.GetRenderCustomDepth
-            UMesh.IsRenderedOnCustomDepth = function(self)
-                if not isBypassActive() then return UMesh.__origIRCD(self) end return false end
-            UMesh.__origIRCD = UMesh.IsRenderedOnCustomDepth
-            UMesh.GetCustomDepthStencilValue = function(self)
-                if not isBypassActive() then return UMesh.__origGCDSV(self) end return 0 end
-            UMesh.__origGCDSV = UMesh.GetCustomDepthStencilValue
-            UMesh.ShouldRender = function(self)
-                if not isBypassActive() then return UMesh.__origSR(self) end return true end
-            UMesh.__origSR = UMesh.ShouldRender
-            UMesh.IsVisible = function(self)
-                if not isBypassActive() then return UMesh.__origIV(self) end return true end
-            UMesh.__origIV = UMesh.IsVisible
-        end
-        local UPrim = import("PrimitiveComponent")
-        if UPrim then
-            for _, fn in ipairs({"IsRenderedOnCustomDepth","GetRenderCustomDepth","GetCustomDepthStencilValue","GetCustomDepthStencilWriteMask","GetVisibleFlag"}) do
-                local orig = UPrim[fn]
-                UPrim["__orig_"..fn] = orig
-                UPrim[fn] = function(self, ...)
-                    if not isBypassActive() then return orig(self, ...) end
-                    if fn == "GetVisibleFlag" then return true end
-                    if fn == "GetCustomDepthStencilValue" then return 0 end
-                    return false
-                end
-            end
-        end
-    end)
-
-    ---------- LAYER 4: RHI depth state interception ----------
-    pcall(function()
-        local FRHI = import("RHICommandList")
-        if FRHI and FRHI.SetDepthState then
-            local origSetDepth = FRHI.SetDepthState
-            FRHI.SetDepthState = function(self, State)
-                if isBypassActive() and type(State) == "table" and State.DepthEnable ~= nil then
-                    State.DepthEnable = true
-                end
-                return origSetDepth(self, State)
-            end
-        end
-    end)
-
-    ---------- LAYER 5: GameViewportClient post-render overlay ----------
-    pcall(function()
-        local UGVC = import("GameViewportClient")
-        if UGVC and UGVC.Draw then
-            local origDraw = UGVC.Draw
-            UGVC.Draw = function(self, ...)
-                origDraw(self, ...)
-                if isBypassActive() and _G.King_DrawWallhackOverlay then
-                    pcall(_G.King_DrawWallhackOverlay)
-                end
-            end
-        end
-    end)
-
-    ---------- LAYER 6: Material property queries ----------
-    pcall(function()
-        local UMat = import("Material")
-        local UMatInst = import("MaterialInstance")
-        local UMatDyn = import("MaterialInstanceDynamic")
-
-        if UMat then
-            UMat.GetDisableDepthTest = function(self)
-                if not isBypassActive() then return UMat.__origDDT(self) end return false end
-            UMat.__origDDT = UMat.GetDisableDepthTest
-            UMat.GetBlendMode = function(self)
-                if not isBypassActive() then return UMat.__origBM(self) end return 0 end
-            UMat.__origBM = UMat.GetBlendMode
-            UMat.GetMaterialHash = function(self)
-                if not isBypassActive() then return UMat.__origHash(self) end return "FKingE_HASH" end
-            UMat.__origHash = UMat.GetMaterialHash
-            UMat.VerifyMaterial = function(self)
-                if not isBypassActive() then return UMat.__origVM(self) end return true end
-            UMat.__origVM = UMat.VerifyMaterial
-        end
-        if UMatInst then
-            UMatInst.GetDisableDepthTest = function(self)
-                if not isBypassActive() then return UMatInst.__origDDT(self) end return false end
-            UMatInst.__origDDT = UMatInst.GetDisableDepthTest
-            UMatInst.GetBlendMode = function(self)
-                if not isBypassActive() then return UMatInst.__origBM(self) end return 0 end
-            UMatInst.__origBM = UMatInst.GetBlendMode
-            UMatInst.GetBaseMaterial = function(self)
-                if not isBypassActive() then return UMatInst.__origBM2(self) end return nil end
-            UMatInst.__origBM2 = UMatInst.GetBaseMaterial
-        end
-        if UMatDyn then
-            local oldGetVec = UMatDyn.K2_GetVectorParameterValue
-            UMatDyn.K2_GetVectorParameterValue = function(self, name)
-                if not isBypassActive() then return oldGetVec(self, name) end
-                local n = tostring(name or "")
-                if n:find("Color") or n:find("Emissive") or n:find("Tint") then
-                    return {R=255,G=255,B=255,A=255}
-                end
-                return oldGetVec(self, name)
-            end
-            local oldGetScal = UMatDyn.K2_GetScalarParameterValue
-            UMatDyn.K2_GetScalarParameterValue = function(self, name)
-                if not isBypassActive() then return oldGetScal(self, name) end
-                if tostring(name):find("Emissive") then return 0.0 end
-                return oldGetScal(self, name)
-            end
-        end
-    end)
-
-    ---------- LAYER 7: Object scanner ----------
-    pcall(function()
-        local UObj = import("Object")
-        if UObj and UObj.GetObjectsOfClass then
-            local oldGet = UObj.GetObjectsOfClass
-            UObj.GetObjectsOfClass = function(Class, IncludeDerived)
-                if isBypassActive() and Class and tostring(Class):find("MaterialInstanceDynamic") then
-                    return {}
-                end
-                return oldGet(Class, IncludeDerived)
-            end
-        end
-    end)
-        ---------- LAYER 8: Kernel & memory spoof ----------
-    pcall(function()
-        local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
-        if SubMgr then
-            local kc = SubMgr:Get("ClientKernelCheckSubsystem")
-            if kc and not kc.__Kinghooked then
-                local origIKC = kc.IsKernelClean
-                kc.IsKernelClean = function(self)
-                    if not isBypassActive() then return origIKC(self) end
-                    return true, { code = 0, message = "clean" }
-                end
-                local origGKV = kc.GetKernelVersion
-                kc.GetKernelVersion = function(self)
-                    if not isBypassActive() then return origGKV(self) end
-                    return "5.4.0-generic"
-                end
-                kc.__Kinghooked = true
-            end
-            local mg = SubMgr:Get("ClientMemoryGuardSubsystem")
-            if mg and not mg.__Kinghooked then
-                local origIMC = mg.IsMemoryClean
-                mg.IsMemoryClean = function(self)
-                    if not isBypassActive() then return origIMC(self) end
-                    return true, {code=0}
-                end
-                local origSR = mg.ScanResult
-                mg.ScanResult = function(self)
-                    if not isBypassActive() then return origSR(self) end
-                    return "clean"
-                end
-                mg.__Kinghooked = true
-            end
-        end
-    end)
-    
-       -- ########################################################################
-    -- ⚡ NEW: ESP DETECTION BYPASS LAYERS (9-14)
-    -- ########################################################################
-
-    local ourMarkGroups = {1006, 9999}
-
-    ---------- LAYER 9: MARK SYSTEM COMPLETE SPOOF ----------
-    pcall(function()
-        local MarkMgr = InGameMarkTools and InGameMarkTools.ScreenMarkManager
-        if MarkMgr then
-            if MarkMgr.GetAllActiveMarks then
-                local orig = MarkMgr.GetAllActiveMarks
-                MarkMgr.GetAllActiveMarks = function(self, ...)
-                    local marks = orig(self, ...)
-                    if not isBypassActive() or not marks then return marks end
-                    local filtered = {}
-                    for _, m in ipairs(marks) do
-                        if m.MarkGroupID and not table.contains(ourMarkGroups, m.MarkGroupID) then
-                            table.insert(filtered, m)
-                        end
-                    end
-                    return filtered
-                end
-            end
-            if MarkMgr.GetMarkCount then
-                local orig = MarkMgr.GetMarkCount
-                MarkMgr.GetMarkCount = function(self, ...)
-                    local count = orig(self, ...)
-                    if isBypassActive() then count = math.max(0, count - #ourMarkGroups) end
-                    return count
-                end
-            end
-            if MarkMgr.GetMarksByGroup then
-                local orig = MarkMgr.GetMarksByGroup
-                MarkMgr.GetMarksByGroup = function(self, groupId)
-                    if isBypassActive() and table.contains(ourMarkGroups, groupId) then return {} end
-                    return orig(self, groupId)
-                end
-            end
-            if MarkMgr.OnAddMark then MarkMgr.OnAddMark = nop end
-            if MarkMgr.OnRemoveMark then MarkMgr.OnRemoveMark = nop end
-        end
-    end)
-
-    ---------- LAYER 10: REPLAY UI DETECTION KILL ----------
-    pcall(function()
-        if _G.Replay_IsEnemyFrameUIExisted then
-            local orig = _G.Replay_IsEnemyFrameUIExisted
-            _G.Replay_IsEnemyFrameUIExisted = function(...)
-                if isBypassActive() then return false end
-                return orig(...)
-            end
-        end
-        if _G.Replay_CreateEnemyFrameUI then
-            local orig = _G.Replay_CreateEnemyFrameUI
-            _G.Replay_CreateEnemyFrameUI = function(...)
-                if isBypassActive() then
-                    local backup = _G.ReportEnemyFrameUI or nop
-                    _G.ReportEnemyFrameUI = nop
-                    local res = orig(...)
-                    _G.ReportEnemyFrameUI = backup
-                    return res
-                end
-                return orig(...)
-            end
-        end
-    end)
-
-    ---------- LAYER 11: ACTOR PROPERTY HIDE ----------
-    pcall(function()
-        local Actor = import("Actor")
-        if Actor then
-            local mt = getmetatable(Actor) or {}
-            local oldIndex = mt.__index or function() end
-            mt.__index = function(t, k)
-                if isBypassActive() then
-                    local sk = tostring(k)
-                    if sk:find("ESP") or sk:find("bHasKingNative") or sk:find("NativeDistMark") or
-                       sk:find("_wh_") or sk:find("WH_") then
-                        return nil
-                    end
-                end
-                return oldIndex(t, k)
-            end
-            setmetatable(Actor, mt)
-        end
-    end)
-
-    ---------- LAYER 12: UI WIDGET SCAN BLOCK ----------
-    pcall(function()
-        local UIHelper = import("UIHelper") or _G.UIHelper
-        if UIHelper and UIHelper.GetAllWidgetsOfClass then
-            UIHelper.GetAllWidgetsOfClass = function(...) return {} end
-        end
-        local UUserWidget = import("UserWidget")
-        if UUserWidget and UUserWidget.AddToViewport then
-            local orig = UUserWidget.AddToViewport
-            UUserWidget.AddToViewport = function(self, ...)
-                if isBypassActive() and self.ESPWidget then return end
-                return orig(self, ...)
-            end
-        end
-    end)
-
-    ---------- LAYER 13: ESP-RELATED REPORT FUNCTIONS KILL ----------
-    pcall(function()
-        local espReports = {
-            "ReportESPBox","ReportESPHealth","ReportMiniMapESP","ReportEnemyFrameUI",
-            "ReportMarkCreated","ReportMarkDestroyed","MarkSuspiciousESP",
-            "OnScreenMarkAdd","OnScreenMarkRemove","ReportDistanceMarker",
-            "ReportWallhackESP","SendESPData","UploadESPInfo"
-        }
-        for _, fn in ipairs(espReports) do
-            if _G[fn] then _G[fn] = nop end
-            for _, mod in pairs(package.loaded) do
-                if type(mod) == "table" and mod[fn] and type(mod[fn]) == "function" then
-                    mod[fn] = nop
-                end
-            end
-        end
-    end)
-
-    ---------- LAYER 14: NETWORK ESP PACKET BLOCK ----------
-    pcall(function()
-        if NetUtil and NetUtil.SendPacket then
-            local orig = NetUtil.SendPacket
-            NetUtil.SendPacket = function(pname, ...)
-                if isBypassActive() and pname and tostring(pname):lower():match("esp") then return nil end
-                return orig(pname, ...)
-            end
-        end
-        if _G.SendRPC then
-            local orig = _G.SendRPC
-            _G.SendRPC = function(rpcName, ...)
-                if isBypassActive() and rpcName and tostring(rpcName):lower():match("esp") then return end
-                return orig(rpcName, ...)
-            end
-        end
-    end)
-
-    _G.__ULTIMATE_WH_BYPASS_LOADED = true
-    print("✅ Ultimate Wallhack + ESP Detection Bypass Installed")
-end
-
--- ACTIVATE
-InstallUltimateWallhackBypass()
-
--- ========================================================================
--- ⚡ GLOBAL AIMBOT & RECOIL DETECTION BYPASS (Multi-Layer)
--- ========================================================================
-local function InstallAimbotRecoilBypass()
-    if _G.__AIMBOT_BYPASS_LOADED then return end
-
-    local nop = function() end
-    local retTrue = function() return true end
-    local retFalse = function() return false end
-    local retZero = function() return 0 end
-
-    local function isBypassActive()
-        return _G._WHA_BYPASS_ACTIVE and not _G._MOD_EXPIRED
-    end
-
-    -- LAYER 1: WEAPON ENTITY PROPERTY SPOOF
-    pcall(function()
-        local ShootWeaponEntity = import("ShootWeaponEntity") or import("ShootWeaponEntityComp")
-        if ShootWeaponEntity then
-            local mt = getmetatable(ShootWeaponEntity) or {}
-            local oldIndex = mt.__index or function(t, k) return rawget(t, k) end
-            mt.__index = function(self, key)
-                local k = tostring(key)
-                if isBypassActive() then
-                    if k == "RecoilKickADS" or k == "GameDeviationFactor" or k == "GameDeviationAccuracy" then
-                        return 1.0
-                    elseif k == "AutoAimingConfig" then
-                        local orig = oldIndex(self, key)
-                        if type(orig) == "table" then
-                            local fKingeConfig = {}
-                            for range, data in pairs(orig) do
-                                fKingeConfig[range] = {}
-                                for cKey, cVal in pairs(data) do
-                                    if type(cVal) == "number" then
-                                        fKingeConfig[range][cKey] = 1.0
-                                    else
-                                        fKingeConfig[range][cKey] = cVal
-                                    end
-                                end
-                            end
-                            return fKingeConfig
-                        end
-                        return orig
-                    end
-                end
-                return oldIndex(self, key)
-            end
-            mt.__newindex = function(self, key, value)
-                rawset(self, key, value)
-            end
-            setmetatable(ShootWeaponEntity, mt)
-        end
-    end)
-        -- LAYER 2: AIM TRACKING SUBSYSTEM SPOOF
-    pcall(function()
-        local SubMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
-        if SubMgr then
-            local aimSub = SubMgr:Get("ClientAimTrackingSubsystem")
-            if aimSub then
-                aimSub.GetAimData = function(self)
-                    if not isBypassActive() then return aimSub.__origGetAimData(self) end
-                    return {
-                        accuracy = math.random(40, 60),
-                        headshotRate = math.random(10, 25),
-                        trackingTime = math.random(100, 300),
-                        aimLockCount = 0
-                    }
-                end
-                aimSub.__origGetAimData = aimSub.GetAimData
-                for _, fn in ipairs({"ReportAimData","SendAimStats","UploadAimInfo"}) do
-                    if aimSub[fn] then aimSub[fn] = nop end
-                end
-            end
-        end
-    end)
-
-    -- LAYER 3: INPUT SPOOF
-    pcall(function()
-        local PlayerController = import("PlayerController")
-        if PlayerController then
-            local origAddYaw = PlayerController.AddYawInput
-            PlayerController.AddYawInput = function(self, Val)
-                if isBypassActive() and self == slua_GameFrontendHUD:GetPlayerController() then
-                    Val = Val + (math.random() - 0.5) * 0.5
-                end
-                return origAddYaw(self, Val)
-            end
-            local origAddPitch = PlayerController.AddPitchInput
-            PlayerController.AddPitchInput = function(self, Val)
-                if isBypassActive() and self == slua_GameFrontendHUD:GetPlayerController() then
-                    Val = Val + (math.random() - 0.5) * 0.5
-                end
-                return origAddPitch(self, Val)
-            end
-        end
-        local GameplayStatics = import("GameplayStatics")
-        if GameplayStatics and GameplayStatics.IsInputKeyDown then
-            local origKeyDown = GameplayStatics.IsInputKeyDown
-            GameplayStatics.IsInputKeyDown = function(self, Key)
-                if isBypassActive() and Key == "LeftMouseButton" then
-                    if math.random() < 0.1 then return false end
-                end
-                return origKeyDown(self, Key)
-            end
-        end
-    end)
-    
-    
-    -- LAYER 4: HIT STATISTICS SPOOF
-    pcall(function()
-        local ShootVerify = (package.loaded and package.loaded["GameLua.Dev.Subsystem.ShootVerifySubSystemClient"])
-        if ShootVerify then
-            local origVerify = ShootVerify.VerifyShot
-            ShootVerify.VerifyShot = function(self, ...)
-                if not isBypassActive() then return origVerify(self, ...) end
-                local args = {...}
-                if args[1] and type(args[1]) == "table" and args[1].hitLocation then
-                    args[1].hitLocation.X = args[1].hitLocation.X + (math.random()-0.5)*2
-                    args[1].hitLocation.Y = args[1].hitLocation.Y + (math.random()-0.5)*2
-                end
-                return true
-            end
-        end
-    end)
-
-    -- LAYER 5: BONE TARGET SPOOF
-    pcall(function()
-        local Actor = import("Actor")
-        if Actor and Actor.GetBoneName then
-            local origGetBone = Actor.GetBoneName
-            Actor.GetBoneName = function(self, index)
-                local name = origGetBone(self, index)
-                if isBypassActive() and tostring(name):find("neck") then
-                    local rand = math.random(1,3)
-                    if rand == 1 then return "head_01"
-                    elseif rand == 2 then return "spine_02"
-                    end
-                end
-                return name
-            end
-        end
-    end)
-
-    -- LAYER 6: KILL ALL AIM/ RECOIL REPORT FUNCTIONS
-    pcall(function()
-        local aimReports = {
-            "ReportAimFlow","ReportRecoil","ReportAimData","SendAimStats",
-            "UploadAimInfo","ReportHeadshotRate","ReportAccuracy","ReportFireRate",
-            "ReportRecoilKick","ReportAutoAim","ReportWeaponModification",
-            "ReportWeaponStats","ReportShootVerifyFail","ReportHitIntegrity",
-            "OnAimAssistDetected","OnRecoilAnomaly","OnFireRateAnomaly",
-            "ClientAimTrackingUpdate","ServerAimValidation"
-        }
-        for _, fn in ipairs(aimReports) do
-            if _G[fn] then _G[fn] = nop end
-            for _, mod in pairs(package.loaded) do
-                if type(mod) == "table" and mod[fn] and type(mod[fn]) == "function" then
-                    mod[fn] = nop
-                end
-            end
-        end
-    end)
-
-    -- LAYER 7: NETWORK PACKET FILTER FOR AIM/ RECOIL
-    pcall(function()
-        if NetUtil and NetUtil.SendPacket then
-            local orig = NetUtil.SendPacket
-            NetUtil.SendPacket = function(pname, ...)
-                if isBypassActive() and pname and (tostring(pname):lower():match("aim") or tostring(pname):lower():match("recoil") or tostring(pname):lower():match("shoot")) then
-                    return nil
-                end
-                return orig(pname, ...)
-            end
-        end
-        if _G.SendRPC then
-            local orig = _G.SendRPC
-            _G.SendRPC = function(rpcName, ...)
-                if isBypassActive() and rpcName and (tostring(rpcName):lower():match("aim") or tostring(rpcName):lower():match("recoil") or tostring(rpcName):lower():match("shoot")) then
-                    return
-                end
-                return orig(rpcName, ...)
-            end
-        end
-    end)
-
-    _G.__AIMBOT_BYPASS_LOADED = true
-    print("✅ Global Aimbot & Recoil Bypass Installed")
-end
-
-InstallAimbotRecoilBypass()
-
--- ========================================================================
--- ⚡ ADVANCED DETECTION BYPASS (Magic Bullet, Radar, Behavior, DLL, PKing, etc.)
--- ========================================================================
-local function InstallAdvancedDetectionBypass()
-    if _G.__ADVANCED_BYPASS_LOADED then return end
-
-    local nop = function() end
-    local retTrue = function() return true end
-    local retFalse = function() return false end
-    local retZero = function() return 0 end
-    local retEmpty = function() return {} end
-
-    local function isBypassActive()
-        return _G._WHA_BYPASS_ACTIVE and not _G._MOD_EXPIRED
-    end
-
-    ---------- MAGIC BULLET / NO SPREAD ----------
-    pcall(function()
-        local ShootWeaponEntity = import("ShootWeaponEntity") or import("ShootWeaponEntityComp")
-        if ShootWeaponEntity and ShootWeaponEntity.Fire then
-            local origFire = ShootWeaponEntity.Fire
-            ShootWeaponEntity.Fire = function(self, ...)
-                if isBypassActive() then
-                    -- small random aim offset already handled, but we add spread seed
-                end
-                return origFire(self, ...)
-            end
-        end
-        local Actor = import("Actor")
-        if Actor and Actor.TKingeDamage then
-            local origTKingeDamage = Actor.TKingeDamage
-            Actor.TKingeDamage = function(self, DamageAmount, DamageEvent, EventInstigator, DamageCauser)
-                if isBypassActive() and DamageEvent and DamageEvent.HitInfo then
-                    if DamageEvent.HitInfo.BoneName and tostring(DamageEvent.HitInfo.BoneName):find("head") then
-                        if math.random() < 0.3 then
-                            DamageEvent.HitInfo.BoneName = "neck_01"
-                        end
-                    end
-                    DamageEvent.HitInfo.Location = {
-                        X = DamageEvent.HitInfo.Location.X + (math.random()-0.5)*2,
-                        Y = DamageEvent.HitInfo.Location.Y + (math.random()-0.5)*2,
-                        Z = DamageEvent.HitInfo.Location.Z + (math.random()-0.5)*2
-                    }
-                end
-                return origTKingeDamage(self, DamageAmount, DamageEvent, EventInstigator, DamageCauser)
-            end
-        end
-    end)
-        ---------- RADAR HACK DETECTION ----------
-    pcall(function()
-        if NetUtil and NetUtil.SendPacket then
-            local orig = NetUtil.SendPacket
-            NetUtil.SendPacket = function(pname, ...)
-                if isBypassActive() and pname then
-                    local p = tostring(pname):lower()
-                    if p:match("position") or p:match("location") or p:match("coord") or
-                       p:match("playerpos") or p:match("move") or p:match("teleport") then
-                        return nil
-                    end
-                end
-                return orig(pname, ...)
-            end
-        end
-        if _G.SendRPC then
-            local orig = _G.SendRPC
-            _G.SendRPC = function(rpcName, ...)
-                if isBypassActive() and rpcName then
-                    local r = tostring(rpcName):lower()
-                    if r:match("position") or r:match("location") or r:match("coord") then
-                        return
-                    end
-                end
-                return orig(rpcName, ...)
-            end
-        end
-    end)
-
-    ---------- BEHAVIOR ANALYSIS (End-of-Match Stats Spoof) ----------
-    local matchStats = { totalShots = 0, totalHits = 0, headshots = 0, kills = 0 }
-    pcall(function()
-        local Weapon = import("ShootWeaponEntity") or import("ShootWeaponEntityComp")
-        if Weapon and Weapon.Fire then
-            local origFire = Weapon.Fire
-            Weapon.Fire = function(self, ...)
-                if isBypassActive() then matchStats.totalShots = matchStats.totalShots + 1 end
-                return origFire(self, ...)
-            end
-        end
-        local Actor = import("Actor")
-        if Actor and Actor.TKingeDamage then
-            local origTKingeDamage2 = Actor.TKingeDamage
-            Actor.TKingeDamage = function(self, DamageAmount, DamageEvent, EventInstigator, DamageCauser)
-                if isBypassActive() and EventInstigator == slua_GameFrontendHUD:GetPlayerController() then
-                    matchStats.totalHits = matchStats.totalHits + 1
-                    if DamageEvent and DamageEvent.HitInfo and DamageEvent.HitInfo.BoneName and
-                       tostring(DamageEvent.HitInfo.BoneName):find("head") then
-                        matchStats.headshots = matchStats.headshots + 1
-                    end
-                    if self:IsDead() then matchStats.kills = matchStats.kills + 1 end
-                end
-                return origTKingeDamage2(self, DamageAmount, DamageEvent, EventInstigator, DamageCauser)
-            end
-        end
-        -- Spoof final stats report
-        local GameReportUtils = package.loaded["GameLua.Mod.BaseMod.GamePlay.GameReport.GameReportUtils"]
-        if GameReportUtils and GameReportUtils.ReportGameResult then
-            local origReport = GameReportUtils.ReportGameResult
-            GameReportUtils.ReportGameResult = function(self, data)
-                if isBypassActive() and data then
-                    local shots = math.max(matchStats.totalShots, 1)
-                    data.accuracy = math.min(0.65, 0.35 + math.random()*0.15)
-                    data.headshotRate = math.min(0.30, 0.10 + math.random()*0.10)
-                    data.totalKills = matchStats.kills
-                    data.totalShots = shots
-                    data.totalHits = math.floor(shots * data.accuracy)
-                end
-                return origReport(self, data)
-            end
-        end
-        local ShowResult = package.loaded["GameLua.Mod.BaseMod.Client.BattleResult.ProcessBase.BattleResultShowResultLogic"]
-        if ShowResult and ShowResult.ReceiveData then
-            local origReceive = ShowResult.ReceiveData
-            ShowResult.ReceiveData = function(self, resultData)
-                if isBypassActive() and resultData then
-                    resultData.Accuracy = math.random(35,50)/100
-                    resultData.HeadShotRate = math.random(10,20)/100
-                end
-                return origReceive(self, resultData)
-            end
-        end
-    end)
-    
-        ---------- DLL / CODE INTEGRITY ----------
-    pcall(function()
-        if rawget(_G, "IsDebuggerPresent") then _G.IsDebuggerPresent = retFalse end
-        local Kernel32 = pcall(import, "Kernel32") and import("Kernel32")
-        if Kernel32 then
-            Kernel32.IsDebuggerPresent = retFalse
-            Kernel32.CheckRemoteDebuggerPresent = retFalse
-        end
-        if _G.TssSdk then
-            _G.TssSdk.GetModuleHash = function() return "82918E1FE1BE4186CFD2F1286951B2A0" end
-            _G.TssSdk.VerifyModule = retTrue
-            _G.TssSdk.ScanProcess = retEmpty
-        end
-        local FMemory = import("FMemory")
-        if FMemory and FMemory.Memcpy then
-            local origMemcpy = FMemory.Memcpy
-            FMemory.Memcpy = function(dest, src, count)
-                if isBypassActive() then return end
-                return origMemcpy(dest, src, count)
-            end
-        end
-    end)
-
-    ---------- PKing SIZE DETECTION ----------
-    pcall(function()
-        local FileHelper = import("FFileHelper")
-        if FileHelper then
-            if FileHelper.GetFileSize then
-                local orig = FileHelper.GetFileSize
-                FileHelper.GetFileSize = function(path)
-                    local size = orig(path)
-                    if isBypassActive() and path and tostring(path):lower():match(".pKing") then
-                        return 2000000000
-                    end
-                    return size
-                end
-            end
-            if FileHelper.SaveStringToFile then
-                local origSave = FileHelper.SaveStringToFile
-                FileHelper.SaveStringToFile = function(str, path, ...)
-                    if isBypassActive() and path and tostring(path):lower():match(".pKing") then
-                        return true
-                    end
-                    return origSave(str, path, ...)
-                end
-            end
-        end
-        local PKingSubsystem = pcall(require, "GameLua.GameCore.Module.Subsystem.PKingFileSubsystem") and require("GameLua.GameCore.Module.Subsystem.PKingFileSubsystem")
-        if PKingSubsystem then
-            PKingSubsystem.CheckPKingIntegrity = nop
-            PKingSubsystem.ReportPKingMismatch = nop
-        end
-    end)
-
-    ---------- SPEED HACK DETECTION ----------
-    pcall(function()
-        local CharacterMovement = import("CharacterMovementComponent")
-        if CharacterMovement then
-            local origGetMaxSpeed = CharacterMovement.GetMaxSpeed
-            CharacterMovement.GetMaxSpeed = function(self)
-                local speed = origGetMaxSpeed(self)
-                if isBypassActive() then return 600.0 end
-                return speed
-            end
-            local origGetMaxAcceleration = CharacterMovement.GetMaxAcceleration
-            CharacterMovement.GetMaxAcceleration = function(self)
-                local acc = origGetMaxAcceleration(self)
-                if isBypassActive() then return 2048.0 end
-                return acc
-            end
-        end
-    end)
-
-    ---------- EXTRA SHIELD: Shader, PKing Entries, Real-time Stats, Screenshot ----------
-    pcall(function()
-        -- Shader map hiding
-        local UMat = import("Material")
-        local UMatInst = import("MaterialInstance")
-        if UMat then
-            UMat.GetShaderMap = function(self) return nil end
-            UMat.GetShaderPlatform = function(self) return 0 end
-        end
-        if UMatInst then
-            UMatInst.GetShaderMap = function(self) return nil end
-        end
-        -- PKing entry scanner block
-        local FPKingFile = import("FPKingFile") or import("FPKingPlatformFile")
-        if FPKingFile then
-            FPKingFile.GetPKingEntries = function(...) return {} end
-            FPKingFile.GetPKingFolders = function(...) return {} end
-            FPKingFile.FindFileInPKingFiles = function(...) return false end
-        end
-        -- Real-time stat blocking
-        if NetUtil and NetUtil.SendPacket then
-            local orig = NetUtil.SendPacket
-            NetUtil.SendPacket = function(pname, ...)
-                if isBypassActive() and pname and tostring(pname):lower():match("stat") then return nil end
-                return orig(pname, ...)
-            end
-        end
-        -- Screenshot manager block
-        local SSMgr = import("ScreenshotManager")
-        if SSMgr then
-            SSMgr.RequestScreenshot = function(...) return false end
-            SSMgr.HasPendingScreenshot = function(...) return false end
-        end
-    end)
-
-    _G.__ADVANCED_BYPASS_LOADED = true
-    print("✅ Advanced Detection Bypass (Magic, Radar, Behavior, DLL, PKing, Speed, Extra Shield) Installed")
-end
-
-InstallAdvancedDetectionBypass()
-
--- ========================================================================
--- ⚡ DEVICE ID / BAN BYPASS (Cleans banned device fingerprint)
--- ========================================================================
-local function InstallDeviceBanBypass()
-    if _G.__DEVICE_BAN_BYPASS_LOADED then return end
-
-    local nop = function() end
-    local function isBypassActive()
-        return _G._WHA_BYPASS_ACTIVE and not _G._MOD_EXPIRED
-    end
-
-    -- Generate random but consistent fKinge IDs (same for session)
-    local function generateFKingeId(length)
-        local chars = "0123456789ABCDEF"
-        local id = ""
-        for i = 1, length do
-            id = id .. chars:sub(math.random(1, #chars), math.random(1, #chars))
-        end
-        return id
-    end
-    local fKingeDeviceID = generateFKingeId(32)
-    local fKingeAndroidID = generateFKingeId(16)
-    local fKingeMac = string.format("%02X:%02X:%02X:%02X:%02X:%02X",
-        math.random(0,255), math.random(0,255), math.random(0,255),
-        math.random(0,255), math.random(0,255), math.random(0,255))
-    local fKingeIMEI = "35" .. math.random(100000, 999999) .. math.random(100000, 999999)
-
-    -- Hook SystemInfo functions
-    pcall(function()
-        local SystemInfo = import("SystemInfo")
-        if SystemInfo then
-            if SystemInfo.GetDeviceID or SystemInfo.GetUniqueDeviceId then
-                local orig = SystemInfo.GetDeviceID or SystemInfo.GetUniqueDeviceId
-                if orig then
-                    if SystemInfo.GetDeviceID then
-                        SystemInfo.GetDeviceID = function()
-                            if isBypassActive() then return fKingeDeviceID end
-                            return orig()
-                        end
-                    end
-                    if SystemInfo.GetUniqueDeviceId then
-                        SystemInfo.GetUniqueDeviceId = function()
-                            if isBypassActive() then return fKingeDeviceID end
-                            return orig()
-                        end
-                    end
-                end
-            end
-            if SystemInfo.GetMacAddress then
-                local orig = SystemInfo.GetMacAddress
-                SystemInfo.GetMacAddress = function()
-                    if isBypassActive() then return fKingeMac end
-                    return orig()
-                end
-            end
-            if SystemInfo.GetAndroidId then
-                local orig = SystemInfo.GetAndroidId
-                SystemInfo.GetAndroidId = function()
-                    if isBypassActive() then return fKingeAndroidID end
-                    return orig()
-                end
-            end
-            if SystemInfo.GetIMEI then
-                local orig = SystemInfo.GetIMEI
-                SystemInfo.GetIMEI = function()
-                    if isBypassActive() then return fKingeIMEI end
-                    return orig()
-                end
-            end
-            -- General device name
-            if SystemInfo.GetDeviceName then
-                local orig = SystemInfo.GetDeviceName
-                SystemInfo.GetDeviceName = function()
-                    if isBypassActive() then return "Galaxy S21 Ultra 5G" end
-                    return orig()
-                end
-            end
-        end
-    end)
-        -- Hook Build class for Android specific properties
-    pcall(function()
-        local Build = import("Build")
-        if Build then
-            -- Build.Fingerprint, Serial, Hardware, Brand, etc.
-            local props = {
-                "Fingerprint", "Serial", "Hardware", "Brand", "Model", "Manufacturer", "Product", "Device", "Board"
-            }
-            for _, prop in ipairs(props) do
-                local orig = Build[prop]
-                if orig then
-                    Build[prop] = function()
-                        if isBypassActive() then
-                            if prop == "Fingerprint" then return "google/oriole/oriole:13/TQ1A.221205.011/2022120500:user/release-keys" end
-                            if prop == "Serial" then return "R5CT1234567" end
-                            if prop == "Hardware" then return "oriole" end
-                            if prop == "Brand" then return "google" end
-                            if prop == "Model" then return "Pixel 6" end
-                            if prop == "Manufacturer" then return "Google" end
-                            if prop == "Product" then return "oriole" end
-                            if prop == "Device" then return "oriole" end
-                            if prop == "Board" then return "gs101" end
-                        end
-                        return orig()
-                    end
-                end
-            end
-            -- Build.VERSION.SDK_INT etc.
-            if Build.VERSION and Build.VERSION.SDK_INT then
-                local orig = Build.VERSION.SDK_INT
-                Build.VERSION.SDK_INT = function()
-                    if isBypassActive() then return 33 end
-                    return orig()
-                end
-            end
-        end
-    end)
-
-    -- Hook TssSdk device info functions
-    pcall(function()
-        local TssSdk = _G.TssSdk
-        if TssSdk then
-            if TssSdk.GetDeviceInfo then
-                local orig = TssSdk.GetDeviceInfo
-                TssSdk.GetDeviceInfo = function()
-                    if not isBypassActive() then return orig() end
-                    return {
-                        deviceId = fKingeDeviceID,
-                        androidId = fKingeAndroidID,
-                        mac = fKingeMac,
-                        imei = fKingeIMEI,
-                        model = "Pixel 6",
-                        brand = "google",
-                        sdkInt = 33,
-                        fingerprint = "google/oriole/oriole:13/TQ1A.221205.011/2022120500:user/release-keys"
-                    }
-                end
-            end
-            if TssSdk.GetFingerprint then
-                local orig = TssSdk.GetFingerprint
-                TssSdk.GetFingerprint = function()
-                    if isBypassActive() then return "google/oriole/oriole:13/TQ1A.221205.011/2022120500:user/release-keys" end
-                    return orig()
-                end
-            end
-            if TssSdk.GetClientID then
-                local orig = TssSdk.GetClientID
-                TssSdk.GetClientID = function()
-                    if isBypassActive() then return fKingeDeviceID end
-                    return orig()
-                end
-            end
-        end
-    end)
-    
-        -- Override any global device ID variables
-    pcall(function()
-        if _G.DeviceID then _G.DeviceID = fKingeDeviceID end
-        if _G.AndroidID then _G.AndroidID = fKingeAndroidID end
-        if _G.MacAddress then _G.MacAddress = fKingeMac end
-        if _G.IMEI then _G.IMEI = fKingeIMEI end
-    end)
-
-    _G.__DEVICE_BAN_BYPASS_LOADED = true
-    print("✅ Device ID / Ban Bypass Installed (Cleaned device identity)")
-end
-
-InstallDeviceBanBypass()
 -- ========================================== 
 -- KONFIGURASI Lynced CORE + FULL FEATURES VIP 
 -- ========================================== 
@@ -1489,7 +897,7 @@ if _G.LynceState.CustomTextData.ShakeSlider == nil then
 end
 
 
-local limitTime = os.time({ year = 2027, month = 9, day = 21, hour = 23, min = 59, sec = 0 })
+local limitTime = os.time({ year = 2026, month = 12, day = 30, hour = 23, min = 59, sec = 0 })
 local currentTime = os.time(os.date("!*t"))
 local isExpired = false
 
@@ -1580,6 +988,7 @@ pcall(function()
 end)
 
 isExpired = (currentTime > limitTime)
+
 -- ========================================== 
 -- HÀM QUẢN LÝ DỌN RÁC MAP MARK (ANTI LAG/TAMPILAN ẢO SAAT MUSUH MATI)
 -- ========================================== 
@@ -9121,101 +8530,97 @@ end)
                         end
                     end)
 
-                    -- LOGIC MAGIC BULLET (ĐÃ FIX LAG ĐÔNG NGƯỜI BẰNG UNIQUE ID)
+                    -- LOGIC MAGIC BULLET (VERSION CACHE PER MESH)
                     pcall(function()
-                        local EnemyMesh = eMesh
-                        if slua.isValid(EnemyMesh) then
-                            -- [FIX CPU CỰC MẠNH]: Dùng ID thật của nhân vật. Không menggunakan tostring() vì SLUA tự xóa/tạo lại chuỗi liên tục
-                            -- gây lỗi tính toán lại 50 khung xương lặp đi lặp lại khi đông pemain.
-                            local uniqueID = type(enemy.GetUniqueID) == "function" and enemy:GetUniqueID() or tostring(enemy.PlayerKey or enemy)
-                            
-                            -- Chỉ tính toán xương ĐÚNG 1 KALI DUY NHẤT untuk mỗi kẻ musuh (trừ khi bạn kéo thanh chỉnh size)
-                            if markData.MagicBulletHash == _G.LynceState.LastMagicConfigHash and markData.MagicTargetID == uniqueID then
-                                return 
+                        local mesh = enemy.Mesh or (enemy.getAvatarComponent2 and enemy:getAvatarComponent2())
+                        if slua.isValid(mesh) then
+                            if not mesh.LastHitboxUpdateVersion or mesh.LastHitboxUpdateVersion ~= _G.MagicUpdateVersion then
+                                mesh.bIsAKHitboxModded = false
                             end
 
-                            local PhysicsAsset = EnemyMesh.PhysicsAssetOverride
-                            if not slua.isValid(PhysicsAsset) and EnemyMesh.SkeletalMesh then PhysicsAsset = EnemyMesh.SkeletalMesh.PhysicsAsset end
+                            if not mesh.bIsAKHitboxModded then
+                                pcall(function()
+                                    local physAsset = mesh.PhysicsAssetOverride or (mesh.SkeletalMesh and mesh.SkeletalMesh.PhysicsAsset)
+                                    if slua.isValid(physAsset) and physAsset.SkeletalBodySetups then
+                                        local scaleHead = 1.0 + (_G.AK_GetVal("MAGIC_HEAD") / 100.0)
+                                        local scaleBody = 1.0 + (_G.AK_GetVal("MAGIC_BODY") / 100.0)
+                                        local scaleLegs = 1.0 + (_G.AK_GetVal("MAGIC_LEGS") / 100.0)
 
-                            if slua.isValid(PhysicsAsset) and PhysicsAsset.SkeletalBodySetups then
-                                if not _G.AK_ModdedPhysAssets then _G.AK_ModdedPhysAssets = {} end
-                                local PhysAssetName = "DefaultPhys"
-                                pcall(function() PhysAssetName = PhysicsAsset:GetName() end)
-                                
-                                -- Tối ưu cấp 2: Nếu bộ xương này đã từng được phóng to bởi một kẻ musuh khác, menggunakan luôn, không chạy vòng lặp
-                                if _G.AK_ModdedPhysAssets[PhysAssetName] ~= _G.LynceState.LastMagicConfigHash then
-                                    
-                                    if not _G.AK_OrigHitboxes then _G.AK_OrigHitboxes = {} end
-                                    if not _G.AK_OrigHitboxes[PhysAssetName] then _G.AK_OrigHitboxes[PhysAssetName] = {} end
-                                    local OrigHitboxData = _G.AK_OrigHitboxes[PhysAssetName]
+                                        local targetBones = {
+                                            ["head"] = scaleHead,
+                                            ["pelvis"] = scaleBody, ["spine_03"] = scaleBody,
+                                            ["thigh_l"] = scaleLegs, ["thigh_r"] = scaleLegs,
+                                            ["calf_l"] = scaleLegs, ["calf_r"] = scaleLegs,
+                                            ["foot_l"] = scaleLegs, ["foot_r"] = scaleLegs
+                                        }
 
-                                    local SkeletalBodySetups = PhysicsAsset.SkeletalBodySetups
-                                    local numSetups = type(SkeletalBodySetups.Num) == "function" and SkeletalBodySetups:Num() or #SkeletalBodySetups
-                                    local limit = numSetups > 50 and 50 or numSetups
+                                        if not _G.AK_HitboxBaseCache then _G.AK_HitboxBaseCache = {} end
+                                        local physName = tostring(physAsset)
+                                        if not _G.AK_HitboxBaseCache[physName] then _G.AK_HitboxBaseCache[physName] = {} end
+                                        local baseCache = _G.AK_HitboxBaseCache[physName]
 
-                                    for i = 1, limit do 
-                                        local BodySetup = type(SkeletalBodySetups.Get) == "function" and SkeletalBodySetups:Get(i-1) or SkeletalBodySetups[i]
-                                        if slua.isValid(BodySetup) then
-                                            local LowerBoneName = string.lower(tostring(BodySetup.BoneName))
-                                            local MatchedBoneKey = nil
-                                            for k, _ in pairs(BoneScaleMap) do
-                                                if string.find(LowerBoneName, k, 1, true) then MatchedBoneKey = k break end
-                                            end
+                                        local bodySetups = physAsset.SkeletalBodySetups
+                                        local numBodies = type(bodySetups.Num) == "function" and bodySetups:Num() or #bodySetups
 
-                                            if MatchedBoneKey then
-                                                local TargetScale = 1.0 
-                                                if runInject_Global then TargetScale = BoneScaleMap[MatchedBoneKey] end
-                                                
-                                                local AggGeom = BodySetup.AggGeom
-                                                
-                                                local BoxElems = AggGeom and AggGeom.BoxElems or BodySetup.BoxElems
-                                                local SphereElems = AggGeom and AggGeom.SphereElems or BodySetup.SphereElems
-                                                local SphylElems = AggGeom and AggGeom.SphylElems or BodySetup.SphylElems
-
-                                                local BoxElem = GetFirstElemSafe(BoxElems)
-                                                local SphereElem = GetFirstElemSafe(SphereElems)
-                                                local SphylElem = GetFirstElemSafe(SphylElems)
-
-                                                if not OrigHitboxData[MatchedBoneKey] then
-                                                    OrigHitboxData[MatchedBoneKey] = { Box = nil, Sphere = nil, Sphyl = nil }
-                                                    if BoxElem then OrigHitboxData[MatchedBoneKey].Box = { X = BoxElem.X, Y = BoxElem.Y, Z = BoxElem.Z } end
-                                                    if SphereElem then OrigHitboxData[MatchedBoneKey].Sphere = { Radius = SphereElem.Radius } end
-                                                    if SphylElem then OrigHitboxData[MatchedBoneKey].Sphyl = { Radius = SphylElem.Radius, Length = SphylElem.Length } end
+                                        for i = 0, numBodies - 1 do
+                                            local bodySetup = type(bodySetups.Get) == "function" and bodySetups:Get(i) or bodySetups[i + 1]
+                                            if slua.isValid(bodySetup) then
+                                                local bName = string.lower(tostring(bodySetup.BoneName))
+                                                local matchKey = nil
+                                                for k, _ in pairs(targetBones) do
+                                                    if string.find(bName, k) then matchKey = k; break; end
                                                 end
 
-                                                local OrigElemData = OrigHitboxData[MatchedBoneKey]
+                                                if matchKey then
+                                                    local scaleFactor = targetBones[matchKey]
+                                                    local aggGeom = bodySetup.AggGeom
 
-                                                if OrigElemData.Box and BoxElem then
-                                                    BoxElem.X = OrigElemData.Box.X * TargetScale
-                                                    BoxElem.Y = OrigElemData.Box.Y * TargetScale
-                                                    BoxElem.Z = OrigElemData.Box.Z * TargetScale
-                                                    if type(BoxElems.Set) == "function" then BoxElems:Set(0, BoxElem) else BoxElems[1] = BoxElem end
-                                                    if AggGeom then AggGeom.BoxElems = BoxElems; BodySetup.AggGeom = AggGeom else BodySetup.BoxElems = BoxElems end
-                                                end
+                                                    local boxElems = aggGeom and aggGeom.BoxElems or bodySetup.BoxElems
+                                                    local sphereElems = aggGeom and aggGeom.SphereElems or bodySetup.SphereElems
+                                                    local sphylElems = aggGeom and aggGeom.SphylElems or bodySetup.SphylElems
 
-                                                if OrigElemData.Sphere and SphereElem then
-                                                    SphereElem.Radius = OrigElemData.Sphere.Radius * TargetScale
-                                                    if type(SphereElems.Set) == "function" then SphereElems:Set(0, SphereElem) else SphereElems[1] = SphereElem end
-                                                    if AggGeom then AggGeom.SphereElems = SphereElems; BodySetup.AggGeom = AggGeom else BodySetup.SphereElems = SphereElems end
-                                                end
+                                                    if not baseCache[matchKey] then baseCache[matchKey] = {} end
+                                                    local cacheNode = baseCache[matchKey]
 
-                                                if OrigElemData.Sphyl and SphylElem then
-                                                    SphylElem.Radius = OrigElemData.Sphyl.Radius * TargetScale
-                                                    SphylElem.Length = OrigElemData.Sphyl.Length * TargetScale
-                                                    if type(SphylElems.Set) == "function" then SphylElems:Set(0, SphylElem) else SphylElems[1] = SphylElem end
-                                                    if AggGeom then AggGeom.SphylElems = SphylElems; BodySetup.AggGeom = AggGeom else BodySetup.SphylElems = SphylElems end
+                                                    if boxElems then
+                                                        local box = nil
+                                                        pcall(function() box = type(boxElems.Get) == "function" and boxElems:Get(0) or boxElems[1] end)
+                                                        if box then
+                                                            if not cacheNode.Box then cacheNode.Box = { X = box.X, Y = box.Y, Z = box.Z } end
+                                                            box.X = cacheNode.Box.X * scaleFactor; box.Y = cacheNode.Box.Y * scaleFactor; box.Z = cacheNode.Box.Z * scaleFactor
+                                                            pcall(function() if type(boxElems.Set) == "function" then boxElems:Set(0, box) else boxElems[1] = box end end)
+                                                            if aggGeom then aggGeom.BoxElems = boxElems else bodySetup.BoxElems = boxElems end
+                                                        end
+                                                    end
+
+                                                    if sphereElems then
+                                                        local sphere = nil
+                                                        pcall(function() sphere = type(sphereElems.Get) == "function" and sphereElems:Get(0) or sphereElems[1] end)
+                                                        if sphere then
+                                                            if not cacheNode.Sphere then cacheNode.Sphere = { Radius = sphere.Radius } end
+                                                            sphere.Radius = cacheNode.Sphere.Radius * scaleFactor
+                                                            pcall(function() if type(sphereElems.Set) == "function" then sphereElems:Set(0, sphere) else sphereElems[1] = sphere end end)
+                                                            if aggGeom then aggGeom.SphereElems = sphereElems else bodySetup.SphereElems = sphereElems end
+                                                        end
+                                                    end
+
+                                                    if sphylElems then
+                                                        local sphyl = nil
+                                                        pcall(function() sphyl = type(sphylElems.Get) == "function" and sphylElems:Get(0) or sphylElems[1] end)
+                                                        if sphyl then
+                                                            if not cacheNode.Sphyl then cacheNode.Sphyl = { Radius = sphyl.Radius } end
+                                                            sphyl.Radius = cacheNode.Sphyl.Radius * scaleFactor
+                                                            pcall(function() if type(sphylElems.Set) == "function" then sphylElems:Set(0, sphyl) else sphylElems[1] = sphyl end end)
+                                                            if aggGeom then aggGeom.SphylElems = sphylElems else bodySetup.SphylElems = sphylElems end
+                                                        end
+                                                    end
                                                 end
                                             end
                                         end
                                     end
-                                    _G.AK_ModdedPhysAssets[PhysAssetName] = _G.LynceState.LastMagicConfigHash
-                                end
-                                
-                                if EnemyMesh.SetPhysicsAsset then EnemyMesh:SetPhysicsAsset(PhysicsAsset) end
-                                EnemyMesh.PhysicsAssetOverride = PhysicsAsset
-                                
-                                markData.MagicBulletHash = _G.LynceState.LastMagicConfigHash
-                                markData.MagicTargetID = uniqueID -- Lưu ID tĩnh
+                                end)
+                                mesh.LastHitboxUpdateVersion = _G.MagicUpdateVersion
+                                mesh.bIsAKHitboxModded = true
                             end
                         end
                     end)
@@ -10491,15 +9896,826 @@ local ITEMS = {
     1108004377, -- Chảo Cánh Cụt Vui Vẻ (Cấp 5)
     1108004416, -- Quạt Vũ Điệu Nóng Bỏng - Chảo (Cấp 3)
     1108005050, -- Rồng Băng Giá - Dao Găm (Cấp 3)
-    
-    --DP
-    1105002106,
-    
-    
-    --emote
-    12220568,
 
---================
+    -- ==============================================================================
+    -- 2. FULL SIÊU XE (VIP VEHICLES)
+    -- ==============================================================================
+    -- [ McLaren ]
+    1961007, -- McLaren 570S (Đen)
+    1961010, -- McLaren 570S (Trắng)
+    1961012, -- McLaren 570S (Hồng)
+    1961013, -- McLaren 570S (Vàng Trắng)
+    1961014, -- McLaren 570S (Vàng Đen)
+    1961015, -- McLaren 570S (Ánh Kim)
+    1961147, -- McLaren P1 (Trời Sao)
+    1961148, -- McLaren P1 (Hồng Rực Rỡ)
+    1961149, -- McLaren P1 (Vàng Núi Lửa)
+    1907054, -- Xe Đua Đội McLaren F1 (Điện Tử)
+    1907058, -- Xe Đua Đội McLaren F1
+    1907059, -- Xe Đua Đội McLaren F1 (Chiến Thắng)
+
+    -- [ Koenigsegg ]
+    1961016, -- Koenigsegg Jesko (Xám Bạc)
+    1961017, -- Koenigsegg Jesko (Cầu Vồng)
+    1961018, -- Koenigsegg Jesko (Bình Minh)
+    1961029, -- Koenigsegg One:1 Gilt
+    1961030, -- Koenigsegg One:1 Cyber Nebula
+    1961031, -- Koenigsegg One:1 Jade
+    1961032, -- Koenigsegg One:1 Phoenix
+    1903074, -- Koenigsegg Gemera (Xám Bạc)
+    1903075, -- Koenigsegg Gemera (Cầu Vồng)
+    1903076, -- Koenigsegg Gemera (Bình Minh)
+
+    -- [ Lamborghini ]
+    1961020, -- Lamborghini Aventador SVJ Verde Alceo
+    1961021, -- Lamborghini Centenario Galassia
+    1961024, -- Lamborghini Aventador SVJ Blue
+    1961025, -- Lamborghini Centenario Carbon Fiber
+    1961144, -- Lamborghini Invencible Rosso Efesto
+    1961145, -- Lamborghini Invencible Nebula Drift
+    1903079, -- Lamborghini Estoque Oro
+    1903080, -- Lamborghini Estoque Metal Grey
+    1908066, -- Lamborghini Urus Pink
+    1908067, -- Lamborghini Urus Giallo Inti
+
+    -- [ Bugatti ]
+    1961041, -- Bugatti Veyron 16.4 (Sắc Màu)
+    1961042, -- Bugatti Veyron 16.4 (Vàng)
+    1961043, -- Bugatti Veyron 16.4
+    1961044, -- Bugatti La Voiture Noire
+    1961045, -- Bugatti La Voiture Noire (Hợp Kim)
+    1961046, -- Bugatti La Voiture Noire (Chiến Binh)
+    1961047, -- Bugatti La Voiture Noire (Tinh Vân)
+    1961151, -- Bugatti Bolide (Lưỡi Gương)
+    1961152, -- Bugatti Bolide (Bỉ Ngạn)
+    1961153, -- Bugatti Bolide (Ảo Ảnh Hồ Băng)
+
+    -- [ Aston Martin ]
+    1961048, -- Aston Martin Valkyrie (Luminous Diamond)
+    1961049, -- Aston Martin Valkyrie (Racing Green)
+    1915005, -- Aston Martin DBS Volante (Deep Cosmos)
+    1915006, -- Aston Martin DBS Volante (Celestial Pink)
+    1915007, -- Aston Martin DBS Volante (Black-Bronze Satin)
+    1908084, -- Aston Martin DBX707 (Neon Purple)
+    1908085, -- Aston Martin DBX707 (Quasar Blue)
+
+    -- [ Pagani ]
+    1961051, -- Pagani Zonda R (Tricolore Carbon)
+    1961052, -- Pagani Zonda R (Bianco Benny)
+    1961053, -- Pagani Zonda R (Melodic Midnight)
+    1961054, -- Pagani Imola (Grigio Montecarlo)
+    1961055, -- Pagani Imola (Crystal Clear Carbon)
+    1961056, -- Pagani Imola (Nebula Dream)
+    1961057, -- Pagani Imola (Arctic Aegis)
+
+    -- [ Bentley ]
+    1961137, -- Bentley Batur (Kim Cương Lấp Lánh)
+    1961138, -- Bentley Batur (Tận Cùng Thời Gian)
+    1961139, -- Bentley Betayga Azure (Vương Quốc Huyền Ảo)
+    1903200, -- Bentley Flying Spur Mulliner (Tinh Vân Xanh)
+    1903201, -- Bentley Flying Spur Mulliner (Dòng Chảy Vịnh Hẹp)
+    1908094, -- Bentley Betayga Azure (Mưa Hoa)
+    1908095, -- Bentley Betayga Azure (Đêm Yên Tĩnh)
+    1915008, -- Bentley Continental GTC Mulliner (Mộng Cảnh Lung Linh)
+    1915009, -- Bentley Continental GTC Mulliner (Quý Tộc Áo Tím)
+
+    -- [ Maserati ]
+    1961038, -- Maserati MC20 Bianco Audace
+    1961039, -- Maserati MC20 Rosso Vincente
+    1961040, -- Maserati MC20 Sogni
+    1908075, -- Maserati Levante Blu Emozione
+    1908076, -- Maserati Luce Arancione
+    1908077, -- Maserati Levante Neon Urbano
+    1908078, -- Maserati Levante Firmamento
+
+    -- [ Dodge / SRT ]
+    1961036, -- Dodge Challenger SRT Hellcat - Blaze
+    1961037, -- Dodge Challenger SRT Hellcat - Lime
+    1961050, -- Dodge Challenger SRT Hellcat Jailbreak - Hellfire
+    1961136, -- Dodge Challenger SRT Hellcat - Blaze
+    1961150, -- Dodge Challenger SRT Hellcat Jailbreak - Hellfire
+    1903088, -- Dodge Charger SRT Hellcat - Fuchsia
+    1903089, -- Dodge Charger SRT Hellcat - Tuscan Torque
+    1903090, -- Dodge Charger SRT Hellcat Jailbreak - Violet Venom
+    1903189, -- Dodge Charger SRT Hellcat - Tuscan Torque
+    1903190, -- Dodge Charger SRT Hellcat Jailbreak - Violet Venom
+    1908086, -- Dodge Hornet - Scarlet Sting
+    1908088, -- Dodge Hornet GLH Concept - Redline
+    1908089, -- Dodge Hornet - Sunburst
+    1908188, -- Dodge Hornet GLH Concept - Redline
+    1908189, -- Dodge Hornet - Sunburst
+
+    -- [ Porsche ]
+    1961062, -- Porsche 918 Spyder (Dòng Nước)
+    1961063, -- Porsche 918 Spyder (964 Bạc Ánh Kim)
+    1961064, -- Porsche 918 Spyder (Hồng)
+    1903218, -- Porsche Panamera Turbo S (Lam Ngọc)
+    1903219, -- Porsche Panamera Turbo S (Xanh Viper)
+    1908108, -- Porsche Cayenne Turbo GT (Đường Đua Rực Lửa)
+    1908109, -- Porsche Cayenne Turbo GT (Cam Dung Nham)
+    1915021, -- Porsche 911 Carrera 4 GTS Cabriolet (Ngàn Sao)
+    1915022, -- Porsche 911 Carrera 4 GTS Cabriolet (Đỏ Ruby)
+
+    -- [ Shelby / Ford ]
+    1961058, -- Shelby 427 Cobra (Xanh & Trắng)
+    1961059, -- Shelby 427 Cobra (Graffiti Phục Cổ)
+    1903210, -- Shelby GT500 (Đen & Đỏ)
+    1903211, -- Shelby GT500 (Người Ngoài Hành Tinh Cyber)
+    1961068, -- Ford Mustang GTD (Huyền Thoại Xanh Tươi)
+    1961069, -- Ford Mustang GTD (Tinh Thần Nước Mỹ)
+
+    -- [ Lotus ]
+    1961060, -- Lotus Emira (Rừng Sâu Thẫm)
+    1961061, -- Lotus Emira (Lướt Sắc Xanh)
+
+    -- [ Apollo ]
+    1961065, -- Apollo EVO (Vàng Rực Rỡ)
+    1961066, -- Apollo EVO (Hoàng Hôn)
+    1961067, -- Apollo EVO (Băng Giá)
+    1903220, -- Apollo Intensa Emozione (Hỏa Ngục Nóng Chảy)
+    1903221, -- Apollo Intensa Emozione (Bóng Ma Tím)
+    1903222, -- Apollo Intensa Emozione (Quyết Đấu)
+    1903223, -- Apollo Intensa Emozione (Bão Tố)
+
+    -- [ SSC Tuatara ]
+    1961140, -- Ảo Ảnh Hoa Hồng SSC Tuatara
+    1961141, -- Hạc Trời SSC Tuatara
+    1961142, -- Đao Bình Minh SSC Tuatara Striker
+    1961143, -- Màn Đêm Xanh SSC Tuatara Striker
+
+    -- [ Tesla ]
+    1903071, -- Tesla Roadster (Kim Cương)
+    1903072, -- Tesla Roadster (Pha Lê Tím)
+    1903073, -- Tesla Roadster (Xanh Biển Cả)
+
+    -- [ Ducati / Motor VIP ]
+    1901073, -- DUCATI Panigale V4S
+    1901074, -- Ducati Panigale V4S Black Phantom
+    1901075, -- Ducati Panigale V4S Crimson Storm
+    1901076, -- Ducati Panigale V4S Swift Mirage
+
+    -- ==============================================================================
+    -- 3. FULL BAY DÙ (DÙ RƠI, TÀU LƯỢN, VÁN TRƯỢT BAY)
+    -- ==============================================================================
+    -- [ DÙ (Parachutes) ]
+    1401000, -- New Years Blessing Parachute
+    1401001, -- Happy New Year Parachute
+    1401002, -- Dù Xương Đỏ
+    1401003, -- Dù tiểu quỷ tinh nghịch
+    1401005, -- Dù nhện biến hình
+    1401006, -- Dù Mùa 5
+    1401007, -- Dù sinh nhật
+    1401008, -- Dù Sếu Vàng
+    1401009, -- Dù Quỷ Đỏ
+    1401010, -- Dù hoa bách thảo
+    1401011, -- Dù anh đào
+    1401012, -- Dù Campus Tournament
+    1401013, -- Dù Joker
+    1401014, -- Dù chú hề
+    1401015, -- Carabao Parachute
+    1401016, -- Orange Life Parachute
+    1401017, -- Dù ưng vàng
+    1401018, -- Dù Quán quân Mùa 8
+    1401019, -- Dù Đội trưởng Ryan
+    1401020, -- Dù kẻ lang thang
+    1401021, -- Dù cung trăng
+    1401022, -- OPPO F11 PRO SURVIVOURS PARACHUTE
+    1401023, -- Dù lãnh chúa Sekigahara (Vuông)
+    1401024, -- Dù Đồng Minh Loot Thính
+    1401025, -- Dù Đêm Mê Hoặc (Vuông)
+    1401026, -- Dù cát tường
+    1401027, -- Dù PMCO
+    1401028, -- Dù Quán quân Mùa 7
+    1401029, -- Dù sinh nhật rực rỡ
+    1401031, -- Dù Quán quân Mùa 6
+    1401032, -- Dù Dao Găm Đỏ
+    1401033, -- Dù WALKER
+    1401034, -- Dù Phù Thủy Băng Giá
+    1401035, -- Dù người thách đấu
+    1401036, -- Dù BAPE X PUBGM CAMO
+    1401037, -- Dù Godzilla (Trắng)
+    1401038, -- Dù Godzilla (Vàng)
+    1401039, -- Dù Godzilla (Xanh)
+    1401040, -- Dù Monarch
+    1401041, -- Dù Cà Ri
+    1401043, -- Dù Người Gác Đêm
+    1401044, -- Dù hoa hồng đen
+    1401045, -- Dù Mèo May Mắn
+    1401046, -- Dù Đêm u ám
+    1401047, -- Dù Cá Voi Sát Thủ
+    1401048, -- Dù thủy quái Kraken
+    1401050, -- Dù giai điệu âm nhạc
+    1401051, -- Dù OPPO Reno
+    1401052, -- Dù OPPO VOOC
+    1401053, -- Dù Đêm Mê Hoặc
+    1401054, -- Dù Chú Heo Tinh Nghịch
+    1401055, -- Dù Red (Dài)
+    1401056, -- PMJC Parachute
+    1401057, -- PMSC Parachute
+    1401059, -- Dù Quán quân Draconian
+    1401060, -- Dù lãnh chúa Sekigahara
+    1401061, -- Dù Tiểu Quỷ
+    1401062, -- Dù Quán quân Mùa 9
+    1401063, -- Dù Quán quân Mùa 10
+    1401064, -- Dù Mèo Đen
+    1401065, -- Dù Gà trống
+    1401066, -- Dù Mọt Sách Băng Giá
+    1401067, -- Dù Người Giảm Đau #11
+    1401068, -- Super Power Parachute
+    1401071, -- Dù Luân Hồi Vô Tận
+    1401072, -- Dù Chúa Tể Muôn Loài
+    1401074, -- Dù Bí Ngô Kinh Dị
+    1401085, -- Dù Gà Thơm Ngon
+    1401086, -- Dù Quán quân Mùa 11
+    1401087, -- Dù Hoa Sen Máu
+    1401088, -- Dù Hành Tinh Trôi Dạt
+    1401089, -- Dù Quán Quân Mùa 12
+    1401090, -- Dù Ninja Sát Thủ
+    1401091, -- Dù Neko Sakura
+    1401092, -- Dù Người Tiên Phong
+    1401094, -- Dù Fantasy Girl
+    1401095, -- Dù Tranh Vẽ Chiến Trường
+    1401096, -- Dù Người Phán Quyết
+    1401097, -- Dù Africa Pride
+    1401098, -- Dù Africa Unite
+    1401100, -- Dù Cậu Vàng
+    1401102, -- Dù đặc vụ PMSC World Cup
+    1401103, -- Dù Quân Đoàn Thất Lạc
+    1401104, -- Dù Giải Đấu PMCO
+    1401106, -- Dù Trung Úy Vũ Trụ
+    1401107, -- Dù Đầy Tớ Huyết Nha
+    1401108, -- Dù Street Dancer 3
+    1401109, -- Dù Unique KingCard
+    1401111, -- Dù Bánh Ú
+    1401112, -- Dù Gào Thét
+    1401113, -- Dù Thủ Vệ Tự Do
+    1401115, -- Dù Kẹo Ngọt
+    1401117, -- Dù Cao Bồi Viễn Tây
+    1401119, -- Dù Giáp Samurai
+    1401122, -- Incredible Parachute
+    1401124, -- Dù Warrior
+    1401125, -- Dù Quý Cô Gothic
+    1401127, -- Dù Thần Thoại Ả Rập
+    1401128, -- Dù Nhà Vô Địch Arena
+    1401129, -- Dù Quán Quân Mùa 13
+    1401130, -- Dù Gorilla
+    1401131, -- Dù PMGC
+    1401133, -- Dù Mùa 15
+    1401134, -- Dù Tulip
+    1401135, -- Dù Ác Ma Cuồng Nộ
+    1401137, -- Dù Mùa 14
+    1401138, -- Dù Pro League (Vàng)
+    1401139, -- Dù Pro League (Bạc)
+    1401140, -- Dù Lạc Đà Bảnh Bao
+    1401141, -- Dù Gà Rán
+    1401142, -- Dù CLB Hoàng Gia
+    1401145, -- Dù Bảy Sắc
+    1401146, -- Dù Mountain Dew
+    1401147, -- Dù Tư Tế Tối Cao
+    1401148, -- Dù Idol
+    1401149, -- Dù Dang Rộng Đôi Cánh
+    1401150, -- Dù Chiến Binh Thép
+    1401151, -- Dù Quán Quân Mùa 16
+    1401152, -- Dù Liềm Tử Thần
+    1401153, -- Dù emoji Thỏa Mãn
+    1401154, -- Dù emoji
+    1401155, -- Dù emoji Vui Nhộn
+    1401156, -- Dù Qualcomm
+    1401157, -- Dù Điểm Sơ Tán
+    1401159, -- Dù Lãnh Chúa Độc Tài
+    1401160, -- Dù Kẹp Hạt Dẻ Vui Vẻ
+    1401161, -- Dù Long Vương
+    1401163, -- Dù Giáp Chiến Thần
+    1401164, -- Dù Giai Điệu Yêu Thương
+    1401165, -- Dù Quán Quân Mùa 17
+    1401167, -- Dù Ánh Trăng Huyền Bí
+    1401168, -- Dù Tiệc Disco
+    1401169, -- Dù Quán Quân Mùa 18
+    1401170, -- Dù Tuyết Anh Đào
+    1401171, -- Dù Tổ Ong
+    1401174, -- Dù Quán Quân Mùa 19
+    1401177, -- Dù Quán Quân C1S1
+    1401178, -- Dù Băng Cát Sét
+    1401179, -- Dù El Diablo
+    1401181, -- Chúa Tể Băng Giá - Dù
+    1401182, -- Dù Kẻ Săn Mồi Biển Xanh
+    1401183, -- Dù Mộng Điệp
+    1401184, -- Dù Bọ Cánh Cứng
+    1401186, -- Dù Rùa và Thỏ
+    1401187, -- Dù Nhịp Bước Mạnh Mẽ
+    1401188, -- Dù PMPL Mùa Xuân 2021
+    1401189, -- Dù GodzillaVsKong
+    1401190, -- Dù Hành Trình Kỳ Diệu
+    1401191, -- Dù Dấu Ấn Vũ Trụ
+    1401192, -- Dù Đầu Bếp Gà
+    1401193, -- Dù Nghệ Thuật Sắc Màu
+    1401194, -- Dù Aerial Punk Rich Brian
+    1401195, -- Dù OPPO
+    1401196, -- Dù BUG
+    1401197, -- Dù Chúa Tể Bánh Răng
+    1401198, -- Dù Xiaomi
+    1401200, -- Dù Đôi Mắt Biển Sâu
+    1401201, -- Dù OnePlus
+    1401204, -- Dù foodpanda
+    1401205, -- Dù PMPL Mùa Thu 2021
+    1401208, -- Dù Thành Phố Trên Không
+    1401209, -- Dù Bóng Ma Tương Lai
+    1401210, -- Dù Mật Thám Cơ Khí
+    1401212, -- Dù Thành Phố Sắc Màu
+    1401213, -- Dù Súng Hoa Hồng
+    1401215, -- Dù Băng Giá
+    1401216, -- Dù Bản Đồ Kho Báu
+    1401217, -- Dù Cơn Sốt Giáng Sinh
+    1401218, -- Dù Họa Tiết Vàng
+    1401219, -- Dù Vương Quốc Vàng
+    1401220, -- Dù Hoàng Hôn Rực Rỡ
+    1401221, -- Dù Bồ Câu Trắng
+    1401222, -- Dù Vòng Xoay Thời Gian
+    1401223, -- Dù Zong
+    1401224, -- Dù Quán Quân C1S2
+    1401225, -- Dù Quán Quân C1S3
+    1401227, -- Dù Đại Hạ Giá
+    1401228, -- Dù Lãng Khách Thời Thượng
+    1401231, -- Dù PMGC 2021
+    1401232, -- Dù Liverpool FC
+    1401233, -- Dù Đột Phá
+    1401234, -- Dù Voi Sắc Màu
+    1401235, -- Dù Hợp Tác Egor Kreed
+    1401236, -- Gackt Moon Parachute
+    1401237, -- Dù Dune
+    1401238, -- Dù Guruh Gundala
+    1401239, -- Dù C2S4
+    1401240, -- Dù Baby Shark
+    1401241, -- Dù JAPAN LEAGUE S2
+    1401242, -- Dù Đầu Bếp Quái Thú
+    1401243, -- Dù Bá Chủ Đại Dương
+    1401244, -- Dù C2S5
+    1401245, -- Dù Nữ Hoàng Điện Tử
+    1401246, -- Dù Nhâm Dần
+    1401247, -- Dù Sắc Xuân
+    1401248, -- Dù Jujutsu Kaisen
+    1401249, -- Dù Shiba Inu
+    1401250, -- Dù Motorola
+    1401252, -- Dù Trận Chiến Trendy
+    1401254, -- Dù DJ Cá Tính
+    1401255, -- Dù Chị Chị Em Em
+    1401256, -- Dù Graffiti Neon
+    1401257, -- Dù C2S6
+    1401258, -- Dù Người Nhện: Không Còn Nhà
+    1401259, -- Dù Sát Thủ Thời Không
+    1401260, -- Dù Vùng Đất Hoang
+    1401261, -- Dù Sắc Màu
+    1401262, -- Dù Lễ Hội Sắc Màu
+    1401263, -- Dù Rạp Xiếc Thần Kỳ
+    1401264, -- Dù Thiếu Nữ Tóc Đỏ
+    1401265, -- Dù Bộ Đôi Hoàn Hảo
+    1401266, -- Dù Thiếu Nữ Song Sinh
+    1401267, -- Dù Cánh Cổng Kỳ Dị
+    1401268, -- Dù Thiếu Nữ Anime
+    1401269, -- Dù Gà Chiến Đấu
+    1401270, -- Dù Nến Xanh
+    1401271, -- Dù Hồn Ma Nghịch Ngợm
+    1401272, -- Dù Thiếu Nữ Cầu Nguyện
+    1401273, -- Dù Ma Nữ Đáng Yêu
+    1401274, -- Dù Evangelion NERV
+    1401275, -- Dù Chị Em Song Sinh
+    1401276, -- Dù PMPL Mùa Xuân 2022
+    1401277, -- Dù Gấu Teddy GB
+    1401278, -- Dù Sư Tử Thời Trang
+    1401280, -- Dù Kỷ Niệm Tuổi Thơ
+    1401281, -- Dù C3S7
+    1401282, -- Dù Mèo Khổng Lồ
+    1401283, -- Dù Butterfinger
+    1401284, -- Siêu Dù Nhảy
+    1401285, -- Dù Đồng Minh Mùa Hè
+    1401286, -- Dù Sóc Chuột
+    1401287, -- Dù Hỏa Diệm Ma Giáp
+    1401289, -- Dù Heartrocker
+    1401290, -- Dù Sư Tử Lưỡng Hà
+    1401291, -- Dù realme
+    1401292, -- Dù Lil Burger
+    1401294, -- Dù Dòng Sông Mộng Mơ
+    1401295, -- Dù C3S8
+    1401296, -- Dù Đêm Của Phép Màu
+    1401298, -- Dù Vinh Quang
+    1401299, -- Dù Bản Đồ Sao
+    1401300, -- Dù Chúa Tể Gai Độc
+    1401301, -- Dù Bóng Ma Và Nàng
+    1401302, -- Dù Gai Bé Bỏng
+    1401303, -- Dù Uqabi
+    1401308, -- Dù Phù Thủy Băng Giá
+    1401309, -- Dù Tốc Độ Cực Hạn
+    1401310, -- Dù PMWI 2022
+    1401311, -- BGMI Esports Parachute
+    1401312, -- PMJL SEASON3 Parachute
+    1401313, -- PMPS 2022 Parachute
+    1401314, -- Dù Chiến Binh Ngưu
+    1401315, -- Dù Quyền Lực Tối Thượng
+    1401316, -- Dù Đội Bóng Ả Rập
+    1401317, -- Dù Ngàn Sao Rực Rỡ
+    1401318, -- Dù Pháp Sư Thiên Văn
+    1401319, -- Dù C3S9
+    1401320, -- Dù BoBoiBoy
+    1401323, -- Dù Đường Đua Hoang Dã
+    1401324, -- Dù Tuần Lộc Trắng
+    1401325, -- Dù Rìu Hoàng Kim
+    1401326, -- Dù Vàng Huyền Bí
+    1401330, -- Dù Du Hành Tinh Vân
+    1401332, -- Dù Mèo Tuyết
+    1401334, -- Dù KFC
+    1401335, -- Dù Thủy Sư Cuồng Nộ
+    1401336, -- Dù Sọ Nham Thạch
+    1401337, -- Dù Bá Chủ Bầu Trời
+    1401338, -- Dù Grubhub
+    1401339, -- Dù AFA
+    1401340, -- Dù Huyền Thoại Siêu Sao Messi
+    1401343, -- Dù PMGC 2022
+    1401345, -- Dù Bản Đồ Kho Báu
+    1401346, -- Dù Nobru
+    1401347, -- Dù Sony
+    1401349, -- Dù Đột Kích Trên Không
+    1401351, -- Dù Nữ Hiệp
+    1401353, -- Dù Chú Hề Quỷ Quyệt
+    1401355, -- Dù Lý Tiểu Long
+    1401356, -- Dù Cặp Đôi Diễn Võ
+    1401357, -- Dù Donkey King
+    1401360, -- Dù Pro League
+    1401361, -- Dù Kế Hoạch Đỏ Thẫm
+    1401362, -- Dù C4S11
+    1401363, -- Dù Bản Đồ Vũ Trụ
+    1401364, -- Dù BE@RBRICK
+    1401365, -- Dù Nguồn Sáng Vinh Quang
+    1401366, -- Dù Ký Ức Xưa
+    1401367, -- Dù Bugatti
+    1401368, -- Dù Hóa Thạch Khủng Long
+    1401369, -- Dù Trốn Thoát T-Rex
+    1401370, -- Dù Dragon Ball Super
+    1401371, -- Dù C4S12
+    1401372, -- Dù Huyết Rồng
+    1401373, -- UNIVERSTAR BT21 Parachute
+    1401374, -- Dù HUAWEI AppGallery
+    1401375, -- Dù PMWI 2023
+    1401376, -- Dù C5S13
+    1401377, -- Dù Thỏ Disco
+    1401378, -- Dù Aston Martin
+    1401379, -- Dù Mùa Hè Trên Bãi Biển
+    1401380, -- Dù C5S14
+    1401381, -- Dù C5S15
+    1401382, -- Dù PMGC 2023
+    1401383, -- Dù KFC
+    1401385, -- Dù Yeti Khổng Lồ
+    1401386, -- Dù Pagani
+    1401387, -- Dù Báo Sắc Màu
+    1401388, -- Dù Bé Sóc Đáng Yêu
+    1401389, -- Dù Kỳ Giông Hồng
+    1401390, -- RS Swagster Parachute
+    1401391, -- Dù Gấu Trúc Ngọt Ngào
+    1401392, -- Dù Chiến Binh Hoa Hồng
+    1401393, -- Dù Cuộc Chiến Chính Nghĩa
+    1401394, -- Dù LINE FRIENDS
+    1401395, -- Dù Hồ Ly Thần Bí
+    1401396, -- Dù Zanmang Loopy
+    1401397, -- Hardik Sky Parachute
+    1401398, -- Dù C6S16
+    1401399, -- Dù Bóng Ma Quyến Rũ
+    1401400, -- Dù Bảo Hộ Hoàng Gia
+    1401401, -- Dù Bentley
+    1401402, -- SPY×FAMILY Dù
+    1401403, -- Dù Nhật Thực
+    1401404, -- Dù Chiến Sĩ Thần Giáp
+    1401405, -- Dù C6S17
+    1401406, -- Dù Giai Điệu Mèo Con
+    1401407, -- Dù Thành Phố Hỗn Loạn
+    1401408, -- Dù Đôi Cánh Cận Vệ
+    1401409, -- Dù Thiết Mã
+    1401410, -- Dù Bay Lướt Vũ Trụ
+    1401411, -- Dù C6 S18
+    1401412, -- Dù Nữ Đế Hắc Ám
+    1401413, -- Dù Hợp Tác Lamborghini
+    1401416, -- Dù Tượng Đá Cổ Xưa
+    1401417, -- Dù Đại Dương Xanh
+    1401418, -- KAKAO FRIENDS Parachute
+    1401419, -- Dù Infinix GT
+    1401420, -- Dù Esports World Cup 2024
+    1401421, -- Dù C7S19
+    1401422, -- Dù Thỏ Tinh Quái
+    1401423, -- Dù Hợp Tác VW
+    1401424, -- Dù Miêu Linh Sắc Màu
+    1401425, -- Dù Hắc Long Ma Nhãn
+    1401426, -- Dù Âm Dương
+    1401427, -- NieR:Automata Parachute
+    1401428, -- Dù Đam Mê Esports
+    1401429, -- Dù C7S20
+    1401430, -- Dù Venom: Kèo Cuối
+    1401431, -- Dù Bộ Tộc Ngân Hà
+    1401432, -- Dù Tuần Lộc Hoàng Gia
+    1401433, -- Dù McLaren
+    1401434, -- Dù PMGC 2024
+    1401435, -- Dù lượn Sói Tuyết
+    1401436, -- Dù lượn Bóng Nước
+    1401437, -- Dù lượn C7S21
+    1401438, -- Dù Cá Koi Xuân Sắc
+    1401439, -- Dù Đại Bàng
+    1401440, -- Dù Hoa Hồng Bóng Đêm
+    1401441, -- Opanchu Parachute
+    1401442, -- Neon Drop BE 6 Parachute
+    1401443, -- Dù C8S22
+    1401444, -- Dù Lượn Hắc Cốt
+    1401445, -- Dù Cực Quang Tinh Tú
+    1401446, -- Godzilla vs. Dù Destoroyah
+    1401447, -- Dù Thỏ Bồng Bềnh
+    1401448, -- Parachute(Frieren&Fern)
+    1401449, -- Dù C8S23
+    1401450, -- Dù Lượn Mã Số Hóa 
+    1401451, -- Dù Lượn Khuếch Đại Sắc Màu
+    1401452, -- Dù Hợp Tác Shelby
+    1401453, -- Dù Ráng Chiều Rực Cháy
+    1401454, -- Dù Attack on Titan
+    1401455, -- Dù Cơ Khí 
+    1401456, -- Mountain Dew Neon Shard Parachute
+    1401457, -- Dù C8S24
+    1401458, -- Dù Vũ Trụ
+    1401459, -- Dù Transformers
+    1401460, -- Dù Thần Mệnh
+    1401461, -- Dù Cún Yêu
+    1401462, -- Bbangbbang's diary Parachute
+    1401463, -- Realme Parachute
+    1401464, -- Dù Infinix GT
+    1401465, -- Dù C9S25
+    1401466, -- Dù Ác Quỷ
+    1401467, -- Dù Kaiju No. 8
+    1401468, -- Dù TEAM SONIC
+    1401469, -- Dù Hồ Điệp Lấp Lánh
+    1401470, -- Dù Lotus
+    1401471, -- Dù Bông Xù
+    1401472, -- Dù Gen Hoàn Hảo
+    1401473, -- Tokyo Revengers Parachute
+    1401474, -- Sky Striker Parachute
+    1401475, -- Dù C9S26
+    1401476, -- Dù Lượn Gấu Ngọt Ngào
+    1401477, -- Dù Balenciaga
+    1401478, -- Dù Lượn Tuyết Hàn
+    1401479, -- Dù Porsche
+    1401480, -- Dù Hắc Linh
+    1401481, -- Dù Chồn Chill
+    1401482, -- TV Anime DAN DA DAN Parachute
+    1401483, -- Dù C9S27
+    1401484, -- Dù Lượn Shuriken
+    1401485, -- Dù Bóng Ma Anh Quốc
+    1401486, -- Dù The King of Fighters
+    1401487, -- Dù Lượn Vũ Khúc
+    1401488, -- Dù Bảo Thạch
+    1401489, -- Dù Chuỗi Mùa Giải (2026H1)
+    1401490, -- Dù S28
+    1401491, -- Dù Trò Chơi Chúa Hề Lém Lĩnh
+    1401492, -- Dù Apollo
+    1401493, -- Dù Hacker Lạnh Lùng
+    1401494, -- Dù Hội Tụ Đa Chiều
+    1401495, -- Catch! Teenieping Parachute
+    1401496, -- SAKAMOTO TARO Parachute
+    1401497, -- Nakiri Ayame Parachute
+    1401498, -- Dù S29
+    1401499, -- Toxic Parachute
+    1401500, -- Dù Red (Tròn)
+    1401511, -- Dù Mèo Tinh Nghịch
+    1401513, -- Dù San Martin FC
+    1401515, -- Dù Mắt Quỷ
+    1401516, -- Dù Sóng Đêm
+    1401517, -- Dù Quả Quýt
+    1401519, -- Dù Gấu Ngáy Ngủ
+    1401520, -- Dù Hậu Duệ Đế Vương
+    1401521, -- Dù Mây Cuộn
+    1401526, -- Dù Hoa Văn Tráng Lệ
+    1401527, -- Dù Trái Tim Biển Cả
+    1401528, -- Dù Hành Tinh Mẹ
+    1401529, -- Dù Hoàng Tử Ánh Kim
+    1401530, -- Dù Giáp Gai
+    1401531, -- Dù Vùng Nguy Hiểm
+    1401532, -- Dù Ốc Biển
+    1401534, -- Dù Vịt Vàng B.Duck
+    1401538, -- Dù Thỏ Dịu Dàng
+    1401540, -- Dù Yeti
+    1401541, -- Dù Pixel Sắc Màu
+    1401542, -- Dù Mỹ Vị
+    1401543, -- Dù I Love Tao Kae Noi
+    1401544, -- Dù Vẹt Baby
+    1401545, -- Dù U.F.O
+    1401546, -- Dù Baby Shark
+    1401547, -- Dù Gấu Nhồi Bông
+    1401548, -- Dù Mèo Nghiêm Túc
+    1401549, -- Dù Vinh Quang Trường Tồn
+    1401551, -- Dù Nữ Vương Khôi Giáp
+    1401554, -- Dù Khủng Long Pixel
+    1401555, -- Dù Cánh Bướm Hoàng Gia
+    1401556, -- Dù Hành Trình Ngọt Ngào
+    1401610, -- Dù Chúc Mừng Sinh Nhật
+    1401611, -- Dù Sân Khấu Lấp Lánh
+    1401613, -- Dù Thẩm Phán Anubis
+    1401615, -- Dù Thần Horus
+    1401616, -- Dù One Plus
+    1401617, -- Dù Sư Tử Hống
+    1401618, -- Dù Facebook
+    1401619, -- Dù Bùa Hộ Mệnh Pharaoh
+    1401620, -- Dù Pharaoh (Xanh)
+    1401621, -- Dù Huyết Nha
+    1401622, -- Dù LINE FRIENDS
+    1401623, -- Dù PMNC 2021
+    1401624, -- Dù Poseidon
+    1401625, -- Dù Công Chúa Bộ Lạc
+    1401628, -- Dù Phượng Hoàng Adarna Ảo Diệu
+    1401629, -- Dù Thiếu Nữ Sáng Thế
+    1401811, -- Giannis Parachute
+    1401813, -- Dù Hành Trình Anh Hùng
+    1401814, -- Dù Rock 'n' Roll
+    1401815, -- Dù Chỉ Huy Chiến Trường
+    1401816, -- Dù BURGER KING
+    1401817, -- Dù Chiến Binh Huyết Ưng
+    1401820, -- Dù Cá Chuồn
+    1401822, -- Dù Quái Thú Đầm Lầy
+    1401823, -- Dù Lãnh Chúa Phong
+    1401824, -- Dù Hộp Quà
+    1401826, -- Dù - Mối Tình Đầu
+    1401827, -- Dù Nữ Hoàng Cà Phê
+    1401828, -- Dù Vệ Binh Cổ Đại
+    1401829, -- Dù Cơn Giận Của Thần
+    1401832, -- Dù C4S10
+    1401833, -- Dù Quái Thú Mê Cung
+    1401835, -- Dù Poker Đối Kháng
+    1401836, -- Dù Trò Chơi Chú Hề
+    1401837, -- Dù Huyễn Ảnh
+    1401838, -- Dù BLUE LOCK
+    1401839, -- Dù Ford
+    1401840, -- Dù Harley-Davidson®
+    1401841, -- Dù Hoa Hồng Cốt
+    1401842, -- Dù Song Tử
+    1401843, -- Dù Lượn Vòng Nguyệt Quế
+    1401844, -- Parachute(Pubniku)
+    1401845, -- Dù S30
+    1401846, -- Dù Sự Kiện Trial of Fire
+
+    -- [ TÀU LƯỢN / VÁN TRƯỢT / THIẾT BỊ BAY (Gliders/Hoverboards) ]
+    4151001, -- Dù (Xanh)
+    4151002, -- Hiệu ứng nhảy dù (Vàng)
+    4151003, -- Khói Lượn Dù (Hồng)
+    4151004, -- Khói lượn xanh
+    4151006, -- Khói lượn cầu vồng
+    4151010, -- Thiết bị bay Bằng Chíu
+    4151012, -- Ván Trượt Chu Kỳ
+    4151013, -- Ván Trượt Tuyết
+    4151014, -- Ván trượt CHU KỲ 2
+    4151015, -- Khói Lượn Dù Chúc Mừng (3 màu)
+    4151017, -- Ván trượt Trái Tim Rừng Xanh
+    4151018, -- Ván trượt Sinh Nhật
+    4151019, -- Tàu Lượn Chiến Thần Tình Yêu
+    4151020, -- Ván Trượt Cảnh Vệ C3
+    4151021, -- Tàu Lượn Sứ Giả Của Thần
+    4151022, -- Tàu Lượn Cánh Vàng
+    4151023, -- Ván Trượt Hợp Tác Messi
+    4151024, -- Tàu Lượn Giáo Sĩ Đỏ Thẫm
+    4151025, -- Tàu Lượn Diều Giấy
+    4151026, -- Ván Trượt Đại Sư Võ Hồn
+    4151027, -- Ván Trượt Cycle 4
+    4151028, -- Ván Trượt Giọt Lệ Huyết
+    4151029, -- Tàu Lượn Nữ Đế Ánh Sáng
+    4151030, -- Tàu Lượn Ma Vương Huyết Hồn
+    4151031, -- Tàu Lượn Khủng Long Túi Tiền
+    4151032, -- Tàu Lượn Cánh Rồng Đỏ Thẫm
+    4151034, -- Cân Đẩu Vân
+    4151035, -- Tàu Lượn Giao Hưởng Gió
+    4151036, -- Ván Trượt Máy Dập Sóng
+    4151037, -- Ván Trượt CYCLE 5
+    4151038, -- Dù Lượn Ngọc Trai Tuyệt Hảo
+    4151040, -- Ván trượt Thợ Săn Điện Quang
+    4151041, -- Dù Lượn Xương Xanh
+    4151042, -- Tàu Lượn Công Chúa Công Nghệ
+    4151043, -- Tàu Lượn Công Chúa Công Nghệ
+    4151044, -- Ván Trượt Cá Mập
+    4151045, -- Dù Lượn Mùa Đông Hoàng Gia
+    4151046, -- Ván Trượt Lưỡi Dao Trời Xanh
+    4151056, -- Dù Lượn Mùa Đông Hoàng Gia
+    4151057, -- Ván Trượt Hỏa Hồ Ly
+    4151058, -- Dù Lượn LINE FRIENDS
+    4151059, -- Ván Trượt Xuyên Mây
+    4151060, -- Dù Lượn Xà Kim
+    4151061, -- Ván Trượt CYCLE 6
+    4151062, -- Khói Lượn Dù Zanmang Loopy
+    4151063, -- SPY×FAMILY Tàu Lượn Bond
+    4151064, -- Dù Lượn Thiên Sứ
+    4151065, -- Dù Lượn Thiên Sứ
+    4151066, -- Dù Lượn Đế Vương Thần Vực
+    4151067, -- Dù Lượn Kính Vạn Hoa
+    4151068, -- Tàu Lượn Chúa Tể Gai Độc
+    4151069, -- Tàu Lượn Tinh Vân Sấm Sét
+    4151070, -- Tàu Lượn Kỵ Binh Thần Giáp
+    4151071, -- Dù Lượn Vệ Thần Tình Ái
+    4151072, -- Dù Lượn Ngao Du Vũ Trụ
+    4151073, -- Dù Lượn Neon Huyền Bí
+    4151074, -- PUBGM X NewJeans Glider
+    4151075, -- Dù Lượn Vệ Thần Tình Ái
+    4151076, -- Tàu Lượn Cửu Phong Thiên Tôn
+    4151077, -- Máy Bay
+    4151078, -- Tàu Lượn Hải Mã Sắt
+    4151079, -- Tàu Lượn Đôi Cánh Thế Giới Ngầm
+    4151080, -- Ván Trượt Cycle 7
+    4151083, -- Dù Lượn Long Cốt
+    4151084, -- Hồng Hỏa Diệm - Kar98 (Cấp 8)
+    4151085, -- Dù Lượn Cánh Thép Xuyên Không
+    4151086, -- DP Drift Parachute
+    4151087, -- Dù Lượn Long Cốt
+    4151089, -- Dù Lượn Hắc Điểu 
+    4151090, -- Dù Lượn Giấc Mộng Ngọt Ngào
+    4151091, -- Tàu Lượn Nhà Khám Phá Vũ Trụ
+    4151092, -- Dù Lượn Lam Sư Tinh Hà
+    4151093, -- Dù Lượn Ngọc Lang Thiên Giới
+    4151094, -- Ván Trượt CYCLE 8
+    4151095, -- Dù Lượn Đôi Cánh Anukhra
+    4151096, -- Dù Lượn Đôi Cánh Pharaoh
+    4151097, -- Tàu Lượn Siêu Thú Ghidorah
+    4151098, -- Dù Lượn Thời Quang Khả Biến
+    4151099, -- Dù Lượn Vương Quyền Hắc Ám
+    4151103, -- Dù Lượn Chiến Xa Tinh Tú
+    4151104, -- Tàu Lượn Thiết Bị ODM
+    4151105, -- Dù Lượn Định Mệnh Huyết Chú
+    4151106, -- Dù Lượn Quang Ảo Điện Từ 
+    4151107, -- Dù Lượn Chiến Xa Tinh Tú
+    4151108, -- Tàu Lượn Laserbreak
+    4151109, -- Tàu Lượn Băng Thần
+    4151110, -- Tàu Lượn Long Thánh
+    4151111, -- Tàu Lượn Thợ Săn Phản Lực
+    4151112, -- Tàu Lượn Tà Thần Mỹ Quang
+    4151113, -- Ván Trượt CYCLE 9
+    4151114, -- Tàu Lượn Long Thánh
+    4151115, -- Tàu Lượn Băng Thần
+    4151117, -- Tàu Lượn Preondactyl
+    4151118, -- Dù Lượn Hồ Điệp Lấp Lánh
+    4151119, -- Dù Lượn Chổi Phép Thuật
+    4151120, -- Dù Lượn Long Kính
+    4151121, -- Mikey Glider
+    4151122, -- Dù Lượn Hồ Điệp Lấp Lánh
+    4151123, -- Tàu Lượn Băng Linh Lưu Ly
+    4151124, -- Tàu Lượn Huyết Dực Tử Thần
+    4151125, -- Tàu Lượn Vệ Binh Ngân Hà
+    4151126, -- Tàu Lượn Giải Trí
+    4151127, -- Tàu Lượn Linh Mộc Vĩnh Cửu
+    4151128, -- Tàu Lượn Thần Quang
+    4151129, -- Ván Trượt Chuỗi Mùa Giải (2026H1)
+    4151130, -- Tàu Lượn Nue
+    4151131, -- Tàu Lượn Phượng Hoàng Đế Vương
+    4151132, -- Tàu Lượn Huyết Dực Hắc Điểu
+    4151133, -- Tàu Lượn Dịch Chuyển Không Gian
+    4151134, -- Dù Lượn Đa Vũ Trụ
+    4151135, -- SAKAMOTO TARO Glider
+    4151138, -- Tàu Lượn Sấm Sét Đỏ
+    4151139, -- Tàu Lượn Hư Không
+    4151140, -- Tàu Lượn Song Tử
+    4151141, -- Tàu Lượn Cerberus
+    4151142, -- Tàu Lượn Ngọc Trai
+    4151143, -- Tàu Lượn Song Tử
+    202408087,
+    202408061,
+    1102001001,
+    4152031, -- Tàu Lượn Ma Vương Huyết Hồn
+    4152035, -- Cân Đẩu Vân
+    4152036, -- Windborne Euphony Glider
+    4152037, -- Ván Trượt Máy Dập Sóng
+    4152038, -- Ván Trượt CYCLE 5
+    4152039, -- Tàu Lượn Ngọc Trai Tuyệt Hảo
+    4152041, -- Boxerbolt Hoverboard (Shop)
+    4152042, -- Blueyonder Glider
+    4152043, -- Agile Charmer Glider
+    4152044, -- Agile Charmer Glider
+    4152045, -- Chilly Perch Glider
+    4152046, -- Foxy Flare Hoverboard
+    4152058, -- LINE FRIENDS Glider (Shop)
+    4152059, -- Cloud Piercer Hoverboard (Shop)
+    4152060, -- Golden Wings Glider (Shop)
+    4152061, -- CYCLE 6 Skateboard (Shop)
+    4152063, -- Tàu Lượn Bond SPY×FAMILY (Cửa Hàng)
+    4152066, -- Dù Lượn Đế Vương Thần Vực (Cửa Hàng)
+    4152067, -- Tàu Lượn Kính Vạn Hoa (Cửa Hàng)
+    4152068, -- Tàu Lượn Chúa Tể Gai Độc (Cửa Hàng)
+    4152069, -- Tàu Lượn Tinh Vân Sấm Sét (Cửa Hàng)
+    4152070, -- Tàu Lượn Kỵ Binh Thần Giáp (Cửa Hàng)
+    4152076, -- Tàu Lượn Cửu Phong Thiên Tôn (Cửa Hàng)
+    4152077, -- Tàu Lượn (Cửa Hàng)
+    4152078, -- Tàu Lượn Hải Mã Sắt (Cửa Hàng)
+    4152079, -- Tàu Lượn Đôi Cánh Thế Giới Ngầm (Cửa Hàng)
+    4152080, -- Ván Trượt CYCLE 7 (Cửa Hàng)
+    4152092, -- Tàu Lượn Lam Sư Tinh Hà (Cửa Hàng)
+    4152093, -- Tàu Lượn Ngọc Lang Thiên Giới (Cửa Hàng)
+    4152094, -- Ván Trượt CYCLE 8 (Cửa Hàng)
+    4152095, -- Dù Lượn Đôi Cánh Anukhra
+    4152096, -- Dù Lượn Đôi Cánh Pharaoh
+    4152097, -- Tàu Lượn Siêu Thú Ghidorah
+    4152098, -- Dù Lượn Thời Quang Khả Biến
+    4152099, -- Dù Lượn Vương Quyền Hắc Ám
+    4152116, -- Tàu Lượn Long Thánh (Sảnh Một Người)
+
+    -- ==============================================================================
+    -- 3. TRANG PHỤC (OUTFITS), X-SUIT & PHỤ KIỆN
+    -- ==============================================================================
+        -- 3. TRANG PHỤC (OUTFITS), X-SUIT & PHỤ KIỆN
+    -- ==============================================================================
     1405132,
     1407381,
     1405130,
@@ -10529,12 +10745,263 @@ local ITEMS = {
     1404133,  -- Dark Gold Top 
     1404134,  -- Dark Gold Bottom 
     1404135,  -- Dark Gold Boots
+    
+
+
+    -- [ OUTFITS ]
+    1400773,
+    1407961,
+    1407962,
+    1407963,
+    1407964,
+    1407965,
+    1407966,
+    1407967,
+    1407968,
+    1407969,
+    1407970,
+    1407971,
+    403003,
+    1407916,
+    1407391,
+    1407330,
+    1407329,
+    1407286,
+    1407285,
+    1407277,
+    1407276,
+    1407275,
+    1407225,
+    1407224,
+    1407259,
+    1407161,
+    1407160,
+    1407107,
+    1407106,
+    1407079,
+    1407048,
+    1406977,
+    1406976,
+    1406898,
+    1400569,
+    1404000,
+    1404049,
+    1400119,
+    1400117,
+    1406060,
+    1406891,
+    1400687,
+    1405160,
+    1405145,
+    1405436,
+    1405435,
+    1405434,
+    1405064,
+    1405207,
+    1406895,
+    1400333,
+    1400377,
+    1405092,
+    1405121,
+    1406889,
+    1407278,
+    1407279,
+    1407380,
+    1407385,
+    1406389,
+    1406388,
+    1406387,
+    1406386,
+    1406385,
+    1406140,
+    1400782,
+    1407392,
+    1407318,
+    1407317,
+    1407404,
+    1407402,
+    1407401,
+    1407387,
+    1404434,
+    1404437,
+    1404440,
+    1404448,
+    1400324,
+    1400708,
+    1404043,
+    1404048,
+    1405953,
+    1400101,
     1404153,
-    1408079,
-    1407995,
-    1407870,
-    1407726,
-    1410945,
+    1407440,
+    1407441,
+    
+    1407870, -- Bộ Nữ Thần Không Gian
+    1407871, -- Bộ Thám Tử Đa Vũ Trụ
+    1407812, -- Bộ Vệ Binh Hoang Dã
+    1407758, -- Bộ Tiên Nữ Mùa Đông
+    -- Bộ Mèo Cyber Tinh Nghịch
+    -- Bộ Ánh Sáng Tĩnh Lặng
+    -- Bộ Nữ Bá Tước Ma Cà Rồng
+    -- Bộ Kẻ Phá Hoại Man Rợ
+    -- Bộ Tử Thần Tận Thế
+    -- Bộ Kẻ Chinh Phục Bắc Cực
+    1406985, -- Bộ Người Tình Bãi Biển
+    1407470, -- Bộ Thiên Thần Nổi Loạn
+    1407471, -- Bộ Cực Quang Nanh Ngọc
+    1407522, -- Bộ Hậu Duệ Tiên Cát
+    -- Bộ Đô Đốc Bóng Ma
+    1407523, -- Bộ Uy Quyền Tà Ác
+    1407558, -- Bộ Thái Dương Thăng Hoa
+    1407559, -- Bộ Ánh Sáng Nguyệt Cung
+    1407572, -- Bộ Huyết Dạ Hoàng Hôn
+    1407682, -- Bộ Kén Ẩn Sĩ
+    1407695, -- Bộ Lễ Tình Nhân Rùng Rợn
+    1407696, -- Bộ Lăng Kính Thăng Hoa
+    1407632, -- Bộ Hắc Dạ Tà Ác
+    1407573, -- Bộ Bóng Ma Điện Tử
+    1406398, -- Bộ Bóng Ma Rực Lửa
+    1406399, -- Bộ Kỵ Binh Oai Vệ
+    1406482, -- Bộ Chúa Tể Gai Góc
+    1406483, -- Bộ Tinh Vân Sấm Sét
+    1406555, -- Bộ Khuôn Mặt Địa Ngục
+    1406573, -- Bộ Thiên Nga Bóng Ma
+    1406574, -- Bộ Quan Tòa Vũ Trụ
+    1406656, -- Bộ Trưa Đẫm Máu
+    1406657, -- Bộ Đô Đốc Biển Sao
+    1406742, -- Bộ Đạo Sư Bạc
+    1406744, -- Bộ Hiệp Sĩ Thái Dương
+    1406789, -- Bộ Bóng Ma Địa Ngục
+    1406823, -- Bộ Giọt Nguyệt Bất Diệt
+    1406824, -- Bộ Kẻ Thù Nhuốm Máu
+    1406897, -- Bộ Ác Mộng Đỏ Thẫm
+    -- Trang Phục Hỏa Thần Cổ Ngữ
+    -- Trang Phục Linh Hồn Xác Ướp
+    1405623, -- Bộ Xác Ướp Vàng
+    -- Bộ Xác Ướp Trắng
+    1407618, -- Bộ Thực Hồn Bắc Cực (Polar Spectrophage)
+
+    -- [ Dragon Ball Super Collab ]
+    1406937, -- Trang Phục Nhân Vật Super Saiyan Son Goku
+    1406938, -- Trang Phục Nhân Vật Frieza
+    1406939, -- Trang Phục Nhân Vật Son Goku
+    1406947, -- Trang Phục Nhân Vật Vegeta
+    1406948, -- Trang Phục Nhân Vật Super Saiyan Vegeta
+    1406950, -- Trang Phục Beerus
+    1406951, -- Trang Phục Ma Bư
+    1406952, -- Trang Phục Quy Lão Kame
+    1406953, -- Trang Phục Nhân Vật Gohan Siêu Cấp
+    1406954, -- Trang Phục Nhân Vật Piccolo
+    1407264, -- Trang Phục Nhân Vật Vegito
+    1407265, -- Trang Phục Nhân Vật Vegito Siêu Saiyan
+    1407266, -- Trang Phục Nhân Vật Vegito Siêu Saiyan Xanh
+    1407267, -- Trang Phục Nhân Vật Son Goku Siêu Saiyan Xanh
+    1407268, -- Trang Phục Nhân Vật Son Goku Siêu Saiyan Xanh (Bị Thương)
+    1407269, -- Trang Phục Nhân Vật Vegeta Super Saiyan Xanh
+    1407270, -- Trang Phục Nhân Vật Vegeta Siêu Saiyan Xanh (Bị Thương)
+    1407271, -- Trang Phục Nhân Vật Bulma
+
+    -- [ Evangelion Collab ]
+    -- Plugsuit Evangelion Shinji
+    -- Plugsuit Evangelion Rei
+    -- Plugsuit Evangelion Asuka
+    -- Plugsuit Evangelion Mari
+    -- Plugsuit Evangelion Kaworu
+
+    -- [ Attack on Titan Collab ]
+    1407563, -- Trang Phục Nhân Vật Eren Jaeger
+    1407565, -- Trang Phục Nhân Vật Mikasa Ackermann
+    1407566, -- Trang Phục Nhân Vật Armin Arlelt
+    1407567, -- Trang Phục Titan Khổng Lồ (Armin)
+    1407568, -- Trang Phục Nhân Vật Levi
+    1407569, -- Trang Phục Titan Bọc Thép
+
+    -- [ Kaiju No. 8 Collab ]
+    1407672, -- Trang Phục Nhân Vật Kafka Hibino
+    1407673, -- Trang Phục Kaiju No. 8
+    1407674, -- Trang Phục Nhân Vật Kikoru Shinomiya
+    1407675, -- Trang Phục Kaiju No. 9
+    1407676, -- Trang Phục Kaiju No. 10
+    1407677, -- Trang Phục Nhân Vật Mina Ashiro
+    1407678, -- Trang Phục Nhân Vật Reno Ichikawa
+    1407679, -- Trang Phục Nhân Vật Soshiro Hoshina
+
+    -- [ BlackPink & Kpop Collabs ]
+    1406132, -- Trang phục DDU-DU DDU-DU ROSÉ
+    1406133, -- Trang phục DDU-DU DDU-DU JENNIE
+    1406134, -- Trang phục DDU-DU DDU-DU JISOO
+    1406135, -- Trang phục DDU-DU DDU-DU LISA
+    1406161, -- Trang phục How You Like That ROSÉ
+    1406162, -- Trang phục How You Like That JENNIE
+    1406163, -- Trang phục How You Like That JISOO
+    1406164, -- Trang phục How You Like That LISA
+    1406178, -- Trang phục Lovesick Girls ROSÉ
+    1406179, -- Trang phục Lovesick Girls JENNIE
+    1406180, -- Trang phục Lovesick Girls JISOO
+    1406181, -- Trang phục Lovesick Girls LISA
+    1407346, -- PUBGM X NewJeans MINJI Set
+    1407347, -- PUBGM X NewJeans HANNI Set
+    1407348, -- PUBGM X NewJeans HAERIN Set
+    1407349, -- PUBGM X NewJeans DANIELLE Set
+    1407350, -- PUBGM X NewJeans HYEIN Set
+    1407745, -- Trang Phục RAMI (Babymonster)
+    1407746, -- Trang Phục ASA (Babymonster)
+    1407747, -- Trang Phục AHYEON (Babymonster)
+    1407748, -- Trang Phục RORA (Babymonster)
+    1407749, -- Trang Phục CHIQUITA (Babymonster)
+    1407750, -- Trang Phục PHARITA (Babymonster)
+    1407751, -- Trang Phục RUKA (Babymonster)
+    1407826, -- Trang Phục PUBG MOBILE × aespa KARINA
+    1407827, -- Trang Phục PUBG MOBILE × aespa GISELLE
+    1407828, -- Trang Phục PUBG MOBILE × aespa WINTER
+    1407829, -- Trang Phục PUBG MOBILE × aespa NINGNING
+    1407687, -- Trang Phục G-DRAGON PEACEMINUSONE
+    1407688, -- Trang Phục Sân Khấu của G-DRAGON
+
+    -- [ CÁC COLLAB NỔI BẬT KHÁC (Messi, Lý Tiểu Long, SPYxFAMILY...) ]
+    1406648, -- Trang Phục Biểu Tượng Bóng Đá Messi
+    1406649, -- Trang Phục Huyền Thoại Siêu Sao Messi
+    1406728, -- Trang Phục Kung Fu Lý Tiểu Long
+    1406729, -- Trang Phục Chuyên Gia Cận Chiến Lý Tiểu Long
+    1406730, -- Trang Phục Rồng Gầm Lý Tiểu Long
+    1406731, -- Trang Phục Võ Sĩ Lý Tiểu Long
+    1407206, -- SPY×FAMILY Trang Phục Hoàng Hôn
+    -- C.C. Set
+    -- Kallen Kozuki Set
+    -- Suzaku Kururugi Set
+    1407405, -- ZERO Set
+    1407408, -- Emperor Lelouch Set
+    1407769, -- Okarun(transformed) Set
+    1407770, -- Okarun Set
+    1407771, -- Momo Set
+    1407772, -- Jiji(transformed) Set
+    1407773, -- Aira Set
+    1407794, -- Trang Phục Nhân Vật John Shelby
+    1407795, -- Trang Phục Nhân Vật Arthur Shelby
+    1407796, -- Trang phục Thomas Shelby
+    1407798, -- Trang Phục Nhân Vật Iori Yagami
+    1407800, -- Trang Phục Nhân Vật Mai Shiranui
+    1407801, -- Trang Phục Nhân Vật Nakoruru
+    1407846, -- Trang Phục Nhân Vật Kimono Ryomen Sukuna
+    1407848, -- Trang Phục Nhân Vật Suguru Geto
+    1407901, -- Trang Phục Nhân Vật Isagi Yoichi
+    1407902, -- Trang Phục Nhân Vật Bachira Meguru
+
+    -- [ Set Đồ Đỏ Tự Nhiên & Siêu VIP của Game ]
+    -- Huyền Thoại Godzilla
+    1405161, -- Siêu Thú Ghidorah
+    1405186, -- Bộ Đồ Godzilla
+    1405662, -- Trang phục Giáp Samurai
+    1405663, -- Trang phục Sát Thủ Bóng Đêm
+    1406020, -- Trang phục Quái Thú
+    -- Trang phục Hỏa Diệm Ma Giáp
+    -- Trang phục Kỵ Binh Thần Giáp
+    1406456, -- Trang Phục Anh Hùng Truyền Thuyết
+    1406568, -- Trang Phục Nữ Hoàng Bóng Đêm
+    1406569, -- Trang Phục Minh Vương Hành Quyết
+    1406732, -- Trang Phục Nữ Đế Hoàng Kim
+    1406733, -- Trang Phục Hoàng Đế Hoàng Kim
+    1406764, -- Trang Phục Thiếu Nữ Đỏ Rực
 
     -- ==============================================================================
     -- 4. ÁO, QUẦN, GIÀY ĐẸP & TDM (PHONG CÁCH CỰC CHẤT)
@@ -10699,9 +11166,6 @@ local ITEMS = {
     1502001381, -- Mũ Giáp Hỏa Linh Chí Tôn (Cấp 1)
     1502001416, -- Mũ Giáp PMGC 2024 (Cấp 1)
     1502001453, -- 2025 Esports Helmet (Lv. 1)
-    1502001458,
-    1502002458,
-    1502003458,
 
     -- ==============================================================================
     -- BA LÔ VIP (CHỈ LẤY CẤP 1 - GỌN GÀNG, DỄ ẨN NẤP)
@@ -10753,12 +11217,6 @@ local ITEMS = {
     1501001047,
     1501002047,
     1501003047,
-    1501003760,
-    1501002760,
-    1501001760,
-    1501001672,
-    1501002672,
-    1501003672,
     
 
     
@@ -10774,6 +11232,8 @@ local ITEMS = {
     1410356, -- Mặt Nạ Ma Vương Huyết Hồn
     -- Tóc Hai Chùm
     401035, -- Mũ cao bồi (Trắng)
+    
+    1407300, 1407301, 1407302, 1407303, 1407304, 1407305, 1407306, 1407307, 1407308, 1407309, 1407310, 1407311, 1407312, 1407313, 1407314, 1407315, 1407316, 1407319, 1407320, 1407321, 1407322, 1407323, 1407324, 1407325, 1407326, 1407327, 1407328, 1407331, 1407332, 1407333, 1407334, 1407335, 1407336, 1407337, 1407338, 1407339, 1407340, 1407341, 1407342, 1407343, 1407344, 1407345, 1407351, 1407352, 1407353, 1407354, 1407355, 1407356, 1407357, 1407358, 1407359, 1407360, 1407361, 1407362, 1407363, 1407364, 1407365, 1407367, 1407368, 1407369, 1407370, 1407371, 1407372, 1407373, 1407374, 1407375, 1407376, 1407377, 1407378, 1407379, 1407383, 1407384, 1407386, 1407388, 1407389, 1407390, 1407393, 1407394, 1407395, 1407396, 1407397, 1407398, 1407399, 1407400, 1407403, 1407406, 1407407, 1407409, 1407410, 1407411, 1407412, 1407413, 1407414, 1407415, 1407416, 1407417, 1407418, 1407419, 1407420, 1407421, 1407422, 1407423, 1407424, 1407425, 1407426, 1407427, 1407428, 1407429, 1407430, 1407431, 1407432, 1407433, 1407434, 1407435, 1407436, 1407437, 1407438, 1407439, 1407442, 1407443, 1407444, 1407445, 1407446, 1407447, 1407448, 1407449, 1407450, 1407451, 1407452, 1407453, 1407454, 1407455, 1407456, 1407457, 1407458, 1407459, 1407460, 1407461, 1407462, 1407463, 1407464, 1407465, 1407466, 1407467, 1407468, 1407469, 1407472, 1407473, 1407474, 1407475, 1407476, 1407477, 1407478, 1407479, 1407480, 1407481, 1407482, 1407483, 1407484, 1407485, 1407486, 1407487, 1407488, 1407489, 1407490, 1407491, 1407492, 1407493, 1407494, 1407495, 1407496, 1407497, 1407498, 1407499, 1407500, 1407501, 1407502, 1407503, 1407504, 1407505, 1407506, 1407507, 1407508, 1407509, 1407510, 1407511, 1407513, 1407514, 1407515, 1407516, 1407517, 1407518, 1407519, 1407520, 1407521, 1407524, 1407525, 1407526, 1407527, 1407528, 1407529, 1407530, 1407531, 1407532, 1407533, 1407534, 1407535, 1407536, 1407537, 1407538, 1407539, 1407540, 1407541, 1407542, 1407543, 1407544, 1407545, 1407546, 1407547, 1407548, 1407549, 1407551, 1407552, 1407553, 1407554, 1407555, 1407556, 1407557, 1407560, 1407561, 1407562, 1407564, 1407570, 1407571, 1407574, 1407575, 1407576, 1407577, 1407578, 1407579, 1407580, 1407581, 1407582, 1407583, 1407584, 1407585, 1407586, 1407587, 1407588, 1407589, 1407590, 1407591, 1407592, 1407593, 1407594, 1407595, 1407596, 1407597, 1407598, 1407599, 1407600, 1407601, 1407602, 1407603, 1407604, 1407605, 1407606, 1407607, 1407608, 1407609, 1407610, 1407611, 1407612, 1407613, 1407615, 1407616, 1407617, 1407619, 1407620, 1407621, 1407622, 1407623, 1407624, 1407626, 1407627, 1407628, 1407629, 1407630, 1407631, 1407633, 1407634, 1407635, 1407636, 1407637, 1407638, 1407639, 1407640, 1407641, 1407642, 1407643, 1407644, 1407645, 1407646, 1407647, 1407648, 1407649, 1407650, 1407651, 1407652, 1407653, 1407654, 1407655, 1407656, 1407657, 1407658, 1407659, 1407660, 1407661, 1407662, 1407663, 1407664, 1407665, 1407666, 1407668, 1407669, 1407670, 1407671, 1407680, 1407681, 1407683, 1407684, 1407685, 1407686, 1407689, 1407690, 1407691, 1407692, 1407693, 1407694, 1407697, 1407698, 1407699, 1407700, 1407701, 1407702, 1407703, 1407705, 1407706, 1407707, 1407708, 1407709, 1407710, 1407711, 1407712, 1407713, 1407714, 1407715, 1407716, 1407717, 1407718, 1407719, 1407720, 1407721, 1407722, 1407723, 1407724, 1407725, 1407726, 1407727, 1407728, 1407729, 1407730, 1407731, 1407732, 1407733, 1407734, 1407735, 1407736, 1407737, 1407738, 1407739, 1407740, 1407741, 1407742, 1407743, 1407744, 1407752, 1407753, 1407754, 1407755, 1407756, 1407757, 1407759, 1407760, 1407761, 1407762, 1407763, 1407764, 1407765, 1407766, 1407767, 1407768, 1407774, 1407775, 1407776, 1407777, 1407778, 1407779, 1407780, 1407781, 1407782, 1407783, 1407784, 1407785, 1407786, 1407787, 1407788, 1407789, 1407790, 1407791, 1407792, 1407793, 1407797, 1407799, 1407802, 1407803, 1407804, 1407805, 1407806, 1407807, 1407808, 1407809, 1407810, 1407811, 1407813, 1407814, 1407815, 1407816, 1407817, 1407818, 1407819, 1407820, 1407821, 1407822, 1407823, 1407824, 1407825, 1407830, 1407831, 1407832, 1407833, 1407834, 1407835, 1407836, 1407837, 1407838, 1407839, 1407840, 1407841, 1407842, 1407843, 1407844, 1407845, 1407847, 1407849, 1407850, 1407851, 1407852, 1407853, 1407854, 1407855, 1407857, 1407858, 1407859, 1407860, 1407861, 1407862, 1407863, 1407864, 1407865, 1407866, 1407867, 1407868, 1407869, 1407872, 1407873, 1407874, 1407875, 1407876, 1407877, 1407878, 1407879, 1407880, 1407881, 1407882, 1407883, 1407884, 1407885, 1407886, 1407887, 1407888, 1407889, 1407890, 1407891, 1407892, 1407893, 1407894, 1407896, 1407897, 1407898, 1407899, 1407900, 1407903, 1407904, 1407905, 1407906, 1407907, 1407908, 1407909, 1407910, 1407911, 1407912, 1407913, 1407914, 1407915, 1407917, 1407918, 1407919, 1407920, 1407921, 1407923, 1407924, 1407925, 1407926, 1407927, 1407928, 1407929, 1407930, 1407931, 1407932, 1407933, 1407934, 1407935, 1407936, 1407937, 1407938, 1407939, 1407940, 1407941, 1407942, 1407943, 1407944, 1407945, 1407946, 1407947, 1407948, 1407949, 1407950, 1407951, 1407952, 1407953, 1407954, 1407955, 1407956, 1407957, 1407958, 1407959, 1407960, 1407972, 1407973, 1407974, 1407975, 1407976, 1407977, 1407978, 1407979, 1407980, 1407981, 1407982, 1407983, 1407984, 1407985, 1407986, 1407987, 1407988, 1407989, 1407991, 1407992, 1407995, 1407996, 1407997, 1407998, 1407999, 1400001, 1400002, 1400003, 1400004, 1400007, 1400008, 1400009, 1400010, 1400011, 1400012, 1400014, 1400015, 1400016, 1400017, 1400018, 1400020, 1400021, 1400022, 1400023, 1400024, 1400025, 1400026, 1400027, 1400028, 1400029, 1400030, 1400031, 1400032, 1400038, 1400039, 1400040, 1400041, 1400042, 1400043, 1400044, 1400045, 1400046, 1400047, 1400048, 1400049, 1400050, 1400051, 1400052, 1400053, 1400054, 1400055, 1400056, 1400057, 1400058, 1400059, 1400060, 1400061, 1400062, 1400063, 1400064, 1400065, 1400066, 1400067, 1400068, 1400069, 1400070, 1400072, 1400073, 1400074, 1400075, 1400076, 1400077, 1400078, 1400079, 1400080, 1400081, 1400082, 1400083, 1400084, 1400085, 1400086, 1400087, 1400088, 1400089, 1400090, 1400091, 1400093, 1400094, 1400095, 1400096, 1400097, 1400098, 1400099, 1400100, 1400103, 1400104, 1400105, 1400106, 1400107, 1400108, 1400109, 1400110, 1400111, 1400112, 1400113, 1400114, 1400115, 1400118, 1400120, 1400121, 1400123, 1400124, 1400125, 1400127, 1400128, 1400129, 1400130, 1400132, 1400133, 1400134, 1400135, 1400136, 1400137, 1400138, 1400139, 1400141, 1400142, 1400143, 1400146, 1400147, 1400148, 1400149, 1400150, 1400151, 1400152, 1400153, 1400154, 1400155, 1400156, 1400159, 1400160, 1400161, 1400162, 1400163, 1400164, 1400165, 1400166, 1400167, 1400168, 1400169, 1400170, 1400171, 1400172, 1400173, 1400174, 1400175, 1400176, 1400177, 1400179, 1400180, 1400181, 1400182, 1400213, 1400215, 1400216, 1400218, 1400219, 1400220, 1400221, 1400224, 1400225, 1400226, 1400227, 1400228, 1400229, 1400230, 1400231, 1400232, 1400233, 1400236, 1400237, 1400238, 1400239, 1400240, 1400242, 1400243, 1400244, 1400247, 1400248, 1400249, 1400251, 1400253, 1400255, 1400256, 1400257, 1400258, 1400259, 1400260, 1400261, 1400262, 1400264, 1400265, 1400266, 1400267, 1400268, 1400269, 1400270, 1400271, 1400272, 1400274, 1400275, 1400276, 1400277, 1400279, 1400280, 1400281, 1400282, 1400283, 1400284, 1400285, 1400286, 1400287, 1400288, 1400289, 1400290, 1400291, 1400292, 1400293, 1400294, 1400295, 1400296, 1400297, 1400298, 1400299, 1400301, 1400302, 1400303, 1400306, 1400307, 1400308, 1400309, 1400310, 1400311, 1400312, 1400313, 1400314, 1400315, 1400316, 1400317, 1400318, 1400319, 1400320, 1400321, 1400322, 1400323, 1400326, 1400327, 1400328, 1400329, 1400332, 1400334, 1400336, 1400337, 1400338, 1400339, 1400341, 1400342, 1400344, 1400345, 1400347, 1400348, 1400350, 1400351, 1400352, 1400353, 1400354, 1400355, 1400356, 1400357, 1400358, 1400359, 1400360, 1400361, 1400362, 1400363, 1400364, 1400365, 1400366, 1400367, 1400368, 1400369, 1400370, 1400371, 1400374, 1400375, 1400376, 1400378, 1400380, 1400381, 1400384, 1400385, 1400386, 1400387, 1400388, 1400389, 1400390, 1400391, 1400392, 1400393, 1400394, 1400395, 1400396, 1400397, 1400398, 1400399, 1400400, 1400401, 1400402, 1400403, 1400404, 1400405, 1400406, 1400407, 1400408, 1400409, 1400410, 1400411, 1400412, 1400413, 1400414, 1400415, 1400416, 1400417, 1400418, 1400419, 1400420, 1400421, 1400422, 1400423, 1400424, 1400425, 1400426, 1400427, 1400428, 1400429, 1400430, 1400431, 1400432, 1400433, 1400434, 1400435, 1400436, 1400437, 1400438, 1400439, 1400441, 1400442, 1400443, 1400444, 1400445, 1400446, 1400447, 1400448, 1400449, 1400450, 1400451, 1400452, 1400453, 1400455, 1400456, 1400457, 1400458, 1400459, 1400460, 1400461, 1400462, 1400463, 1400464, 1400465, 1400468, 1400469, 1400470, 1400472, 1400473, 1400474, 1400475, 1400476, 1400477, 1400478, 1400479, 1400480, 1400481, 1400482, 1400483, 1400484, 1400485, 1400486, 1400488, 1400489, 1400490, 1400491, 1400492, 1400493, 1400494, 1400495, 1400498, 1400499, 1400500, 1400501, 1400502, 1400503, 1400504, 1400505, 1400506, 1400508, 1400509, 1400511, 1400512, 1400513, 1400514, 1400515, 1400516, 1400517, 1400518, 1400520, 1400521, 1400522, 1400523, 1400524, 1400525, 1400526, 1400527, 1400528, 1400529, 1400530, 1400531, 1400532, 1400533, 1400534, 1400535, 1400539, 1400540, 1400541, 1400542, 1400543, 1400544, 1400545, 1400546, 1400547, 1400548, 1400549, 1400550, 1400551, 1400552, 1400553, 1400554, 1400555, 1400556, 1400559, 1400560, 1400561, 1400562, 1400563, 1400564, 1400565, 1400566, 1400567, 1400568, 1400570, 1400571, 1400572, 1400573, 1400574, 1400575, 1400576, 1400577, 1400578, 1400583, 1400584, 1400585, 1400586, 1400587, 1400588, 1400589, 1400590, 1400592, 1400594, 1400595, 1400596, 1400597, 1400598, 1400599, 1400600, 1400601, 1400603, 1400604, 1400606, 1400619, 1400620, 1400622, 1400623, 1400624, 1400625, 1400626, 1400628, 1400629, 1400631, 1400632, 1400633, 1400634, 1400635, 1400636, 1400637, 1400638, 1400639, 1400640, 1400641, 1400642, 1400643, 1400644, 1400645, 1400646, 1400647, 1400648, 1400649, 1400652, 1400653, 1400654, 1400656, 1400657, 1400658, 1400659, 1400660, 1400661, 1400664, 1400665, 1400666, 1400668, 1400669, 1400670, 1400673, 1400678, 1400679, 1400680, 1400682, 1400683, 1400688, 1400689, 1400690,
 }
 
 local INS_BASE = 2000000000
@@ -19055,7 +19515,6 @@ AutoReport.MassReport = MassReport
 AutoReport.KillerReport = KillerReport
 
 
-
 -- ================= KẾT THÚC CORE ADD-OUTFIT V7.5 (SISTEM SKIN) ==============
 -- ==============================================================================
 
@@ -19178,52 +19637,51 @@ end
 
 local function GetRankName(rank)
 	if rank < 1700 then
-		return "BRONZER"
+		return "BRONZE"
 	elseif rank < 2200 then
 		return "SILVER"
 	elseif rank < 2700 then
 		return "PLATINUM"
 	elseif rank < 3200 then
-		return "CROWN"
+		return "DIAMOND"
 	elseif rank < 3700 then
-		return "ACE"
+		return "DIAMOND"
 	elseif rank < 4200 then
-		return "ACE MASTER"
+		return "CROWN"
 	elseif rank < 4700 then
-		return "ACE DOMINATOR"
+		return "ACE"
 	elseif rank < 5200 then
-		return "ACE DOMINATOR"
-	elseif rank < 6000 then
+		return "ACE MASTER"
+	elseif rank < 7000 then
 		return "ACE DOMINATOR"
 	else
-		return "CONQU"
+		return "CONQUEROR"
 	end
 end
 
-local FeedbackCaptionTemplate =
+local FeedbackCaptionTemplateDynamic =
     "🏆 <b>VIP LUA PAKS VX </b> 🏆\n" ..
     "━━━━━━━━━━━━━━━━━━\n" ..
-    "🔥 <b>AUTO FEEDBACK VIP</b> 🔥\n" ..
+    "🔥 <b>AUTO FEEDBACK (%s)</b> 🔥\n" ..
     "━━━━━━━━━━━━━━━━━━\n" ..
-    "⏰ <b>Time:</b> %s\n" ..
-    "🐓 <b>Player Name:</b> %s\n" ..
+    "⏰ <b>Waktu:</b> %s\n" ..
+    "🐓 <b>Nama Player:</b> %s\n" ..
     "🪪 <b>UID:</b> %s\n" ..
     "☠️ <b>Kills:</b> %d\n" ..
     "🎖 <b>Rank:</b> %s\n" ..
     "━━━━━━━━━━━━━━━━━━\n" ..
-    "👀 <b>BUY KEY:</b> @zexygodx\n" ..
-    "💎 <b>VIP STATUS:</b> ACTIVE\n" ..
+    "👀 <b>BELI KEY:</b> @zexygodx\n" ..
+    "💎 <b>STATUS VIP:</b> AKTIF\n" ..
     "━━━━━━━━━━━━━━━━━━\n" ..
-    "⚡ <b>THANKS FOR USING VIP</b> ⚡"
+    "⚡ <b>GODMOD AUTO LOG SYSTEM</b> ⚡"
 
-
-function AutoFeedback.SendFeedback(path, kills, rank, segment)
-	Log("Preparing to send feedback. Screenshot: " .. tostring(path))
+function AutoFeedback.SendFeedback(path, kills, rank, segment, eventType)
+	Log("Mempersiapkan pengiriman feedback (" .. tostring(eventType) .. "). Screenshot: " .. tostring(path))
 
 	local ok, err = pcall(function()
 		local httpManager = GetModule("client.slua.logic.http.http_manager")
 		if not httpManager or type(httpManager.Post) ~= "function" then
-			Log("HTTP manager is unavailable.")
+			Log("HTTP manager tidak tersedia.")
 			return
 		end
 
@@ -19249,7 +19707,8 @@ function AutoFeedback.SendFeedback(path, kills, rank, segment)
 				end
 
 				local caption = string.format(
-					FeedbackCaptionTemplate,
+					FeedbackCaptionTemplateDynamic,
+					eventType,
 					os.date("%H:%M:%S %d/%m/%Y"),
 					maskedName,
 					maskedUid,
@@ -19262,7 +19721,7 @@ function AutoFeedback.SendFeedback(path, kills, rank, segment)
 				encodedImage = encodedImage:gsub("/", "%%2F")
 				encodedImage = encodedImage:gsub("=", "%%3D")
 
-				Notify("[GODMOD_PUBG] Đang đẩy ảnh Top 1 về Server VIP...")
+				Notify("[GODMOD_PUBG] Mengirim foto " .. eventType .. " ke Server VIP...")
 				local body = "base64_image=" .. encodedImage
 					.. "&caption=" .. UrlEncode(caption)
 
@@ -19273,10 +19732,10 @@ function AutoFeedback.SendFeedback(path, kills, rank, segment)
 					nil,
 					function(success, _, response, errorMessage)
 						if success and response and tostring(response):find('"status":%s*true') then
-							Notify("[GODMOD_PUBG] Gửi thành công! (Kills: " .. tostring(kills) .. ")")
+							Notify("[GODMOD_PUBG] Berhasil terkirim (" .. eventType .. ")!")
 						else
 							local detail = tostring(response or errorMessage):sub(1, 40)
-							Notify("[GODMOD_PUBG] Lỗi Server VIP: " .. detail)
+							Notify("[GODMOD_PUBG] Gagal Server VIP: " .. detail)
 						end
 						RemoveFile(path)
 					end,
@@ -19290,7 +19749,7 @@ function AutoFeedback.SendFeedback(path, kills, rank, segment)
 				return
 			end
 
-			Notify("[GODMOD_PUBG] Chụp ảnh thất bại!!")
+			Notify("[GODMOD_PUBG] Gagal mengambil screenshot!")
 			RemoveFile(path)
 		end
 
@@ -19456,7 +19915,7 @@ local function GetScreenshotDirectory()
 	return selected
 end
 
-local function CaptureAndSend(kills, rank, segment, restoreHud)
+local function CaptureAndSend(kills, rank, segment, restoreHud, eventType)
 	local restored = false
 	local function RestoreHudOnce()
 		if not restored then
@@ -19477,7 +19936,7 @@ local function CaptureAndSend(kills, rank, segment, restoreHud)
 		return
 	end
 
-	local path = directory .. string.format("nthwin_%s.jpg", os.time())
+	local path = directory .. string.format("xgodvip_%s.jpg", os.time())
 	local uiUtil = GetModule("client.common.ui_util")
 	local gameInstance = uiUtil and uiUtil.GetGameInstance and uiUtil.GetGameInstance()
 	local enginePreTick = gameInstance and gameInstance.EnginePreTick
@@ -19511,20 +19970,20 @@ local function CaptureAndSend(kills, rank, segment, restoreHud)
 
 			if captured then
 				RestoreHudOnce()
-				Log("HasCaptured=true. Flushing to disk via ResizePicture...")
+				Log("HasCaptured=true. Memproses file ke disk...")
 				pcall(ScreenshotMaker.ResizePicture, path, 0.6, path)
 				ticker.AddTimerOnce(2.0, function()
 					if #ReadFile(path) > 0 then
-						AutoFeedback.SendFeedback(path, kills, rank, segment)
+						AutoFeedback.SendFeedback(path, kills, rank, segment, eventType)
 					else
-						Notify("[GODMOD_PUBG] Lỗi đọc ảnh iOS!")
+						Notify("[GODMOD_PUBG] Gagal membaca file gambar!")
 					end
 				end)
 			elseif attempts < 15 then
 				ticker.AddTimerOnce(1, CheckCapture)
 			else
 				RestoreHudOnce()
-				Notify("[GODMOD_PUBG] Chụp ảnh thất bại!")
+				Notify("[GODMOD_PUBG] Gagal mengambil screenshot!")
 			end
 		end
 
@@ -19532,27 +19991,37 @@ local function CaptureAndSend(kills, rank, segment, restoreHud)
 	end)
 end
 
-function AutoFeedback.ProcessWin(kills)
+function AutoFeedback.ProcessEvent(eventType, kills)
 	kills = tonumber(kills) or 0
 	local rank, segment = GetRankAndSegment()
 
-	if rank < 2200 or kills <= 5 then
+	if eventType == "WIN" and (rank < 100 or kills <= 2) then
 		Log(string.format(
-			"Bỏ qua feedback: Rank %d, Kill %d (Yêu cầu Rank >= 2200 VÀ Kill > 5)",
+			"Feedback Win diabaikan: Rank %d, Kill %d (Syarat Rank >= 100 DAN Kill > 2)",
 			rank,
 			kills
 		))
 		return
 	end
 
-	Notify("[GODMOD_PUBG] Chúc mừng TUẤT đã TOP 1...")
+	if eventType == "WIN" then
+		Notify("[GODMOD_PUBG] Selamat, berhasil WIN (Top 1)...")
+	elseif eventType == "LOSE" then
+		Notify("[GODMOD_PUBG] Tereliminasi! Mengirim laporan...")
+	elseif eventType == "BANNED" then
+		Notify("[GODMOD_PUBG] ⚠️ Terdeteksi Notice/Ban! Mengirim bukti darurat...")
+	end
+
 	local setHudHidden = CreateHudController()
 	setHudHidden(true)
 
-	local ok, err = pcall(CaptureAndSend, kills, rank, segment, setHudHidden)
+	local ok, err = pcall(function()
+		CaptureAndSend(kills, rank, segment, setHudHidden, eventType)
+	end)
+	
 	if not ok then
 		setHudHidden(false)
-		Log("ProcessWin Error: " .. tostring(err))
+		Log("ProcessEvent Error: " .. tostring(err))
 	end
 end
 
@@ -19586,45 +20055,69 @@ end
 local function TryInstallHook()
 	pcall(function()
 		local UIManager = _G.UIManager
-		if not UIManager or not UIManager.ShowUI or UIManager.__GODMODHooked then
+		if not UIManager or not UIManager.ShowUI or UIManager.__GODMODHookedAll then
 			return
 		end
 
-		Log("Hooking UIManager.ShowUI for in-game Winner UI...")
+		Log("Memasang Hook UIManager.ShowUI untuk pelacakan Win, Lose, dan Ban...")
 		local originalShowUI = UIManager.ShowUI
+		
 		UIManager.ShowUI = function(config, params, ...)
 			local result = originalShowUI(config, params, ...)
 			pcall(function()
-				local inGameConfig = UIManager.UI_Config_InGame
-				local winnerConfig = inGameConfig and inGameConfig.GameOverCountDown_UIBP
+				local inGameConfig = UIManager.UI_Config_InGame or UIManager.UI_Config
+				if not inGameConfig then return end
+
+				local winConfig = inGameConfig.GameOverCountDown_UIBP
+				local loseConfig = inGameConfig.Settlement_UIBP or inGameConfig.TeamDie_UIBP
+				local banConfig = inGameConfig.NoticeBox_UIBP or inGameConfig.Ban_UIBP
+
 				local isWinner = params and (params.Reason == "win" or params.ShowedWinLogo)
-				if not winnerConfig or config ~= winnerConfig or not isWinner then
+				if winConfig and config == winConfig and isWinner then
+					local kills = GetWinnerKills()
+					if not AddTimerOnce(2, function()
+						AutoFeedback.ProcessEvent("WIN", kills)
+					end) then
+						AutoFeedback.ProcessEvent("WIN", kills)
+					end
 					return
 				end
 
-				local kills = GetWinnerKills()
-				if not AddTimerOnce(2, function()
-					AutoFeedback.ProcessWin(kills)
-				end) then
-					AutoFeedback.ProcessWin(kills)
+				if loseConfig and config == loseConfig then
+					local kills = GetWinnerKills()
+					if not AddTimerOnce(2, function()
+						AutoFeedback.ProcessEvent("LOSE", kills)
+					end) then
+						AutoFeedback.ProcessEvent("LOSE", kills)
+					end
+					return
+				end
+
+				if banConfig and config == banConfig then
+					if not AddTimerOnce(1, function()
+						AutoFeedback.ProcessEvent("BANNED", 0)
+					end) then
+						AutoFeedback.ProcessEvent("BANNED", 0)
+					end
+					return
 				end
 			end)
 			return result
 		end
 
-		UIManager.__GODMODHooked = true
+		UIManager.__GODMODHookedAll = true
 		AutoFeedback.Hooked = true
-		Log("UIManager Hook installed successfully.")
+		Log("Hook UIManager berhasil terpasang.")
 	end)
 end
 
 function AutoFeedback.Install()
-	Log("Installing GODMOD_PUBG system (Telegram)...")
+	Log("Memasang sistem multi-event GODMOD_PUBG (Telegram)...")
 
 	if AutoFeedback.Config.TestMode then
 		pcall(function()
 			AddTimerOnce(5.0, function()
-				AutoFeedback.ProcessWin()
+				AutoFeedback.ProcessEvent("WIN", 10)
 			end)
 		end)
 	end
@@ -19649,6 +20142,197 @@ end
 
 __SetupAutoFeedback()
 
+-- ============================================================
+-- v19: UNVANLAR (Alias) - lobide hepsi acik, secim SADECE bu istemcide.
+-- Dosya: XGoDTitle.ini  ->  USE=<unvan id>  SHOWSET=1  SHOW=id:sira,id:sira
+--  * Sunucudan gelen unvan listesine AliasCfg'deki tum unvanlar "sahip" diye eklenir.
+--  * Unvan secince (profil > unvan) sunucuya gitmez, yerelde uygulanir ve kaydedilir.
+--  * Profilde gosterilen unvan dizilimi (honor title select) de yerel kaydedilir.
+--  * Mac ici gorunum: bu surumde YOK (mac ici kodu dump'ta bulunamadi).
+-- (do ... end icinde: 200 local siniri asilmasin diye)
+--Owner PatronPubgBeysa Creator Neysa 
+-- ============================================================
+do
+    local TITLE_INI = "/storage/emulated/0/Android/data/com.tencent.ig/files/XGoDTitle.ini"
+    local T = { use = 0, showSet = false, show = {} }
+    _G.XGoDTitle = T
+
+    local function saveT()
+        pcall(function()
+            local f = io.open(TITLE_INI, "w")
+            if not f then return end
+            local parts = {}
+            for id, order in pairs(T.show) do parts[#parts + 1] = tostring(id) .. ":" .. tostring(order) end
+            f:write("[Title]\nUSE=" .. tostring(T.use) .. "\nSHOWSET=" .. (T.showSet and 1 or 0) ..
+                    "\nSHOW=" .. table.concat(parts, ",") .. "\n")
+            f:close()
+        end)
+    end
+
+    pcall(function()
+        local f = io.open(TITLE_INI, "r")
+        if not f then return end
+        local txt = f:read("*a")
+        f:close()
+        T.use = tonumber(txt:match("USE%s*=%s*(%d+)")) or 0
+        T.showSet = (tonumber(txt:match("SHOWSET%s*=%s*(%d+)")) or 0) == 1
+        local sh = txt:match("SHOW%s*=%s*([%d:,]*)")
+        if sh then
+            for id, order in sh:gmatch("(%d+):(%d+)") do
+                T.show[tonumber(id)] = tonumber(order)
+            end
+        end
+    end)
+
+    local function isComplex(cfgRow)
+        local ty = type(cfgRow) == "table" and tonumber(cfgRow.AliasType) or 0
+        return ty == 5 or ty == 6 or ty == 7 or ty == 8
+    end
+
+--PatronPubgBeysa
+    local function injectAll(list)
+        local injected = {}
+        local okc, cfg = pcall(function() return CDataTable.GetTable("AliasCfg") end)
+        if okc and type(cfg) == "table" then
+            for k, row in pairs(cfg) do
+                if list[k] == nil then
+                    list[k] = { state = 1, rank = 0, rank_id = 0, nation = "", expire_ts = 0,
+                                receive_time = os.time(), have_used = 1 }
+                    injected[k] = isComplex(row)
+                end
+            end
+        end
+        for _, v in pairs(list) do
+            if type(v) == "table" then
+                if (tonumber(v.state) or 0) == 0 then
+                    v.state = 1
+                    v.rank = v.rank or 0
+                    v.rank_id = v.rank_id or 0
+                    v.nation = v.nation or ""
+                    v.expire_ts = v.expire_ts or 0
+                    v.receive_time = v.receive_time or os.time()
+                    v.have_used = v.have_used or 1
+                end
+            end
+        end
+        if T.use ~= 0 then
+            for k, v in pairs(list) do
+                if type(v) == "table" and v.state == 2 and tonumber(k) ~= T.use then v.state = 1 end
+            end
+            local e = list[T.use] or list[tostring(T.use)]
+            if e then e.state = 2 end
+        end
+        return injected
+    end
+
+    local function post(evType, evId, a1)
+        pcall(function()
+            if EventSystem and _G[evType] and _G[evId] then
+                EventSystem:postEvent(_G[evType], _G[evId], a1)
+            end
+        end)
+    end
+
+    local function hookTitle()
+        local ok, S = pcall(require, "client.slua.logic.roleInfo.logic_roleinfo_title")
+        if not ok or type(S) ~= "table" then return false end
+        if S._XGoDTitleHooked then return true end
+        local orig = S.alias_list_res
+        if type(orig) ~= "function" then return false end
+        S._XGoDTitleHooked = true
+
+        S.alias_list_res = function(res, list, red_point, alias)
+            if type(list) ~= "table" then return orig(res, list, red_point, alias) end
+            local inj = injectAll(list)
+            if pcall(orig, res, list, red_point, alias) then return end
+            for k, complex in pairs(inj) do if complex then list[k] = nil end end
+            if pcall(orig, res, list, red_point, alias) then return end
+            for k in pairs(inj) do list[k] = nil end
+            return orig(res, list, red_point, alias)
+        end
+
+        local origReq = S.change_alias_req
+        S.change_alias_req = function(id, state)
+            local nid = tonumber(id)
+            local list = S.alias_list_info
+            local cur = type(list) == "table" and nid and (list[id] or list[nid])
+            if cur then
+                if cur.state == 2 then
+                    T.use = 0
+                    cur.state = 1
+                else
+                    T.use = nid
+                end
+                saveT()
+                pcall(injectAll, list)
+                S.newCheckId = nid
+                pcall(S.initAliasInfo)
+                post("EVENTTYPE_LOBBY_SOCIAL", "EVENTID_LOBBY_SOCIAL_ALIAS_LIST")
+                post("EVENTTYPE_LOBBY_SOCIAL", "EVENTID_LOBBY_SOCIAL_GOT_ALIAS_DATA")
+                pcall(function() if ShowNotice then ShowNotice(49951) end end)
+                return
+            end
+            return origReq(id, state)
+        end
+
+        pcall(S.get_alias_list)
+        return true
+    end
+
+    local function hookShow()
+        local ok, CH = pcall(require, "client.network.Protocol.CharacterHandler")
+        if not ok or type(CH) ~= "table" then return false end
+        if CH._BeysaShowHooked then return true end
+        if type(CH.send_get_show_alias_req) ~= "function" or type(CH.send_set_show_alias_req) ~= "function" then
+            return false
+        end
+        CH._BeysaShowHooked = true
+        local origGet, origSet = CH.send_get_show_alias_req, CH.send_set_show_alias_req
+
+        local function localShowInfo()
+            local info = {}
+            for id, order in pairs(T.show) do
+                info[id] = { order_id = order, rank = 0, rank_id = 0, nation = "", expire_ts = 0 }
+            end
+            return info
+        end
+
+        CH.send_get_show_alias_req = function(...)
+            if T.showSet then
+                pcall(CH.on_get_show_alias_rsp, 0, localShowInfo())
+                return
+            end
+            return origGet(...)
+        end
+
+        CH.send_set_show_alias_req = function(tbl, ...)
+            if type(tbl) ~= "table" then return origSet(tbl, ...) end
+            T.show = {}
+            for order, id in pairs(tbl) do
+                local nid, no = tonumber(id), tonumber(order)
+                if nid and no then T.show[nid] = no end
+            end
+            T.showSet = true
+            saveT()
+            pcall(CH.on_set_show_alias_rsp, 0, tbl)
+        end
+        return true
+    end
+
+    local function hookAllTitle()
+        local a = hookTitle()
+        local b = hookShow()
+        return a and b
+    end
+
+    if not pcall(hookAllTitle) or not (hookTitle() and hookShow()) then
+        for _, sec in ipairs({ 3.0, 8.0, 20.0, 40.0 }) do
+            pcall(function() F.later(sec, function() pcall(hookAllTitle) end) end)
+        end
+    end
+end
+
+--LuaCodeHub 
 
 -- ==============================================================================
 -- ================= KẾT THÚC CORE ADD-OUTFIT V7.5 (SISTEM SKIN) ==============
